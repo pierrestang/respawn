@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Respawn</title>
+<!-- ===================== STYLES ===================== -->
+<!-- (étape 4) -->
+</head>
+<body>
+<!-- ===================== INTERFACE ===================== -->
+<!-- (étape 4) -->
+
+<script>
+// ===================== LOGIQUE DU SCORE =====================
+// Fonctions pures : aucune lecture de l'heure système, aucun accès à Firestore ni au DOM.
+// Tout ce qui dépend du moment présent (aujourd'hui) est passé en paramètre.
+
+// Poids sur 100 (proposition à valider). Les repas valent 15 au total, 5 par repas.
+const POIDS_DEFAUT = {
+  sport: 25, sommeil: 25,
+  eau: 15, petitDej: 5, dejeuner: 5, diner: 5,
+  lecture: 8, meditation: 8,
+  menage: 4,
+};
+const HABITUDES_JOUR = ['sommeil', 'eau', 'petitDej', 'dejeuner', 'diner', 'lecture', 'meditation'];
+const OBJECTIF_SPORT = 3;           // séances par semaine
+const SOMMEIL_MIN_MINUTES = 7 * 60; // sommeil validé à partir de 7 h
+
+// --- Dates : clés « AAAA-MM-JJ » en date locale ---
+// Seule cleDuJour lit l'heure locale ; tout le reste calcule en UTC sur les clés,
+// donc un changement d'heure ne peut ni doubler ni sauter un jour.
+function cleDuJour(date) {
+  const p = n => String(n).padStart(2, '0');
+  return `${date.getFullYear()}-${p(date.getMonth() + 1)}-${p(date.getDate())}`;
+}
+function ajouterJours(cle, n) {
+  const [a, m, j] = cle.split('-').map(Number);
+  const d = new Date(Date.UTC(a, m - 1, j + n));
+  return d.toISOString().slice(0, 10);
+}
+function lundiDe(cle) {
+  const [a, m, j] = cle.split('-').map(Number);
+  const jourSemaine = new Date(Date.UTC(a, m - 1, j)).getUTCDay(); // 0 = dimanche
+  return ajouterJours(cle, -((jourSemaine + 6) % 7));
+}
+function joursDeLaSemaine(lundi) {
+  return Array.from({ length: 7 }, (_, i) => ajouterJours(lundi, i));
+}
+
+// --- Sommeil : durée à l'horloge, indépendante du changement d'heure ---
+function dureeSommeilMinutes(coucher, reveil) {
+  if (!coucher || !reveil) return null;
+  const min = h => { const [hh, mm] = h.split(':').map(Number); return hh * 60 + mm; };
+  return (min(reveil) - min(coucher) + 1440) % 1440;
+}
+
+// --- Valeur et exclusion d'une habitude un jour donné ---
+function valeurHabitude(habitude, jour) {
+  if (!jour) return 0;                                  // jour sans saisie = 0
+  if (habitude === 'sommeil') {
+    const d = dureeSommeilMinutes(jour.sommeil?.coucher, jour.sommeil?.reveil);
+    return d !== null && d >= SOMMEIL_MIN_MINUTES ? 1 : 0;
+  }
+  return jour.habitudes?.[habitude] ? 1 : 0;
+}
+function estExclue(habitude, jour, semaine) {
+  return !!(semaine?.exclusions?.includes(habitude) || jour?.exclusions?.includes(habitude));
+}
+
+// --- Score d'une journée (sert aussi à la couleur du calendrier en pixels) ---
+// Retourne { score: 0..100 ou null si tout est exclu, poids: total des poids comptés }.
+function scoreJour(jour, semaine, poids = POIDS_DEFAUT) {
+  let num = 0, den = 0;
+  for (const h of HABITUDES_JOUR) {
+    if (estExclue(h, jour, semaine)) continue;
+    num += poids[h] * valeurHabitude(h, jour);
+    den += poids[h];
+  }
+  return { score: den ? (100 * num) / den : null, poids: den };
+}
+
+// --- Score de la semaine ---
+// jours : { 'AAAA-MM-JJ': jour }, semaine : { menage, exclusions }.
+// Jours comptés : ceux de la semaine compris entre dateDebut et aujourdhui inclus.
+function calculerScoreSemaine({ lundi, jours = {}, semaine = {}, poids = POIDS_DEFAUT,
+                                objectifSport = OBJECTIF_SPORT, dateDebut, aujourdhui }) {
+  const comptes = joursDeLaSemaine(lundi)
+    .filter(c => (!dateDebut || c >= dateDebut) && (!aujourdhui || c <= aujourdhui));
+
+  // Partie quotidienne : chaque case pèse son poids, une case exclue disparaît.
+  // Moyenne sur les jours qui ont au moins une habitude non exclue.
+  let numJours = 0, denJours = 0, nbJours = 0;
+  const scoresJours = {};
+  for (const c of comptes) {
+    const { score, poids: p } = scoreJour(jours[c], semaine, poids);
+    scoresJours[c] = score;
+    if (p === 0) continue;
+    numJours += (score / 100) * p;
+    denJours += p;
+    nbJours++;
+  }
+  let num = nbJours ? numJours / nbJours : 0;
+  let den = nbJours ? denJours / nbJours : 0;
+
+  // Sport : objectif proratisé sur les jours comptés non exclus, arrondi (minimum 1), plafonné.
+  const joursSport = comptes.filter(c => !estExclue('sport', jours[c], semaine));
+  const seances = comptes.filter(c => jours[c]?.habitudes?.sport).length;
+  let sport = null;
+  if (joursSport.length) {
+    const objectif = Math.max(1, Math.round(objectifSport * joursSport.length / 7));
+    const taux = Math.min(seances, objectif) / objectif;
+    sport = { seances, objectif, taux };
+    num += poids.sport * taux;
+    den += poids.sport;
+  }
+
+  // Ménage : case hebdomadaire.
+  let menage = null;
+  if (comptes.length && !semaine.exclusions?.includes('menage')) {
+    menage = semaine.menage ? 1 : 0;
+    num += poids.menage * menage;
+    den += poids.menage;
+  }
+
+  return {
+    score: den ? Math.round((100 * num) / den) : null,
+    jours: comptes.length, scoresJours, sport, menage,
+  };
+}
+
+// --- Série de jours consécutifs d'une habitude quotidienne ---
+// Un jour exclu met la série en pause (ni +1, ni cassée).
+// Aujourd'hui pas encore coché ne casse pas la série.
+function serieJours(habitude, { jours = {}, semaines = {}, dateDebut, aujourdhui }) {
+  let serie = 0;
+  for (let c = aujourdhui, n = 0; (!dateDebut || c >= dateDebut) && n < 3660; c = ajouterJours(c, -1), n++) {
+    const jour = jours[c];
+    if (estExclue(habitude, jour, semaines[lundiDe(c)])) continue;
+    if (valeurHabitude(habitude, jour)) serie++;
+    else if (c !== aujourdhui) break;
+  }
+  return serie;
+}
+
+// --- Série du sport : semaines consécutives où l'objectif est atteint ---
+// Semaine où le sport est exclu en entier : pause. Semaine en cours pas encore réussie : ne casse pas.
+function serieSemainesSport({ jours = {}, semaines = {}, poids = POIDS_DEFAUT,
+                              objectifSport = OBJECTIF_SPORT, dateDebut, aujourdhui }) {
+  let serie = 0;
+  const lundiCourant = lundiDe(aujourdhui);
+  for (let lundi = lundiCourant, n = 0; (!dateDebut || ajouterJours(lundi, 6) >= dateDebut) && n < 530; lundi = ajouterJours(lundi, -7), n++) {
+    const { sport } = calculerScoreSemaine({ lundi, jours, semaine: semaines[lundi], poids, objectifSport, dateDebut, aujourdhui });
+    if (!sport) continue;
+    if (sport.taux === 1) serie++;
+    else if (lundi !== lundiCourant) break;
+  }
+  return serie;
+}
+// ===================== FIN LOGIQUE DU SCORE =====================
+
+// ===================== DONNÉES =====================
+// (étape 3 : Firebase)
+</script>
+</body>
+</html>
