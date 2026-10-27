@@ -98,6 +98,12 @@ verifier('Sommeil 23:00 → 07:00 = 480 min', L.dureeSommeilMinutes('23:00', '07
 verifier('Sommeil 00:30 → 07:30 = 420 min (validé, pile 7 h)', L.dureeSommeilMinutes('00:30', '07:30'), 420);
 verifier('Sommeil 00:31 → 07:30 = 419 min (non validé)', L.dureeSommeilMinutes('00:31', '07:30'), 419);
 verifier('Jour : 7 h pile validé', L.scoreJour({ habitudes: {}, sommeil: { coucher: '00:30', reveil: '07:30' } }).score > 0, true);
+verifier('Case sommeil cochée → validé (sans heures)', L.scoreJour({ habitudes: { sommeil: true } }).score > 0, true);
+verifier('Case sommeil décochée → non validé, même avec 8 h saisies avant',
+  L.scoreJour({ habitudes: { sommeil: false }, sommeil: { coucher: '23:00', reveil: '07:00' } }).score, 0);
+verifier('Ancien jour sans case, avec 8 h saisies → toujours validé', L.scoreJour({ habitudes: {}, sommeil: { coucher: '23:00', reveil: '07:00' } }).score > 0, true);
+verifier('Série du sommeil avec la case : 3 nuits cochées → 3',
+  L.serieJours('sommeil', { jours: { '2026-10-23': { habitudes: { sommeil: true } }, '2026-10-24': { habitudes: { sommeil: true } }, '2026-10-25': { habitudes: { sommeil: true } } }, aujourdhui: '2026-10-25' }), 3);
 
 // --- Séries ---
 console.log('\nSéries');

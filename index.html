@@ -119,16 +119,6 @@
   #score { font-family: var(--titres); font-size: 32px; font-weight: 600; color: var(--texte); font-variant-numeric: tabular-nums lining-nums; }
   .sur-100 { font-size: 9px; color: var(--texte-doux); margin-top: 3px; letter-spacing: .4px; }
 
-  /* Plante en trait simple, élément secondaire, dans la scène à côté de la cuvette */
-  #plante {
-    position: absolute; left: 50%; top: var(--cy); width: 40px; height: 56px; margin: -28px 0 0 -20px; overflow: visible;
-    transform: translate(calc(var(--coin-x) * -1), var(--coin-y));
-  }
-  #plante .trait { fill: none; stroke: var(--accent); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
-  #plante .pot { fill: none; stroke: var(--texte-doux); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
-  #plante .tige { fill: none; stroke: var(--accent); stroke-width: 2.8; stroke-linecap: round; stroke-dasharray: 100; transition: stroke-dashoffset var(--anim) cubic-bezier(.22, 1, .36, 1); }
-  #plante .etape { opacity: 0; transform: scale(.5); transform-box: fill-box; transform-origin: center bottom; transition: opacity var(--anim), transform var(--anim) cubic-bezier(.22, 1, .36, 1); }
-  #plante .etape.visible { opacity: 1; transform: scale(1); }
 
   /* Semaine en pastilles : pleine (verte selon la journée), manquée (en creux), à venir (en relief). */
   .semaine-pastilles { display: grid; grid-template-columns: repeat(7, 20px); gap: 4px; margin: 0 0 6px; }
@@ -155,20 +145,19 @@
      Chaque bouton est posé au centre de la scène puis décalé sur l'anneau avec cos() et sin() de son angle --a.
      Arc du haut (de gauche à droite) : eau, sport, lecture, méditation, noms au-dessus.
      Arc du bas (de gauche à droite) : petit-déj, déjeuner, dîner, noms en dessous.
-     Ménage et plante hors du cercle, dans les coins du bas. */
+     Sommeil à gauche et ménage à droite, sur les côtés du cercle, noms en dessous. */
   .scene {
-    position: relative; width: 100%; max-width: 358px; height: 366px; margin: 0 auto;
-    --cy: 179px; --rx: 150px; --ry: 128px; --taille-perso: 160px; --cuvette: 196px;
+    position: relative; width: calc(100% + 20px); max-width: 378px; height: 428px; margin: 22px auto 0; left: -10px;
+    --cy: 210px; --rx: 157px; --ry: 160px; --taille-perso: 168px; --cuvette: 232px;
   }
+  /* Neuf boutons tous les 40° : arc du haut, sommeil et ménage sur les côtés, repas sur l'arc du bas. */
   .tuile[data-h="eau"] { --a: -150deg; } .tuile[data-h="sport"] { --a: -110deg; }
   .tuile[data-h="lecture"] { --a: -70deg; } .tuile[data-h="meditation"] { --a: -30deg; }
-  .tuile[data-h="petitDej"] { --a: 122deg; } .tuile[data-h="dejeuner"] { --a: 90deg; } .tuile[data-h="diner"] { --a: 58deg; }
-  /* Ordinateur : les sept boutons régulièrement espacés sur un cercle complet (360° / 7). */
+  .tuile[data-h="menage"] { --a: 10deg; } .tuile[data-h="diner"] { --a: 50deg; }
+  .tuile[data-h="dejeuner"] { --a: 90deg; } .tuile[data-h="petitDej"] { --a: 130deg; } .tuile[data-h="sommeil"] { --a: 170deg; }
+  /* Ordinateur : le même cadran, plus grand et parfaitement rond. */
   @media (min-width: 600px) {
-    .scene { max-width: 520px; height: 420px; --cy: 204px; --rx: 160px; --ry: 160px; --taille-perso: 180px; --cuvette: 246px; }
-    .tuile[data-h="eau"] { --a: -167.14deg; } .tuile[data-h="sport"] { --a: -115.71deg; }
-    .tuile[data-h="lecture"] { --a: -64.29deg; } .tuile[data-h="meditation"] { --a: -12.86deg; }
-    .tuile[data-h="diner"] { --a: 38.57deg; } .tuile[data-h="dejeuner"] { --a: 90deg; } .tuile[data-h="petitDej"] { --a: 141.43deg; }
+    .scene { width: 100%; left: 0; max-width: 520px; height: 488px; --cy: 240px; --rx: 190px; --ry: 190px; --taille-perso: 196px; --cuvette: 290px; }
   }
   .cadran, .cuvette { position: absolute; left: 50%; top: var(--cy); border-radius: 50%; transform: translate(-50%, -50%); }
   /* Fin anneau en relief, sur lequel les boutons sont posés */
@@ -213,14 +202,12 @@
     position: absolute; left: 50%; top: var(--cy); width: 54px; height: 54px; margin: -27px 0 0 -27px;
     transform: translate(calc(cos(var(--a)) * var(--rx)), calc(sin(var(--a)) * var(--ry)));
   }
-  .scene #menage-case { transform: translate(var(--coin-x), var(--coin-y)); }
-  .scene { --coin-x: 152px; --coin-y: 102px; }
-  @media (min-width: 600px) { .scene { --coin-x: 222px; --coin-y: 150px; } }
   .libelle {
     position: absolute; left: 50%; top: calc(100% + 5px); width: 72px; margin-left: -36px;
     display: grid; justify-items: center; gap: 3px; pointer-events: none;
   }
   .tuile.haut .libelle { top: auto; bottom: calc(100% + 5px); }
+  .tuile[data-h="sommeil"] .libelle, .tuile[data-h="menage"] .libelle { width: 62px; margin-left: -31px; }
   .tuile {
     background: none; border: 0; padding: 0; display: block; color: var(--texte); touch-action: manipulation;
     --teinte: #d3e5c6; --teinte-fonce: #3c6431;
@@ -229,6 +216,7 @@
   .tuile[data-h="sport"] { --teinte: #eec3ad; --teinte-fonce: #843b1f; }
   .tuile[data-h="lecture"] { --teinte: #f1cfd4; --teinte-fonce: #843a4b; }
   .tuile[data-h="meditation"] { --teinte: #ddd4ef; --teinte-fonce: #55457f; }
+  .tuile[data-h="sommeil"] { --teinte: #d6dcef; --teinte-fonce: #3a4775; }
   .tuile[data-h="petitDej"], .tuile[data-h="dejeuner"], .tuile[data-h="diner"] { --teinte: #f3dca6; --teinte-fonce: #6f5110; }
   .icone-habitude {
     position: relative; width: 54px; height: 54px; border-radius: 50%; display: grid; place-items: center;
@@ -273,33 +261,17 @@
   .etape-defi.ok { background: var(--accent); box-shadow: none; }
   .etape-defi.rate { background: var(--creux-fond); box-shadow: var(--creux-mini); }
 
-  /* --- Sommeil sur une ligne : coucher, réveil, durée, validé ou non --- */
-  .carte-sommeil { padding: 12px 16px; }
-  .ligne-sommeil { display: grid; grid-template-columns: auto 96px 96px 1fr; align-items: end; gap: 10px; }
-  .icone-sommeil { align-self: center; color: var(--texte); padding-top: 14px; }
-  .ligne-sommeil label { display: grid; gap: 4px; font-size: 11px; color: var(--texte-doux); min-width: 0; }
-  .ligne-sommeil input {
-    background: var(--creux-fond); border: 0; box-shadow: var(--creux-mini); border-radius: 14px; padding: 8px 4px;
-    font-size: 17px; font-weight: 600; text-align: center; width: 100%; min-height: 42px; -webkit-appearance: none; appearance: none;
-  }
-  .ligne-sommeil.suggestion input { color: var(--texte-doux); }
-  .bilan-sommeil { display: grid; justify-items: end; gap: 4px; min-width: 76px; }
-  #duree { font-family: var(--titres); font-size: 19px; font-weight: 600; line-height: 1; }
-  .pastille { border-radius: 999px; padding: 3px 9px; font-size: 11px; background: var(--creux-fond); box-shadow: var(--creux-mini); white-space: nowrap; }
-  .pastille.ok { color: var(--accent-texte); font-weight: 700; }
-  .pastille.non { color: #9a4a36; font-weight: 700; }
   .bouton {
     background: var(--accent); color: #fff; border: 0; border-radius: 999px; padding: 11px 20px; font-weight: 700;
     box-shadow: var(--relief-rond); transition: box-shadow .2s, transform .15s;
   }
   .bouton:active { box-shadow: inset 3px 3px 8px rgba(0, 0, 0, .28); transform: scale(.98); }
-  .bouton.petit { padding: 5px 12px; font-size: 12px; box-shadow: var(--relief-mini); }
 
   /* --- Tâches --- */
   #compteur-taches { font-size: 12.5px; color: var(--texte-doux); margin: -8px 0 16px; }
   #form-tache { display: flex; gap: 12px; }
   #nouvelle-tache { flex: 1; min-width: 0; background: var(--creux-fond); border: 0; box-shadow: var(--creux); border-radius: 999px; padding: 12px 18px; font-size: 16px; }
-  #nouvelle-tache:focus, .ligne-sommeil input:focus { outline: 2px solid rgba(79, 122, 66, .45); outline-offset: 2px; }
+  #nouvelle-tache:focus { outline: 2px solid rgba(79, 122, 66, .45); outline-offset: 2px; }
   #liste-taches { list-style: none; margin: 18px 0 0; padding: 0; display: grid; gap: 12px; }
   #liste-taches button {
     width: 100%; display: flex; align-items: center; gap: 12px; text-align: left; background: var(--fond);
@@ -477,38 +449,7 @@
       <div class="cuvette" aria-hidden="true"></div>
       <div class="ombre-perso" aria-hidden="true"></div>
       <div class="perso-cadre" aria-hidden="true"><div id="perso"></div></div>
-        <svg id="plante" viewBox="0 0 80 110" aria-hidden="true">
-          <path class="pot" d="M24 88h32l-3.5 17h-25zM21 88h38"/>
-          <path class="tige" pathLength="100" d="M40 88C40 76 38 64 41 52C43.5 41 39.5 31 40 20"/>
-          <path class="trait etape" data-min="10" d="M40 80C32 79 27 74 26 68C33 68 38 72 40 80ZM40 80L31 71.5"/>
-          <path class="trait etape" data-min="30" d="M40.5 69C48 67 53 62 54 56C47 56 42 61 40.5 69ZM40.5 69L49 60"/>
-          <path class="trait etape" data-min="50" d="M41 56C33 55.5 28.5 51 27.5 45C34.5 45 39.5 49 41 56ZM41 56L32 48.5"/>
-          <path class="trait etape" data-min="65" d="M41.5 44C48.5 42 52.5 37.5 53 32C46.5 32.5 42.5 37 41.5 44ZM41.5 44L49 36"/>
-          <path class="trait etape" data-min="75" data-max="89" d="M40 22c-3.5-3-3.5-8 0-11c3.5 3 3.5 8 0 11z"/>
-          <g class="trait etape" data-min="90">
-            <ellipse cx="40" cy="10.5" rx="3.8" ry="6.3" transform="rotate(0 40 17)"/>
-            <ellipse cx="40" cy="10.5" rx="3.8" ry="6.3" transform="rotate(72 40 17)"/>
-            <ellipse cx="40" cy="10.5" rx="3.8" ry="6.3" transform="rotate(144 40 17)"/>
-            <ellipse cx="40" cy="10.5" rx="3.8" ry="6.3" transform="rotate(216 40 17)"/>
-            <ellipse cx="40" cy="10.5" rx="3.8" ry="6.3" transform="rotate(288 40 17)"/>
-            <circle cx="40" cy="17" r="2.6"/>
-          </g>
-        </svg>
-      <button class="tuile" id="menage-case" data-h="menage" aria-label="Ménage de la semaine"><span class="icone-habitude"><svg class="icone" aria-hidden="true"><use href="#i-menage"/></svg></span><span class="libelle"><span class="nom">Ménage</span><span class="info" id="menage-info"></span></span></button>
-    </section>
-
-    <section class="carte carte-sommeil">
-      <div class="ligne-sommeil" id="heures">
-        <span class="icone-sommeil" aria-hidden="true"><svg class="icone"><use href="#i-sommeil"/></svg></span>
-        <label>Coucher <input type="time" id="coucher"></label>
-        <label>Réveil <input type="time" id="reveil"></label>
-        <div class="bilan-sommeil">
-          <span id="duree">—</span>
-          <span class="pastille" id="sommeil-statut"></span>
-          <button class="bouton petit" id="sommeil-valider" hidden>Valider</button>
-          <span id="sommeil-serie"></span>
-        </div>
-      </div>
+        <button class="tuile" id="menage-case" data-h="menage" aria-label="Ménage de la semaine"><span class="icone-habitude"><svg class="icone" aria-hidden="true"><use href="#i-menage"/></svg></span><span class="libelle"><span class="nom">Ménage</span><span class="info" id="menage-info"></span></span></button>
     </section>
 
     <section class="carte carte-defi" id="carte-defi" hidden><div id="defi"></div></section>
@@ -635,6 +576,8 @@ function dureeSommeilMinutes(coucher, reveil) {
 function valeurHabitude(habitude, jour) {
   if (!jour) return 0;                                  // jour sans saisie = 0
   if (habitude === 'sommeil') {
+    // Case « nuit de 7 h ou plus ». Les jours saisis avant, avec des heures, restent validés par leur durée.
+    if (typeof jour.habitudes?.sommeil === 'boolean') return jour.habitudes.sommeil ? 1 : 0;
     const d = dureeSommeilMinutes(jour.sommeil?.coucher, jour.sommeil?.reveil);
     return d !== null && d >= SOMMEIL_MIN_MINUTES ? 1 : 0;
   }
@@ -938,8 +881,8 @@ const AVEC_ARTICLE = {
 //   Interactions : boire.png, manger.png, dormir.png, sauter.png, saluer.png
 // Tant qu'un fichier manque, l'image de base (base.png) s'affiche à sa place.
 const PERSONNAGE_PROVISOIRE = 'images/personnage/base.png';
-// Interaction déclenchée par chaque habitude cochée (le sommeil validé déclenche « dormir »).
-const INTERACTION = { eau: 'boire', petitDej: 'manger', dejeuner: 'manger', diner: 'manger', sport: 'sauter', lecture: 'saluer', meditation: 'saluer', menage: 'saluer' };
+// Interaction déclenchée par chaque habitude cochée.
+const INTERACTION = { sommeil: 'dormir', eau: 'boire', petitDej: 'manger', dejeuner: 'manger', diner: 'manger', sport: 'sauter', lecture: 'saluer', meditation: 'saluer', menage: 'saluer' };
 const DUREE_POSE = 1500;
 const SVGNS = 'http://www.w3.org/2000/svg';
 function icone(nom) {
@@ -951,11 +894,11 @@ function icone(nom) {
   svg.append(use);
   return svg;
 }
-// Boutons autour du personnage (leurs angles sont dans le CSS) ; le ménage, statique, est à part.
-const ORDRE_SCENE = ['eau', 'sport', 'lecture', 'meditation', 'petitDej', 'dejeuner', 'diner'];
+// Boutons autour du personnage (leurs angles sont dans le CSS) ; le ménage, écrit à la semaine, est dans le HTML.
+const ORDRE_SCENE = ['eau', 'sport', 'lecture', 'meditation', 'petitDej', 'dejeuner', 'diner', 'sommeil'];
 const ARC_DU_HAUT = ['eau', 'sport', 'lecture', 'meditation'];
 // Un mot sous chaque bouton rond de l'écran du jour.
-const MOT = { eau: 'Eau', sport: 'Sport', lecture: 'Lecture', meditation: 'Méditation', petitDej: 'Petit-déj', dejeuner: 'Déjeuner', diner: 'Dîner' };
+const MOT = { eau: 'Eau', sport: 'Sport', lecture: 'Lecture', meditation: 'Méditation', petitDej: 'Petit-déj', dejeuner: 'Déjeuner', diner: 'Dîner', sommeil: 'Sommeil' };
 function iconeHabitude(h) {
   const span = el('span', 'icone-habitude');
   span.append(icone(h));
@@ -967,14 +910,6 @@ function serie(n, suffixe = '') {
   const span = el('span', 'serie');
   span.append(icone('flamme'), `${n}${suffixe}`);
   return span;
-}
-// Plante de l'en-tête : la tige s'allonge avec le score, puis feuilles, bouton et fleur apparaissent.
-function majPlante(score) {
-  const s = score ?? 0;
-  document.querySelector('#plante .tige').style.strokeDashoffset = 100 - (12 + 88 * s / 100);
-  for (const e of document.querySelectorAll('#plante .etape')) {
-    e.classList.toggle('visible', s >= Number(e.dataset.min) && (!e.dataset.max || s <= Number(e.dataset.max)));
-  }
 }
 // Pose d'interaction affichée DUREE_POSE ms, puis retour à l'état lié au score.
 let etatPerso = 'neutre', pose = null, minuteurPose = 0;
@@ -1144,7 +1079,6 @@ function rendreJour() {
   const sj = scoreJour(jour, semaine, poidsSemaine(lundi)).score;
   $('score-jour').textContent = sj === null ? '—' : Math.round(sj);
   $('libelle-jour').textContent = passe ? formatDate(cle, { weekday: 'long', day: 'numeric' }).replace(/^./, c => c.toUpperCase()) : 'Aujourd’hui';
-  majPlante(r.score);
   $('anneau').style.strokeDashoffset = 100 - (r.score ?? 0);
   majPastilles(lundi, jours, semaine, aujourdhui, dateDebut);
 
@@ -1182,12 +1116,12 @@ function rendreJour() {
       libelle.append(el('span', 'nom', MOT[h]), el('span', 'info'));
       b.append(iconeHabitude(h), libelle);
       if (ARC_DU_HAUT.includes(h)) b.classList.add('haut');
-      b.setAttribute('aria-label', AFFICHAGE[h]);
+      b.setAttribute('aria-label', h === 'sommeil' ? 'Nuit de 7 heures ou plus' : AFFICHAGE[h]);
       TUILES[h] = b;
       conteneur.insertBefore(b, $('menage-case'));
     }
     const exclue = estExclue(h, jour, semaine);
-    const fait = !exclue && !!jour?.habitudes?.[h];
+    const fait = !exclue && !!valeurHabitude(h, jour);
     b.classList.toggle('fait', fait);
     b.classList.toggle('exclue', exclue);
     b.setAttribute('aria-pressed', fait);
@@ -1209,22 +1143,6 @@ function rendreJour() {
     };
   };
   for (const h of ORDRE_SCENE) tuile(h, $('scene'));
-
-  // Sommeil : pré-rempli avec la dernière nuit saisie tant que celle d'aujourd'hui ne l'est pas.
-  let sommeil = jour?.sommeil;
-  const suggestion = !sommeil?.coucher || !sommeil?.reveil;
-  const precedent = Object.keys(jours).filter(c => c < cle && jours[c].sommeil?.coucher && jours[c].sommeil?.reveil).sort().pop();
-  if (suggestion) sommeil = precedent ? jours[precedent].sommeil : { coucher: '23:00', reveil: '07:00' };
-  for (const champ of ['coucher', 'reveil']) if (document.activeElement !== $(champ)) $(champ).value = sommeil[champ];
-  $('heures').classList.toggle('suggestion', suggestion);
-  $('sommeil-valider').hidden = !suggestion;
-  const exclu = estExclue('sommeil', jour, semaine);
-  const duree = dureeSommeilMinutes(sommeil.coucher, sommeil.reveil);
-  $('duree').textContent = suggestion ? '—' : minutesEnTexte(duree);
-  $('sommeil-statut').className = `pastille${suggestion || exclu ? '' : duree >= SOMMEIL_MIN_MINUTES ? ' ok' : ' non'}`;
-  $('sommeil-statut').hidden = suggestion && !exclu;
-  $('sommeil-statut').textContent = exclu ? 'exclu' : duree >= SOMMEIL_MIN_MINUTES ? '✓ validé' : 'moins de 7 h';
-  $('sommeil-serie').replaceChildren(exclu ? '' : serie(serieJours('sommeil', contexte)));
 
   // Ménage
   const menageExclu = !!semaine?.exclusions?.includes('menage');
@@ -1447,16 +1365,7 @@ for (const b of $('navigation').children) b.onclick = () => {
 };
 $('retour-aujourdhui').onclick = () => { etat.jourAffiche = null; rendre(); scrollTo(0, 0); };
 
-// Saisies du sommeil et des tâches
-const enregistrerSommeil = () => {
-  if (!$('coucher').value || !$('reveil').value) return;
-  // Sommeil validé (7 h ou plus) : le personnage s'endort un instant.
-  if (dureeSommeilMinutes($('coucher').value, $('reveil').value) >= SOMMEIL_MIN_MINUTES) jouerPose('dormir');
-  ecrireJour({ sommeil: { coucher: $('coucher').value, reveil: $('reveil').value } });
-};
-$('coucher').onchange = enregistrerSommeil;
-$('reveil').onchange = enregistrerSommeil;
-$('sommeil-valider').onclick = enregistrerSommeil;
+// Saisie des tâches
 $('form-tache').onsubmit = e => {
   e.preventDefault();
   const texte = $('nouvelle-tache').value.trim();
