@@ -322,36 +322,44 @@
   .barre .plein { width: 100%; border-radius: 999px; background: linear-gradient(180deg, var(--n3), var(--accent)); min-height: 6px; }
   .vide-texte { color: var(--texte-doux); font-size: 14px; }
 
-  /* --- Réglages --- */
-  .note { font-size: 13px; color: var(--brun-doux); margin: 10px 0 0; }
-  .animaux { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  /* --- Réglages : mêmes reliefs ; un choix actif passe en creux --- */
+  .note { font-size: 12.5px; color: var(--texte-doux); margin: 14px 0 0; line-height: 1.5; }
+  .animaux { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
   .animal {
-    background: #fff; border: 3px solid var(--sable); border-radius: 20px; padding: 8px 4px; display: grid; justify-items: center; gap: 4px;
-    font-size: 12px; box-shadow: 0 3px 0 var(--sable);
+    background: var(--fond); border: 0; border-radius: 20px; padding: 10px 4px 8px; display: grid; justify-items: center; gap: 4px;
+    font-size: 12px; box-shadow: var(--relief-rond); transition: box-shadow .3s, background .3s;
   }
   .animal img { width: 44px; height: 44px; object-fit: contain; }
-  .animal[aria-pressed="true"] { background: var(--feuille-clair); border-color: var(--feuille); box-shadow: 0 3px 0 var(--feuille-fonce); }
-  .segment { display: flex; background: var(--sable); border-radius: 999px; padding: 4px; gap: 4px; margin-bottom: 10px; }
-  .segment button { flex: 1; border: 0; background: none; border-radius: 999px; padding: 8px 6px; font-weight: 800; color: var(--brun-doux); min-height: 40px; }
-  .segment button[aria-pressed="true"] { background: #fff; color: var(--brun); box-shadow: 0 2px 0 var(--sable-fonce); }
-  .champ { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--brun-doux); }
+  .animal[aria-pressed="true"] { background: var(--creux-fond); box-shadow: var(--creux); color: var(--accent-texte); font-weight: 700; }
+  .segment { display: flex; background: var(--creux-fond); box-shadow: var(--creux-mini); border-radius: 999px; padding: 5px; gap: 4px; margin-bottom: 14px; }
+  .segment button { flex: 1; border: 0; background: none; border-radius: 999px; padding: 8px 6px; font-weight: 600; color: var(--texte-doux); min-height: 40px; transition: box-shadow .3s, background .3s; }
+  .segment button[aria-pressed="true"] { background: var(--fond); color: var(--texte); box-shadow: var(--relief-mini); }
+  .champ { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--texte-doux); }
   .champ input, .poids input {
-    background: #fff; border: 3px solid var(--sable); border-radius: 14px; padding: 6px 10px; font-weight: 800; min-height: 42px;
+    background: var(--creux-fond); border: 0; box-shadow: var(--creux-mini); border-radius: 14px; padding: 6px 10px; font-weight: 600; min-height: 42px;
   }
-  .puces { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-  .puce { border: 3px solid var(--sable); background: #fff; border-radius: 999px; padding: 6px 12px; font-size: 14px; min-height: 40px; }
-  .puce[aria-pressed="true"] { background: var(--soleil); border-color: #e9c45a; }
-  .puce.choisie[aria-pressed="true"] { background: var(--feuille-clair); border-color: var(--feuille); }
-  .puce:disabled { opacity: .5; }
-  .compteur { display: flex; align-items: center; gap: 12px; margin: 6px 0 12px; }
-  .compteur button { width: 44px; height: 44px; border-radius: 50%; border: 3px solid var(--sable); background: #fff; font-size: 22px; font-weight: 900; }
-  .compteur b { font-size: 26px; min-width: 24px; text-align: center; }
-  .defi-actif b { font-size: 17px; }
-  .bouton.secondaire { background: #fff; color: var(--brun); box-shadow: 0 3px 0 var(--sable-fonce); border: 3px solid var(--sable); }
-  .poids { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-  .poids label { display: grid; gap: 4px; font-size: 13px; color: var(--brun-doux); }
+  .puces { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+  .puce {
+    display: inline-flex; align-items: center; gap: 6px; border: 0; background: var(--fond); box-shadow: var(--relief-mini);
+    border-radius: 999px; padding: 7px 13px; font-size: 13.5px; min-height: 40px; transition: box-shadow .3s, background .3s;
+  }
+  .puce .icone { width: 17px; height: 17px; }
+  /* Exclusion active : en creux, texte terracotta ; choix du défi : en creux, texte vert. */
+  .puce[aria-pressed="true"] { background: var(--creux-fond); box-shadow: var(--creux-mini); color: #843b1f; font-weight: 600; }
+  .puce.choisie[aria-pressed="true"] { color: var(--accent-texte); }
+  .puce:disabled { opacity: .55; }
+  .compteur { display: flex; align-items: center; gap: 14px; margin: 8px 0 14px; }
+  .compteur button { width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--fond); box-shadow: var(--relief-rond); font-size: 22px; font-weight: 600; }
+  .compteur button:active { box-shadow: var(--creux-mini); }
+  .compteur b { font-family: var(--titres); font-variation-settings: 'SOFT' 100; font-size: 28px; font-weight: 600; min-width: 24px; text-align: center; }
+  .defi-actif .titre-defi { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 16px; }
+  .defi-actif .icone { width: 20px; height: 20px; color: var(--accent); }
+  .bouton.secondaire { background: var(--fond); color: var(--texte); box-shadow: var(--relief-rond); border: 0; }
+  .bouton.secondaire:active { box-shadow: var(--creux-mini); }
+  .poids { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .poids label { display: grid; gap: 6px; font-size: 12.5px; color: var(--texte-doux); }
   .poids input { width: 100%; text-align: center; font-size: 17px; }
-  #reglage-compte { font-size: 14px; color: var(--brun-doux); margin: 0 0 6px; }
+  #reglage-compte { font-size: 14px; color: var(--texte-doux); margin: 0 0 6px; }
   .liste-defis { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; font-size: 14px; }
   .liste-defis li { display: flex; align-items: center; gap: 10px; background: var(--fond); border-radius: 16px; padding: 12px 14px; box-shadow: var(--relief-mini); }
   .liste-defis .icone { width: 18px; height: 18px; color: var(--accent); }
@@ -485,13 +493,13 @@
 
  <div id="ecran-reglages" hidden>
     <section class="carte">
-      <h2 class="etiquette">Ton compagnon</h2>
+      <h2 class="titre-carte">Ton compagnon</h2>
       <div class="animaux" id="animaux"></div>
       <p class="note">Illustrations provisoires : Twemoji (CC-BY 4.0). Pour mettre tes images, dépose-les dans <b>images/animaux/</b> sous la forme <b>animal-état.png</b> (ex. renard-en-forme.png, renard-content.png, renard-neutre.png, renard-fatigue.png).</p>
     </section>
 
     <section class="carte">
-      <h2 class="etiquette">Exclusions</h2>
+      <h2 class="titre-carte">Exclusions</h2>
       <div class="segment" id="excl-mode">
         <button data-mode="semaine">Toute la semaine</button>
         <button data-mode="jour">Un jour</button>
@@ -503,19 +511,19 @@
     </section>
 
     <section class="carte">
-      <h2 class="etiquette">Défi</h2>
+      <h2 class="titre-carte">Défi</h2>
       <div id="defi-zone"></div>
     </section>
 
     <section class="carte">
-      <h2 class="etiquette">Pondérations</h2>
+      <h2 class="titre-carte">Pondérations</h2>
       <div class="poids" id="poids"></div>
       <p class="note" id="poids-total"></p>
       <p><button class="bouton secondaire" id="poids-defaut">Revenir aux valeurs d’origine</button></p>
     </section>
 
     <section class="carte">
-      <h2 class="etiquette">Compte</h2>
+      <h2 class="titre-carte">Compte</h2>
       <p id="reglage-compte"></p>
       <button id="deconnexion">Se déconnecter</button>
     </section>
@@ -869,9 +877,8 @@ const el = (balise, classe, texte) => {
 };
 
 const AFFICHAGE = {
-  eau: ['💧', '2 L d’eau'], sport: ['🏃', 'Sport 30 min'], lecture: ['📖', 'Lecture'], meditation: ['🧘', 'Méditation'],
-  petitDej: ['🥐', 'Petit-déj'], dejeuner: ['🥗', 'Déjeuner'], diner: ['🍲', 'Dîner'],
-  sommeil: ['😴', 'Sommeil'], menage: ['🧹', 'Ménage'],
+  eau: '2 L d’eau', sport: 'Sport 30 min', lecture: 'Lecture', meditation: 'Méditation',
+  petitDej: 'Petit-déj', dejeuner: 'Déjeuner', diner: 'Dîner', sommeil: 'Sommeil', menage: 'Ménage',
 };
 const AVEC_ARTICLE = {
   sommeil: 'tes 7 h de sommeil', eau: 'tes 2 L d’eau', lecture: 'la lecture', meditation: 'la méditation',
@@ -1098,7 +1105,7 @@ function rendreJour() {
       b = el('button', 'tuile');
       b.dataset.h = h;
       b.append(iconeHabitude(h), el('span', 'nom', MOT[h]), el('span', 'info'));
-      b.setAttribute('aria-label', AFFICHAGE[h][1]);
+      b.setAttribute('aria-label', AFFICHAGE[h]);
       TUILES[h] = b;
       conteneur.insertBefore(b, $('menage-case'));
     }
@@ -1266,7 +1273,8 @@ function rendreReglages() {
   $('excl-puces').replaceChildren(...habitudes.map(h => {
     const viaSemaine = !parSemaine && exclSemaine.includes(h);
     const actif = liste.includes(h) || viaSemaine;
-    const b = el('button', 'puce', `${AFFICHAGE[h][0]} ${AFFICHAGE[h][1]}${viaSemaine ? ' (toute la semaine)' : ''}`);
+    const b = el('button', 'puce');
+    b.append(icone(h), `${AFFICHAGE[h]}${viaSemaine ? ' (toute la semaine)' : ''}`);
     b.setAttribute('aria-pressed', actif);
     b.disabled = viaSemaine;
     b.onclick = () => {
@@ -1283,7 +1291,9 @@ function rendreReglages() {
   if (defi) {
     const { fait, total, statut } = evaluerDefi(defi, { jours, semaines, aujourdhui });
     const bloc = el('div', 'defi-actif');
-    bloc.append(el('b', '', `🎯 ${defi.libelle}`),
+    const titre = el('div', 'titre-defi');
+    titre.append(icone('defi'), defi.libelle);
+    bloc.append(titre,
       el('p', 'note', `Du ${court(defi.debut)} au ${court(defi.fin)} · ${fait}/${total}${statut === 'reussi' ? ' · réussi ✓' : statut === 'rate' ? ' · raté cette fois' : ''}`));
     const abandon = el('button', 'bouton secondaire', ui.abandon ? 'Touche encore pour confirmer' : 'Abandonner le défi');
     abandon.onclick = () => {
@@ -1314,7 +1324,8 @@ function rendreReglages() {
     } else {
       const puces = el('div', 'puces');
       for (const h of Object.keys(AVEC_ARTICLE)) {
-        const b = el('button', 'puce choisie', `${AFFICHAGE[h][0]} ${AFFICHAGE[h][1]}`);
+        const b = el('button', 'puce choisie');
+        b.append(icone(h), AFFICHAGE[h]);
         b.setAttribute('aria-pressed', ui.defiHabitude === h);
         b.onclick = () => { ui.defiHabitude = h; rendre(); };
         puces.append(b);
@@ -1337,7 +1348,7 @@ function rendreReglages() {
   const ordre = ['sport', 'sommeil', 'eau', 'petitDej', 'dejeuner', 'diner', 'lecture', 'meditation', 'menage'];
   if (!$('poids').contains(document.activeElement)) {
     $('poids').replaceChildren(...ordre.map(k => {
-      const label = el('label', '', AFFICHAGE[k][1]);
+      const label = el('label', '', AFFICHAGE[k]);
       const input = el('input');
       Object.assign(input, { type: 'number', min: 0, max: 100, step: 1, inputMode: 'numeric', value: pd[k] });
       input.onchange = () => {
