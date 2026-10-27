@@ -5,11 +5,29 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Respawn</title>
 <!-- ===================== STYLES ===================== -->
-<!-- (étape 4) -->
+<style>
+  /* Provisoire (étape 3) : le vrai style arrive à l'étape 4. */
+  body { margin: 0; min-height: 100vh; display: grid; place-items: center; font-family: system-ui, sans-serif; background: #f3efe2; color: #3d3a2e; }
+  #connexion { text-align: center; padding: 16px; }
+  #uid { font-family: ui-monospace, monospace; user-select: all; background: #fff; padding: 6px 10px; border-radius: 10px; }
+  [hidden] { display: none !important; }
+</style>
+<script src="https://accounts.google.com/gsi/client" async></script>
 </head>
 <body>
 <!-- ===================== INTERFACE ===================== -->
-<!-- (étape 4) -->
+<main id="connexion">
+  <h1>Respawn</h1>
+  <div id="hors-ligne">
+    <div id="bouton-google"></div>
+  </div>
+  <div id="en-ligne" hidden>
+    <p>Connecté : <b id="nom"></b></p>
+    <p>Identifiant Firebase : <span id="uid"></span></p>
+    <button id="deconnexion">Se déconnecter</button>
+  </div>
+  <p id="message"></p>
+</main>
 
 <script>
 // ===================== LOGIQUE DU SCORE =====================
@@ -159,8 +177,55 @@ function serieSemainesSport({ jours = {}, semaines = {}, poids = POIDS_DEFAUT,
 }
 // ===================== FIN LOGIQUE DU SCORE =====================
 
+</script>
+
+<script type="module">
 // ===================== DONNÉES =====================
-// (étape 3 : Firebase)
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js';
+import { getAuth, GoogleAuthProvider, signInWithCredential, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js';
+import { getFirestore } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js';
+
+// Configuration publique (aucun secret) : seules les règles Firestore protègent les données.
+const app = initializeApp({
+  apiKey: 'AIzaSyDwBvjaimTpeO_EGygN_gnka1e4_y3DDs0',
+  authDomain: 'respawn-392c7.firebaseapp.com',
+  projectId: 'respawn-392c7',
+  storageBucket: 'respawn-392c7.firebasestorage.app',
+  messagingSenderId: '565047413369',
+  appId: '1:565047413369:web:bd67572d8fe84ae7dd22a8',
+});
+const auth = getAuth(app);
+const db = getFirestore(app);
+// Client OAuth Web créé par Firebase (Authentication > Google > Configuration du SDK Web).
+const GOOGLE_CLIENT_ID = '565047413369-2bi3f5bqfsao5hgdg271gv7g2prdhqrc.apps.googleusercontent.com';
+
+// ===================== INTERFACE (connexion) =====================
+// Bouton « Se connecter avec Google » (Google Identity Services) puis signInWithCredential :
+// évite les popups et redirections Firebase, peu fiables sur iPhone en mode écran d'accueil.
+const $ = id => document.getElementById(id);
+const attendreGoogle = () => new Promise(ok => {
+  const t = setInterval(() => { if (window.google?.accounts?.id) { clearInterval(t); ok(); } }, 100);
+});
+
+attendreGoogle().then(() => {
+  google.accounts.id.initialize({
+    client_id: GOOGLE_CLIENT_ID,
+    callback: async ({ credential }) => {
+      try { await signInWithCredential(auth, GoogleAuthProvider.credential(credential)); }
+      catch (e) { $('message').textContent = 'Connexion impossible : ' + e.message; }
+    },
+  });
+  google.accounts.id.renderButton($('bouton-google'), { theme: 'outline', size: 'large', shape: 'pill', locale: 'fr' });
+});
+
+onAuthStateChanged(auth, u => {
+  $('hors-ligne').hidden = !!u;
+  $('en-ligne').hidden = !u;
+  $('nom').textContent = u ? `${u.displayName} (${u.email})` : '';
+  $('uid').textContent = u?.uid ?? '';
+});
+$('deconnexion').onclick = () => signOut(auth);
+
 </script>
 </body>
 </html>
