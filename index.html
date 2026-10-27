@@ -290,28 +290,37 @@
   nav button[aria-current="page"] { background: var(--creux-fond); box-shadow: var(--creux-mini); color: var(--accent-texte); padding: 10px 18px; }
   nav button[aria-current="page"] .nav-nom { display: inline; }
 
-  /* --- Calendrier en pixels --- */
-  .cal-ligne { display: grid; grid-template-columns: 52px repeat(7, 1fr) 40px; gap: 5px; align-items: center; margin-bottom: 5px; }
-  .cal-ligne.titres { font-size: 12px; color: var(--brun-doux); text-align: center; }
-  .cal-semaine { font-size: 12px; color: var(--brun-doux); }
-  .cal-score { font-size: 15px; font-weight: 900; text-align: right; color: var(--feuille-fonce); }
-  .cal-score small { display: block; font-size: 10px; color: var(--brun-doux); font-weight: 700; }
-  .cal-case { aspect-ratio: 1; border-radius: 7px; border: 0; padding: 0; background: var(--n0); box-shadow: inset 0 -3px 0 rgba(0,0,0,.08); }
+  /* --- Calendrier en pixels : une case par jour en léger relief, verte selon la journée ; vide = en creux --- */
+  :root { --n1: #cadbb5; --n2: #abc993; --n3: #8ab372; --n4: #6a9656; --n5: #4f7a42; }
+  .cal-ligne { display: grid; grid-template-columns: 52px repeat(7, 1fr) 44px; gap: 7px; align-items: center; margin-bottom: 7px; }
+  .cal-ligne.titres { font-size: 11px; color: var(--texte-doux); text-align: center; letter-spacing: .3px; margin-bottom: 9px; }
+  .cal-semaine { font-size: 12px; color: var(--texte-doux); }
+  .cal-score { font-family: var(--titres); font-variation-settings: 'SOFT' 100; font-size: 17px; font-weight: 600; text-align: right; color: var(--texte); }
+  .cal-score small { display: block; font-family: 'DM Sans', system-ui, sans-serif; font-size: 10px; color: var(--texte-doux); font-weight: 500; }
+  .cal-case {
+    aspect-ratio: 1; border-radius: 9px; border: 0; padding: 0; position: relative;
+    background: var(--creux-fond); box-shadow: var(--creux-mini); transition: transform .15s;
+  }
+  .cal-case:active { transform: scale(.94); }
   .cal-case.vide { background: transparent; box-shadow: none; }
-  .cal-case.exclue { background: transparent; border: 2px dashed var(--sable-fonce); box-shadow: none; }
-  .cal-case.aujourdhui { outline: 3px solid var(--brun); outline-offset: 1px; }
-  :root { --n0: #ecf5e3; --n1: #cfe9bb; --n2: #acd992; --n3: #84c467; --n4: #5ea94b; --n5: #3d8a3f; }
+  .cal-case.exclue { background: transparent; box-shadow: none; outline: 1.5px dashed var(--ombre-foncee); outline-offset: -2px; }
+  .cal-case.n1, .cal-case.n2, .cal-case.n3, .cal-case.n4, .cal-case.n5 { box-shadow: var(--relief-mini); }
+  .cal-case.aujourdhui::after {
+    content: ''; position: absolute; bottom: -6px; left: 50%; width: 4px; height: 4px; border-radius: 50%;
+    background: var(--accent); transform: translateX(-50%);
+  }
   .n1 { background: var(--n1); } .n2 { background: var(--n2); } .n3 { background: var(--n3); } .n4 { background: var(--n4); } .n5 { background: var(--n5); }
-  .legende { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--brun-doux); margin: 12px 0 0; flex-wrap: wrap; }
-  .legende .cal-case { width: 14px; display: inline-block; }
+  .legende { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--texte-doux); margin: 16px 0 0; flex-wrap: wrap; }
+  .legende .cal-case { width: 14px; display: inline-block; border-radius: 5px; }
   .legende .astuce { margin-left: auto; }
 
-  /* --- Évolution des scores --- */
-  #graphique { display: flex; align-items: flex-end; gap: 8px; overflow-x: auto; padding-top: 4px; }
-  .barre { flex: 0 0 40px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 4px; font-size: 12px; color: var(--brun-doux); white-space: nowrap; }
-  .barre b { color: var(--feuille-fonce); font-size: 13px; }
-  .barre .plein { width: 100%; border-radius: 10px 10px 4px 4px; background: var(--feuille); box-shadow: inset 0 -3px 0 rgba(78,155,79,.35); min-height: 4px; }
-  .vide-texte { color: var(--brun-doux); font-size: 14px; }
+  /* --- Évolution des scores : barres vertes dans des rainures en creux --- */
+  #graphique { display: flex; align-items: flex-end; gap: 12px; overflow-x: auto; padding: 4px 2px 2px; }
+  .barre { flex: 0 0 40px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 6px; font-size: 11px; color: var(--texte-doux); white-space: nowrap; }
+  .barre b { font-family: var(--titres); font-variation-settings: 'SOFT' 100; color: var(--texte); font-size: 15px; font-weight: 600; }
+  .barre .rainure { width: 22px; height: 130px; border-radius: 999px; background: var(--creux-fond); box-shadow: var(--creux-mini); display: flex; align-items: flex-end; overflow: hidden; }
+  .barre .plein { width: 100%; border-radius: 999px; background: linear-gradient(180deg, var(--n3), var(--accent)); min-height: 6px; }
+  .vide-texte { color: var(--texte-doux); font-size: 14px; }
 
   /* --- Réglages --- */
   .note { font-size: 13px; color: var(--brun-doux); margin: 10px 0 0; }
@@ -344,7 +353,8 @@
   .poids input { width: 100%; text-align: center; font-size: 17px; }
   #reglage-compte { font-size: 14px; color: var(--brun-doux); margin: 0 0 6px; }
   .liste-defis { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; font-size: 14px; }
-  .liste-defis li { background: #fff; border-radius: 16px; padding: 10px 12px; }
+  .liste-defis li { display: flex; align-items: center; gap: 10px; background: var(--fond); border-radius: 16px; padding: 12px 14px; box-shadow: var(--relief-mini); }
+  .liste-defis .icone { width: 18px; height: 18px; color: var(--accent); }
 
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 </style>
@@ -457,18 +467,18 @@
 
  <div id="ecran-historique" hidden>
     <section class="carte">
-      <h2 class="etiquette">Calendrier</h2>
+      <h2 class="titre-carte">Calendrier</h2>
       <div class="cal-ligne titres"><span></span><span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span><span>Score</span></div>
       <div id="calendrier"></div>
       <p class="legende">Vide <span class="cal-case"></span><span class="cal-case n1"></span><span class="cal-case n2"></span><span class="cal-case n3"></span><span class="cal-case n4"></span><span class="cal-case n5"></span> Parfait
         <span class="astuce">Touche un jour pour le corriger</span></p>
     </section>
     <section class="carte">
-      <h2 class="etiquette">Évolution</h2>
+      <h2 class="titre-carte">Évolution</h2>
       <div id="graphique"></div>
     </section>
     <section class="carte" id="carte-defis" hidden>
-      <h2 class="etiquette">Défis réussis</h2>
+      <h2 class="titre-carte">Défis réussis</h2>
       <ul class="liste-defis" id="defis-reussis"></ul>
     </section>
  </div>
@@ -1201,9 +1211,11 @@ function rendreHistorique() {
   $('graphique').replaceChildren(...passees.map(lundi => {
     const score = semaines[lundi]?.score;
     const barre = el('div', 'barre');
+    const rainure = el('div', 'rainure');
     const plein = el('div', 'plein');
-    plein.style.height = `${(score ?? 0) * 1.3}px`; // 100 = 130 px
-    barre.append(el('b', '', score ?? '—'), plein, el('span', '', formatDate(lundi, { day: '2-digit', month: '2-digit' })));
+    plein.style.height = `${score ?? 0}%`;
+    rainure.append(plein);
+    barre.append(el('b', '', score ?? '—'), rainure, el('span', '', formatDate(lundi, { day: '2-digit', month: '2-digit' })));
     return barre;
   }));
   $('graphique').scrollLeft = $('graphique').scrollWidth;
@@ -1213,9 +1225,13 @@ function rendreDefisReussis() {
   const court = c => formatDate(c, { day: 'numeric', month: 'short' });
   const reussis = (etat.reglages.defisPasses ?? []).filter(d => d.reussi).sort((x, y) => x.fin < y.fin ? 1 : -1);
   $('carte-defis').hidden = !reussis.length;
-  $('defis-reussis').replaceChildren(...reussis.map(d => el('li', '', d.type === 'sport-semaine'
-    ? `🏆 ${d.cible} séances de sport · semaine du ${court(d.debut)}`
-    : `🏆 ${d.libelle} · du ${court(d.debut)} au ${court(d.fin)}`)));
+  $('defis-reussis').replaceChildren(...reussis.map(d => {
+    const li = el('li');
+    li.append(icone('defi'), el('span', '', d.type === 'sport-semaine'
+      ? `${d.cible} séances de sport · semaine du ${court(d.debut)}`
+      : `${d.libelle} · du ${court(d.debut)} au ${court(d.fin)}`));
+    return li;
+  }));
 }
 
 // ===================== INTERFACE (réglages) =====================
