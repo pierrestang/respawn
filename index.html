@@ -36,7 +36,7 @@
       radial-gradient(70px 28px at 80% 140px, #fff9 60%, transparent 62%),
       linear-gradient(var(--ciel) 0, var(--ciel-clair) 300px, var(--beige) 560px) no-repeat,
       var(--beige);
-    padding: env(safe-area-inset-top) 16px calc(24px + env(safe-area-inset-bottom));
+    padding: env(safe-area-inset-top) 16px calc(104px + env(safe-area-inset-bottom));
   }
   button, input { font: inherit; color: inherit; }
   button { cursor: pointer; }
@@ -47,9 +47,12 @@
   #message { color: #b5523b; max-width: 320px; margin: 0 auto; }
 
   /* --- Mise en page --- */
-  #app { max-width: 560px; margin: 0 auto; display: grid; gap: 16px; padding-top: 12px; }
+  #app { max-width: 560px; margin: 0 auto; padding-top: 12px; }
+  #ecran-jour, #ecran-historique, #ecran-reglages { display: grid; gap: 16px; }
   @media (min-width: 960px) {
-    #app { max-width: 1040px; grid-template-columns: 1fr 1fr; align-items: start; column-gap: 24px; }
+    #app { max-width: 1040px; }
+    #ecran-jour { grid-template-columns: 1fr 1fr; align-items: start; column-gap: 24px; }
+    #ecran-historique, #ecran-reglages { max-width: 640px; margin: 0 auto; }
   }
   .colonne { display: grid; gap: 16px; }
   .carte { background: var(--creme); border-radius: var(--rond); box-shadow: var(--ombre); padding: 16px; position: relative; }
@@ -60,7 +63,8 @@
   .sous-titre { font-size: 14px; color: var(--brun-doux); margin: 14px 0 8px; }
 
   /* --- En-tête : personnage et score --- */
-  #date { text-align: center; font-size: 17px; color: var(--brun-doux); margin: 4px 0 0; text-transform: capitalize; }
+  #date { text-align: center; font-size: 17px; color: var(--brun-doux); margin: 4px 0 0; }
+  #date::first-letter { text-transform: uppercase; }
   .entete { display: grid; grid-template-columns: 104px 1fr; gap: 14px; align-items: center; }
   #perso {
     width: 104px; height: 104px; border-radius: 50%; background: #fff; border: 4px solid var(--sable);
@@ -157,6 +161,46 @@
     background: var(--brun); color: #fff; border-radius: 999px; padding: 10px 18px; font-size: 14px; max-width: calc(100% - 32px);
     box-shadow: var(--ombre);
   }
+  /* --- Correction d'un jour passé --- */
+  #bandeau-correction { background: var(--soleil); border-radius: 20px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; box-shadow: var(--ombre); }
+  #bandeau-correction span { flex: 1; }
+  #bandeau-correction .bouton { padding: 8px 14px; font-size: 14px; }
+
+  /* --- Navigation --- */
+  nav {
+    position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(12px + env(safe-area-inset-bottom));
+    display: flex; gap: 6px; background: var(--creme); border-radius: 999px; padding: 6px; box-shadow: 0 4px 0 rgba(107,84,64,.15), 0 8px 24px rgba(107,84,64,.12);
+    z-index: 10;
+  }
+  nav button {
+    border: 0; background: none; border-radius: 999px 999px 999px 8px; padding: 10px 16px; min-height: 48px;
+    display: flex; align-items: center; gap: 6px; font-weight: 800; color: var(--brun-doux); white-space: nowrap;
+  }
+  nav button[aria-current="page"] { background: var(--feuille); color: #fff; box-shadow: 0 3px 0 var(--feuille-fonce); }
+
+  /* --- Calendrier en pixels --- */
+  .cal-ligne { display: grid; grid-template-columns: 52px repeat(7, 1fr) 40px; gap: 5px; align-items: center; margin-bottom: 5px; }
+  .cal-ligne.titres { font-size: 12px; color: var(--brun-doux); text-align: center; }
+  .cal-semaine { font-size: 12px; color: var(--brun-doux); }
+  .cal-score { font-size: 15px; font-weight: 900; text-align: right; color: var(--feuille-fonce); }
+  .cal-score small { display: block; font-size: 10px; color: var(--brun-doux); font-weight: 700; }
+  .cal-case { aspect-ratio: 1; border-radius: 7px; border: 0; padding: 0; background: var(--n0); box-shadow: inset 0 -3px 0 rgba(0,0,0,.08); }
+  .cal-case.vide { background: transparent; box-shadow: none; }
+  .cal-case.exclue { background: transparent; border: 2px dashed var(--sable-fonce); box-shadow: none; }
+  .cal-case.aujourdhui { outline: 3px solid var(--brun); outline-offset: 1px; }
+  :root { --n0: #ecf5e3; --n1: #cfe9bb; --n2: #acd992; --n3: #84c467; --n4: #5ea94b; --n5: #3d8a3f; }
+  .n1 { background: var(--n1); } .n2 { background: var(--n2); } .n3 { background: var(--n3); } .n4 { background: var(--n4); } .n5 { background: var(--n5); }
+  .legende { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--brun-doux); margin: 12px 0 0; flex-wrap: wrap; }
+  .legende .cal-case { width: 14px; display: inline-block; }
+  .legende .astuce { margin-left: auto; }
+
+  /* --- Évolution des scores --- */
+  #graphique { display: flex; align-items: flex-end; gap: 8px; overflow-x: auto; padding-top: 4px; }
+  .barre { flex: 0 0 40px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 4px; font-size: 12px; color: var(--brun-doux); white-space: nowrap; }
+  .barre b { color: var(--feuille-fonce); font-size: 13px; }
+  .barre .plein { width: 100%; border-radius: 10px 10px 4px 4px; background: var(--feuille); box-shadow: inset 0 -3px 0 rgba(78,155,79,.35); min-height: 4px; }
+  .vide-texte { color: var(--brun-doux); font-size: 14px; }
+
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 </style>
 <script src="https://accounts.google.com/gsi/client" async></script>
@@ -172,8 +216,10 @@
 <p id="chargement">Chargement…</p>
 
 <main id="app" hidden>
+ <div id="ecran-jour">
   <div class="colonne">
     <p id="date"></p>
+    <div id="bandeau-correction" hidden><span id="bandeau-texte"></span><button class="bouton" id="retour-aujourdhui">Aujourd’hui</button></div>
     <section class="carte">
       <div class="entete">
         <div id="perso" aria-hidden="true">🌱</div>
@@ -218,7 +264,7 @@
       <button class="tuile" id="menage-case"><span class="emoji">🧹</span><span class="nom">Ménage fait</span><span class="info" id="menage-info"></span></button>
     </section>
 
-    <section class="carte">
+    <section class="carte" id="carte-taches">
       <div class="entete-taches"><h2 class="etiquette">Tâches</h2></div>
       <div id="compteur-taches"></div>
       <form id="form-tache" autocomplete="off">
@@ -230,7 +276,35 @@
 
     <div class="pied"><button id="deconnexion">Se déconnecter</button></div>
   </div>
+ </div>
+
+ <div id="ecran-historique" hidden>
+    <section class="carte">
+      <h2 class="etiquette">Calendrier</h2>
+      <div class="cal-ligne titres"><span></span><span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span><span>Score</span></div>
+      <div id="calendrier"></div>
+      <p class="legende">Vide <span class="cal-case"></span><span class="cal-case n1"></span><span class="cal-case n2"></span><span class="cal-case n3"></span><span class="cal-case n4"></span><span class="cal-case n5"></span> Parfait
+        <span class="astuce">Touche un jour pour le corriger</span></p>
+    </section>
+    <section class="carte">
+      <h2 class="etiquette">Évolution</h2>
+      <div id="graphique"></div>
+    </section>
+ </div>
+
+ <div id="ecran-reglages" hidden>
+    <section class="carte">
+      <h2 class="etiquette">Réglages</h2>
+      <p class="vide-texte">Bientôt : exclusions, défis et choix de l’animal.</p>
+    </section>
+ </div>
 </main>
+
+<nav id="navigation" hidden>
+  <button data-ecran="jour">🌱 Jour</button>
+  <button data-ecran="historique">🍃 Historique</button>
+  <button data-ecran="reglages">🌿 Réglages</button>
+</nav>
 
 <div id="toast" hidden></div>
 
@@ -405,7 +479,7 @@ const db = getFirestore(app);
 const GOOGLE_CLIENT_ID = '565047413369-2bi3f5bqfsao5hgdg271gv7g2prdhqrc.apps.googleusercontent.com';
 
 // État en mémoire, alimenté en temps réel par Firestore (synchronise iPhone et ordinateur).
-const etat = { uid: null, aujourdhui: cleDuJour(new Date()), reglages: null, jours: {}, semaines: {}, taches: [], charge: new Set() };
+const etat = { uid: null, aujourdhui: cleDuJour(new Date()), ecran: 'jour', jourAffiche: null, reglages: null, jours: {}, semaines: {}, taches: [], charge: new Set() };
 let desabonnements = [];
 
 const ref = (...chemin) => doc(db, 'users', etat.uid, ...chemin);
@@ -464,8 +538,10 @@ function figerSemainesPassees() {
   }
 }
 
-const ecrireJour = champs => setDoc(ref('days', etat.aujourdhui), { ...champs, majLe: serverTimestamp() }, { merge: true }).catch(erreur);
-const ecrireSemaine = champs => setDoc(ref('weeks', lundiDe(etat.aujourdhui)), champs, { merge: true }).catch(erreur);
+// Jour affiché sur l'écran du jour : aujourd'hui, ou un jour passé en cours de correction.
+const jourVu = () => etat.jourAffiche ?? etat.aujourdhui;
+const ecrireJour = champs => setDoc(ref('days', jourVu()), { ...champs, majLe: serverTimestamp() }, { merge: true }).catch(erreur);
+const ecrireSemaine = champs => setDoc(ref('weeks', lundiDe(jourVu())), champs, { merge: true }).catch(erreur);
 
 // ===================== INTERFACE =====================
 const $ = id => document.getElementById(id);
@@ -480,36 +556,56 @@ const AFFICHAGE = {
   eau: ['💧', '2 L d’eau'], sport: ['🏃', 'Sport 30 min'], lecture: ['📖', 'Lecture'], meditation: ['🧘', 'Méditation'],
   petitDej: ['🥐', 'Petit-déj'], dejeuner: ['🥗', 'Déjeuner'], diner: ['🍲', 'Dîner'],
 };
+const dateDe = cle => { const [a, m, j] = cle.split('-').map(Number); return new Date(a, m - 1, j, 12); };
+const formatDate = (cle, options) => new Intl.DateTimeFormat('fr-FR', options).format(dateDe(cle));
 const minutesEnTexte = m => `${Math.floor(m / 60)} h ${String(m % 60).padStart(2, '0')}`;
 
 function rendre() {
-  const { aujourdhui, reglages, jours, semaines } = etat;
-  const dateDebut = reglages.dateDebut;
-  const lundi = lundiDe(aujourdhui);
-  const jour = jours[aujourdhui];
-  const semaine = semaines[lundi];
-  const contexte = { jours, semaines, dateDebut, aujourdhui };
-
   $('ecran-connexion').hidden = true;
   $('chargement').hidden = true;
   $('app').hidden = false;
+  $('navigation').hidden = false;
+  for (const nom of ['jour', 'historique', 'reglages']) $(`ecran-${nom}`).hidden = etat.ecran !== nom;
+  for (const b of $('navigation').children) {
+    if (b.dataset.ecran === etat.ecran) b.setAttribute('aria-current', 'page');
+    else b.removeAttribute('aria-current');
+  }
+  rendreJour();
+  rendreHistorique();
+}
 
-  const [a, m, j] = aujourdhui.split('-').map(Number);
-  $('date').textContent = new Intl.DateTimeFormat('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date(a, m - 1, j, 12));
+function rendreJour() {
+  const { aujourdhui, reglages, jours, semaines } = etat;
+  const dateDebut = reglages.dateDebut;
+  const cle = jourVu();
+  const passe = cle !== aujourdhui;
+  const lundi = lundiDe(cle);
+  const jour = jours[cle];
+  const semaine = semaines[lundi];
+  const semaineEnCours = lundi === lundiDe(aujourdhui);
+  // Les séries se lisent toujours à la date d'aujourd'hui : corriger un jour passé les recolle.
+  const contexte = { jours, semaines, dateDebut, aujourdhui };
 
-  // Score de la semaine
+  $('date').textContent = formatDate(cle, { weekday: 'long', day: 'numeric', month: 'long' });
+  $('bandeau-correction').hidden = !passe;
+  if (passe) $('bandeau-texte').textContent = `✏️ Tu modifies ${formatDate(cle, { weekday: 'long', day: 'numeric', month: 'long' })}`;
+  $('carte-taches').hidden = passe;
+
+  // Score de la semaine du jour affiché
   const r = calculerScoreSemaine({ lundi, jours, semaine, poids: poids(), objectifSport: objectifSport(), dateDebut, aujourdhui });
   $('score').textContent = r.score ?? '—';
   $('jauge-rempli').style.width = `${r.score ?? 0}%`;
-  const precedente = semaines[ajouterJours(lundi, -7)];
-  if (!precedente || precedente.score === null || precedente.score === undefined) $('comparaison').textContent = 'Première semaine';
-  else if (r.score === null) $('comparaison').textContent = `Semaine dernière : ${precedente.score}`;
+  document.querySelector('.libelle-score').textContent = semaineEnCours ? 'cette semaine' : `semaine du ${formatDate(lundi, { day: 'numeric', month: 'short' })}`;
+  const lundiPrecedent = ajouterJours(lundi, -7);
+  const precedente = semaines[lundiPrecedent];
+  if (lundiPrecedent < lundiDe(dateDebut) || precedente?.score === null || precedente?.score === undefined) $('comparaison').textContent = 'Première semaine';
+  else if (r.score === null) $('comparaison').textContent = `Semaine précédente : ${precedente.score}`;
   else {
     const ecart = r.score - precedente.score;
-    $('comparaison').textContent = ecart === 0 ? 'Pareil que la semaine dernière'
-      : `${ecart > 0 ? '▲ +' : '▼ −'}${Math.abs(ecart)} par rapport à la semaine dernière`;
+    $('comparaison').textContent = ecart === 0 ? 'Pareil que la semaine précédente'
+      : `${ecart > 0 ? '▲ +' : '▼ −'}${Math.abs(ecart)} par rapport à la semaine précédente`;
   }
-  const defi = reglages.defiEnCours;
+  const defi = semaineEnCours ? reglages.defiEnCours : null;
   $('defi').hidden = !defi;
   if (defi) $('defi').textContent = `🎯 Défi : ${defi.libelle}`;
 
@@ -538,7 +634,7 @@ function rendre() {
   // Sommeil : pré-rempli avec la dernière nuit saisie tant que celle d'aujourd'hui ne l'est pas.
   let sommeil = jour?.sommeil;
   const suggestion = !sommeil?.coucher || !sommeil?.reveil;
-  const precedent = Object.keys(jours).filter(c => c < aujourdhui && jours[c].sommeil?.coucher && jours[c].sommeil?.reveil).sort().pop();
+  const precedent = Object.keys(jours).filter(c => c < cle && jours[c].sommeil?.coucher && jours[c].sommeil?.reveil).sort().pop();
   if (suggestion) sommeil = precedent ? jours[precedent].sommeil : { coucher: '23:00', reveil: '07:00' };
   for (const champ of ['coucher', 'reveil']) if (document.activeElement !== $(champ)) $(champ).value = sommeil[champ];
   $('heures').classList.toggle('suggestion', suggestion);
@@ -557,11 +653,11 @@ function rendre() {
   $('menage-case').className = `tuile${menageFait ? ' fait' : ''}${menageExclu ? ' exclue' : ''}`;
   $('menage-case').setAttribute('aria-pressed', menageFait);
   $('menage-case').disabled = menageExclu;
-  $('menage-info').textContent = menageExclu ? 'exclu cette semaine' : menageFait ? '' : 'à faire cette semaine';
+  $('menage-info').textContent = menageExclu ? 'exclu cette semaine' : menageFait ? '' : semaineEnCours ? 'à faire cette semaine' : 'pas fait';
   $('menage-case').onclick = () => ecrireSemaine({ menage: !menageFait });
 
   // Tâches : les tâches cochées restent barrées jusqu'à la fin de leur semaine.
-  const dansLaSemaine = t => t.fait && t.faitLe && lundiDe(t.faitLe) === lundi;
+  const dansLaSemaine = t => t.fait && t.faitLe && lundiDe(t.faitLe) === lundiDe(aujourdhui);
   const visibles = etat.taches.filter(t => !t.fait || dansLaSemaine(t))
     .sort((x, y) => (x.fait - y.fait) || ((x.creeLe?.toMillis?.() ?? 0) - (y.creeLe?.toMillis?.() ?? 0)));
   const faites = etat.taches.filter(dansLaSemaine).length;
@@ -576,6 +672,62 @@ function rendre() {
     return li;
   }));
 }
+
+// Calendrier en pixels : une ligne par semaine (la plus récente en haut), une case par jour.
+const niveau = s => s === 0 ? 0 : s <= 25 ? 1 : s <= 50 ? 2 : s <= 75 ? 3 : s < 100 ? 4 : 5;
+function rendreHistorique() {
+  const { aujourdhui, reglages, jours, semaines } = etat;
+  const dateDebut = reglages.dateDebut;
+  const lundiCourant = lundiDe(aujourdhui);
+  const lignes = [];
+  for (let lundi = lundiCourant; lundi >= lundiDe(dateDebut); lundi = ajouterJours(lundi, -7)) {
+    const ligne = el('div', 'cal-ligne');
+    ligne.append(el('span', 'cal-semaine', formatDate(lundi, { day: 'numeric', month: 'short' })));
+    for (const c of joursDeLaSemaine(lundi)) {
+      if (c < dateDebut || c > aujourdhui) { ligne.append(el('span', 'cal-case vide')); continue; }
+      const { score } = scoreJour(jours[c], semaines[lundi], poids());
+      const b = el('button', `cal-case${score === null ? ' exclue' : ` n${niveau(score)}`}${c === aujourdhui ? ' aujourdhui' : ''}`);
+      b.setAttribute('aria-label', `${formatDate(c, { weekday: 'long', day: 'numeric', month: 'long' })} : ${score === null ? 'exclu' : `${Math.round(score)} %`}`);
+      b.title = b.getAttribute('aria-label');
+      b.onclick = () => { etat.jourAffiche = c === aujourdhui ? null : c; etat.ecran = 'jour'; rendre(); scrollTo(0, 0); };
+      ligne.append(b);
+    }
+    const scoreSemaine = lundi === lundiCourant
+      ? calculerScoreSemaine({ lundi, jours, semaine: semaines[lundi], poids: poids(), objectifSport: objectifSport(), dateDebut, aujourdhui }).score
+      : semaines[lundi]?.score;
+    const cellule = el('span', 'cal-score', scoreSemaine ?? '—');
+    if (lundi === lundiCourant) cellule.append(el('small', '', 'en cours'));
+    ligne.append(cellule);
+    lignes.push(ligne);
+  }
+  $('calendrier').replaceChildren(...lignes);
+
+  // Évolution : score figé de chaque semaine terminée, de la plus ancienne à la plus récente.
+  const passees = [];
+  for (let lundi = lundiDe(dateDebut); lundi < lundiCourant; lundi = ajouterJours(lundi, 7)) passees.push(lundi);
+  if (!passees.length) {
+    $('graphique').replaceChildren(el('p', 'vide-texte', 'Le graphique apparaîtra à la fin de ta première semaine.'));
+    return;
+  }
+  $('graphique').replaceChildren(...passees.map(lundi => {
+    const score = semaines[lundi]?.score;
+    const barre = el('div', 'barre');
+    const plein = el('div', 'plein');
+    plein.style.height = `${(score ?? 0) * 1.3}px`; // 100 = 130 px
+    barre.append(el('b', '', score ?? '—'), plein, el('span', '', formatDate(lundi, { day: '2-digit', month: '2-digit' })));
+    return barre;
+  }));
+  $('graphique').scrollLeft = $('graphique').scrollWidth;
+}
+
+// Navigation
+for (const b of $('navigation').children) b.onclick = () => {
+  etat.ecran = b.dataset.ecran;
+  if (etat.ecran === 'jour') etat.jourAffiche = null;
+  rendre();
+  scrollTo(0, 0);
+};
+$('retour-aujourdhui').onclick = () => { etat.jourAffiche = null; rendre(); scrollTo(0, 0); };
 
 // Saisies du sommeil et des tâches
 const enregistrerSommeil = () => {
@@ -637,7 +789,7 @@ attendreGoogle().then(() => {
 onAuthStateChanged(auth, u => {
   arreterEcoute();
   if (u) { $('chargement').hidden = false; ecouter(u.uid); }
-  else { $('app').hidden = true; $('chargement').hidden = true; $('ecran-connexion').hidden = false; }
+  else { $('app').hidden = true; $('navigation').hidden = true; $('chargement').hidden = true; $('ecran-connexion').hidden = false; }
 });
 $('deconnexion').onclick = () => signOut(auth);
 </script>
