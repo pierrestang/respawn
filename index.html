@@ -3,31 +3,236 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Respawn">
+<meta name="theme-color" content="#bfe7f7">
 <title>Respawn</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
 <!-- ===================== STYLES ===================== -->
 <style>
-  /* Provisoire (étape 3) : le vrai style arrive à l'étape 4. */
-  body { margin: 0; min-height: 100vh; display: grid; place-items: center; font-family: system-ui, sans-serif; background: #f3efe2; color: #3d3a2e; }
-  #connexion { text-align: center; padding: 16px; }
-  #uid { font-family: ui-monospace, monospace; user-select: all; background: #fff; padding: 6px 10px; border-radius: 10px; }
+  :root {
+    --creme: #fffbf0; --beige: #f6efd9; --sable: #eadfbf; --sable-fonce: #d9caa0;
+    --feuille-clair: #dcf2cc; --feuille: #8ccf6e; --feuille-fonce: #4e9b4f;
+    --ciel: #bfe7f7; --ciel-clair: #e8f7fc;
+    --brun: #6b5440; --brun-doux: #9a8470;
+    --soleil: #ffe08a; --corail: #f4a38c;
+    --ombre: 0 4px 0 rgba(107, 84, 64, .12);
+    --rond: 28px;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   [hidden] { display: none !important; }
+  html { background: var(--ciel); }
+  body {
+    margin: 0; min-height: 100vh; color: var(--brun);
+    font-family: 'Nunito', ui-rounded, system-ui, sans-serif; font-weight: 700;
+    /* Ciel de journée (le cycle selon l'heure arrive à l'étape 7) */
+    background:
+      radial-gradient(60px 26px at 18% 70px, #fff9 60%, transparent 62%),
+      radial-gradient(90px 34px at 26% 82px, #fffb 60%, transparent 62%),
+      radial-gradient(70px 28px at 80% 140px, #fff9 60%, transparent 62%),
+      linear-gradient(var(--ciel) 0, var(--ciel-clair) 300px, var(--beige) 560px) no-repeat,
+      var(--beige);
+    padding: env(safe-area-inset-top) 16px calc(24px + env(safe-area-inset-bottom));
+  }
+  button, input { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+
+  /* --- Connexion --- */
+  #ecran-connexion { min-height: 90vh; display: grid; place-content: center; text-align: center; gap: 16px; }
+  .logo { font-size: 44px; font-weight: 900; color: var(--feuille-fonce); letter-spacing: .5px; text-shadow: 0 3px 0 #fff; margin: 0; }
+  #message { color: #b5523b; max-width: 320px; margin: 0 auto; }
+
+  /* --- Mise en page --- */
+  #app { max-width: 560px; margin: 0 auto; display: grid; gap: 16px; padding-top: 12px; }
+  @media (min-width: 960px) {
+    #app { max-width: 1040px; grid-template-columns: 1fr 1fr; align-items: start; column-gap: 24px; }
+  }
+  .colonne { display: grid; gap: 16px; }
+  .carte { background: var(--creme); border-radius: var(--rond); box-shadow: var(--ombre); padding: 16px; position: relative; }
+  .etiquette {
+    display: inline-block; background: var(--feuille); color: #fff; font-weight: 900; font-size: 15px;
+    padding: 4px 14px; border-radius: 999px; margin: 0 0 12px; box-shadow: 0 3px 0 var(--feuille-fonce);
+  }
+  .sous-titre { font-size: 14px; color: var(--brun-doux); margin: 14px 0 8px; }
+
+  /* --- En-tête : personnage et score --- */
+  #date { text-align: center; font-size: 17px; color: var(--brun-doux); margin: 4px 0 0; text-transform: capitalize; }
+  .entete { display: grid; grid-template-columns: 104px 1fr; gap: 14px; align-items: center; }
+  #perso {
+    width: 104px; height: 104px; border-radius: 50%; background: #fff; border: 4px solid var(--sable);
+    display: grid; place-items: center; font-size: 48px; overflow: hidden;
+    animation: rebond 2.4s ease-in-out infinite;
+  }
+  #perso img { width: 100%; height: 100%; object-fit: cover; }
+  @keyframes rebond { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+  #bulle { background: #fff; border-radius: 20px; padding: 10px 14px; font-size: 15px; position: relative; margin-bottom: 8px; }
+  .score-ligne { display: flex; align-items: baseline; gap: 6px; }
+  #score { font-size: 46px; font-weight: 900; line-height: 1; color: var(--feuille-fonce); }
+  .sur-100 { font-size: 18px; color: var(--brun-doux); }
+  .libelle-score { font-size: 14px; color: var(--brun-doux); margin-left: auto; }
+  .jauge { height: 18px; border-radius: 999px; background: var(--sable); margin: 10px 0 8px; overflow: hidden; box-shadow: inset 0 2px 0 rgba(107,84,64,.12); }
+  #jauge-rempli {
+    height: 100%; width: 0; border-radius: 999px;
+    background: linear-gradient(90deg, var(--feuille), #a9de8c);
+    box-shadow: inset 0 -3px 0 rgba(78,155,79,.35);
+    transition: width .8s cubic-bezier(.34, 1.56, .64, 1);
+  }
+  #comparaison { font-size: 14px; color: var(--brun-doux); }
+  #defi { margin-top: 12px; background: var(--soleil); border-radius: 16px; padding: 8px 12px; font-size: 14px; }
+
+  /* --- Habitudes --- */
+  .grille { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .grille.trois { grid-template-columns: repeat(3, 1fr); }
+  .tuile {
+    background: #fff; border: 3px solid var(--sable); border-radius: 22px; padding: 12px 8px 10px;
+    display: grid; justify-items: center; gap: 2px; min-height: 104px; position: relative;
+    box-shadow: 0 3px 0 var(--sable); transition: transform .12s, background .2s, border-color .2s;
+    touch-action: manipulation;
+  }
+  .tuile:active { transform: translateY(2px) scale(.97); box-shadow: 0 1px 0 var(--sable); }
+  .tuile .emoji { font-size: 32px; line-height: 1.1; }
+  .tuile .nom { font-size: 15px; }
+  .tuile .info { font-size: 13px; color: var(--brun-doux); }
+  .tuile.fait { background: var(--feuille-clair); border-color: var(--feuille); box-shadow: 0 3px 0 var(--feuille-fonce); }
+  .tuile.fait .emoji { animation: saut .45s cubic-bezier(.34, 1.56, .64, 1); }
+  .tuile.fait::after {
+    content: '✓'; position: absolute; top: 6px; right: 8px; width: 22px; height: 22px; border-radius: 50%;
+    background: var(--feuille-fonce); color: #fff; font-size: 13px; display: grid; place-items: center; font-weight: 900;
+  }
+  .tuile.exclue { opacity: .55; border-style: dashed; }
+  @keyframes saut { 0% { transform: scale(.7); } 60% { transform: scale(1.2); } 100% { transform: scale(1); } }
+
+  /* --- Sommeil --- */
+  .heures { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .heures label { display: grid; gap: 4px; font-size: 14px; color: var(--brun-doux); }
+  .heures input {
+    background: #fff; border: 3px solid var(--sable); border-radius: 18px; padding: 10px 12px; font-size: 22px;
+    font-weight: 800; text-align: center; width: 100%; min-height: 54px; -webkit-appearance: none; appearance: none;
+  }
+  .heures.suggestion input { color: var(--brun-doux); border-style: dashed; }
+  .sommeil-bas { display: flex; align-items: center; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+  #duree { font-size: 22px; font-weight: 900; }
+  .pastille { border-radius: 999px; padding: 3px 10px; font-size: 13px; background: var(--sable); }
+  .pastille.ok { background: var(--feuille-clair); color: var(--feuille-fonce); }
+  .pastille.non { background: #fde3da; color: #b5523b; }
+  #sommeil-serie { margin-left: auto; font-size: 14px; color: var(--brun-doux); }
+  .bouton {
+    background: var(--feuille); color: #fff; border: 0; border-radius: 999px; padding: 10px 18px; font-weight: 900;
+    box-shadow: 0 3px 0 var(--feuille-fonce);
+  }
+  .bouton:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--feuille-fonce); }
+  #sommeil-valider { width: 100%; margin-top: 12px; }
+
+  /* --- Ménage --- */
+  #menage-case { width: 100%; display: flex; align-items: center; gap: 12px; text-align: left; min-height: 64px; justify-items: start; }
+  #menage-case .nom { flex: 1; }
+
+  /* --- Tâches --- */
+  .entete-taches { display: flex; align-items: center; justify-content: space-between; }
+  #compteur-taches { font-size: 14px; color: var(--brun-doux); margin-bottom: 12px; }
+  #form-tache { display: flex; gap: 8px; }
+  #nouvelle-tache {
+    flex: 1; min-width: 0; background: #fff; border: 3px solid var(--sable); border-radius: 999px; padding: 10px 16px; font-size: 16px;
+  }
+  #nouvelle-tache:focus, .heures input:focus { outline: none; border-color: var(--feuille); }
+  #liste-taches { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 8px; }
+  #liste-taches button {
+    width: 100%; display: flex; align-items: center; gap: 12px; text-align: left; background: #fff; border: 0;
+    border-radius: 18px; padding: 12px 14px; min-height: 48px;
+  }
+  .rond { flex: none; width: 26px; height: 26px; border-radius: 50%; border: 3px solid var(--sable-fonce); display: grid; place-items: center; font-size: 13px; color: #fff; }
+  .tache-faite .rond { background: var(--feuille-fonce); border-color: var(--feuille-fonce); }
+  .tache-faite .texte { text-decoration: line-through; color: var(--brun-doux); }
+
+  /* --- Divers --- */
+  .pied { text-align: center; }
+  #deconnexion { background: none; border: 0; color: var(--brun-doux); font-size: 14px; text-decoration: underline; padding: 8px; }
+  #chargement { text-align: center; padding: 48px 0; color: var(--brun-doux); font-size: 18px; }
+  #toast {
+    position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom)); transform: translateX(-50%);
+    background: var(--brun); color: #fff; border-radius: 999px; padding: 10px 18px; font-size: 14px; max-width: calc(100% - 32px);
+    box-shadow: var(--ombre);
+  }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 </style>
 <script src="https://accounts.google.com/gsi/client" async></script>
 </head>
 <body>
 <!-- ===================== INTERFACE ===================== -->
-<main id="connexion">
-  <h1>Respawn</h1>
-  <div id="hors-ligne">
-    <div id="bouton-google"></div>
-  </div>
-  <div id="en-ligne" hidden>
-    <p>Connecté : <b id="nom"></b></p>
-    <p>Identifiant Firebase : <span id="uid"></span></p>
-    <button id="deconnexion">Se déconnecter</button>
-  </div>
+<section id="ecran-connexion" hidden>
+  <h1 class="logo">Respawn</h1>
+  <div id="bouton-google"></div>
   <p id="message"></p>
+</section>
+
+<p id="chargement">Chargement…</p>
+
+<main id="app" hidden>
+  <div class="colonne">
+    <p id="date"></p>
+    <section class="carte">
+      <div class="entete">
+        <div id="perso" aria-hidden="true">🌱</div>
+        <div>
+          <p id="bulle" hidden></p>
+          <div class="score-ligne">
+            <span id="score">0</span><span class="sur-100">/100</span>
+            <span class="libelle-score">cette semaine</span>
+          </div>
+          <div class="jauge"><div id="jauge-rempli"></div></div>
+          <div id="comparaison"></div>
+        </div>
+      </div>
+      <div id="defi" hidden></div>
+    </section>
+
+    <section class="carte">
+      <h2 class="etiquette">Habitudes du jour</h2>
+      <div class="grille" id="grille-habitudes"></div>
+      <p class="sous-titre">Repas</p>
+      <div class="grille trois" id="grille-repas"></div>
+    </section>
+  </div>
+
+  <div class="colonne">
+    <section class="carte">
+      <h2 class="etiquette">Sommeil</h2>
+      <div class="heures" id="heures">
+        <label>Coucher <input type="time" id="coucher"></label>
+        <label>Réveil <input type="time" id="reveil"></label>
+      </div>
+      <button class="bouton" id="sommeil-valider" hidden>Valider ces heures</button>
+      <div class="sommeil-bas">
+        <span id="duree">—</span>
+        <span class="pastille" id="sommeil-statut"></span>
+        <span id="sommeil-serie"></span>
+      </div>
+    </section>
+
+    <section class="carte">
+      <h2 class="etiquette">Ménage de la semaine</h2>
+      <button class="tuile" id="menage-case"><span class="emoji">🧹</span><span class="nom">Ménage fait</span><span class="info" id="menage-info"></span></button>
+    </section>
+
+    <section class="carte">
+      <div class="entete-taches"><h2 class="etiquette">Tâches</h2></div>
+      <div id="compteur-taches"></div>
+      <form id="form-tache" autocomplete="off">
+        <input id="nouvelle-tache" placeholder="Nouvelle tâche…" enterkeyhint="done" maxlength="200">
+        <button class="bouton" aria-label="Ajouter">+</button>
+      </form>
+      <ul id="liste-taches"></ul>
+    </section>
+
+    <div class="pied"><button id="deconnexion">Se déconnecter</button></div>
+  </div>
 </main>
+
+<div id="toast" hidden></div>
 
 <script>
 // ===================== LOGIQUE DU SCORE =====================
@@ -183,7 +388,7 @@ function serieSemainesSport({ jours = {}, semaines = {}, poids = POIDS_DEFAUT,
 // ===================== DONNÉES =====================
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js';
 import { getAuth, GoogleAuthProvider, signInWithCredential, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js';
-import { getFirestore } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js';
+import { getFirestore, collection, doc, onSnapshot, setDoc, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js';
 
 // Configuration publique (aucun secret) : seules les règles Firestore protègent les données.
 const app = initializeApp({
@@ -199,14 +404,225 @@ const db = getFirestore(app);
 // Client OAuth Web créé par Firebase (Authentication > Google > Configuration du SDK Web).
 const GOOGLE_CLIENT_ID = '565047413369-2bi3f5bqfsao5hgdg271gv7g2prdhqrc.apps.googleusercontent.com';
 
+// État en mémoire, alimenté en temps réel par Firestore (synchronise iPhone et ordinateur).
+const etat = { uid: null, aujourdhui: cleDuJour(new Date()), reglages: null, jours: {}, semaines: {}, taches: [], charge: new Set() };
+let desabonnements = [];
+
+const ref = (...chemin) => doc(db, 'users', etat.uid, ...chemin);
+const col = nom => collection(db, 'users', etat.uid, nom);
+const poids = () => ({ ...POIDS_DEFAUT, ...etat.reglages?.poids });
+const objectifSport = () => etat.reglages?.objectifSport ?? OBJECTIF_SPORT;
+
+function ecouter(uid) {
+  etat.uid = uid;
+  const pret = nom => { etat.charge.add(nom); if (etat.charge.size === 4) { figerSemainesPassees(); rendre(); } };
+  desabonnements = [
+    onSnapshot(ref('settings', 'main'), s => {
+      // Premier lancement : la date de début est aujourd'hui.
+      if (!s.exists()) {
+        setDoc(ref('settings', 'main'), {
+          dateDebut: etat.aujourdhui, poids: POIDS_DEFAUT, objectifSport: OBJECTIF_SPORT,
+          animal: null, defiEnCours: null, defisPasses: [],
+        }).catch(erreur);
+        return;
+      }
+      etat.reglages = s.data(); pret('reglages');
+    }, erreur),
+    onSnapshot(col('days'), s => {
+      etat.jours = Object.fromEntries(s.docs.map(d => [d.id, d.data()])); pret('jours');
+    }, erreur),
+    onSnapshot(col('weeks'), s => {
+      etat.semaines = Object.fromEntries(s.docs.map(d => [d.id, d.data()])); pret('semaines');
+    }, erreur),
+    onSnapshot(col('tasks'), s => {
+      etat.taches = s.docs.map(d => ({ id: d.id, ...d.data({ serverTimestamps: 'estimate' }) })); pret('taches');
+    }, erreur),
+  ];
+}
+function arreterEcoute() {
+  desabonnements.forEach(f => f());
+  desabonnements = [];
+  Object.assign(etat, { uid: null, reglages: null, jours: {}, semaines: {}, taches: [], charge: new Set() });
+}
+
+// Firestore ne garantit pas l'ordre des clés d'un objet : on compare avec les clés triées.
+const stable = o => JSON.stringify(o, (k, v) => v && typeof v === 'object' && !Array.isArray(v)
+  ? Object.fromEntries(Object.entries(v).sort(([x], [y]) => x < y ? -1 : 1)) : v);
+
+// Fige (ou recalcule après correction d'un jour passé) le score de chaque semaine terminée.
+// N'écrit que si le résultat a changé, pour ne pas boucler avec onSnapshot.
+function figerSemainesPassees() {
+  const dateDebut = etat.reglages.dateDebut;
+  const lundiCourant = lundiDe(etat.aujourdhui);
+  for (let lundi = lundiDe(dateDebut); lundi < lundiCourant; lundi = ajouterJours(lundi, 7)) {
+    const r = calculerScoreSemaine({ lundi, jours: etat.jours, semaine: etat.semaines[lundi], poids: poids(),
+                                     objectifSport: objectifSport(), dateDebut, aujourdhui: etat.aujourdhui });
+    const detail = { sport: r.sport, menage: r.menage, scoresJours: r.scoresJours };
+    const deja = etat.semaines[lundi];
+    if (deja?.fige && deja.score === r.score && stable(deja.detail) === stable(detail)) continue;
+    setDoc(ref('weeks', lundi), { score: r.score, detail, fige: true, calculeLe: serverTimestamp() }, { merge: true }).catch(erreur);
+  }
+}
+
+const ecrireJour = champs => setDoc(ref('days', etat.aujourdhui), { ...champs, majLe: serverTimestamp() }, { merge: true }).catch(erreur);
+const ecrireSemaine = champs => setDoc(ref('weeks', lundiDe(etat.aujourdhui)), champs, { merge: true }).catch(erreur);
+
+// ===================== INTERFACE =====================
+const $ = id => document.getElementById(id);
+const el = (balise, classe, texte) => {
+  const e = document.createElement(balise);
+  if (classe) e.className = classe;
+  if (texte !== undefined) e.textContent = texte;
+  return e;
+};
+
+const AFFICHAGE = {
+  eau: ['💧', '2 L d’eau'], sport: ['🏃', 'Sport 30 min'], lecture: ['📖', 'Lecture'], meditation: ['🧘', 'Méditation'],
+  petitDej: ['🥐', 'Petit-déj'], dejeuner: ['🥗', 'Déjeuner'], diner: ['🍲', 'Dîner'],
+};
+const minutesEnTexte = m => `${Math.floor(m / 60)} h ${String(m % 60).padStart(2, '0')}`;
+
+function rendre() {
+  const { aujourdhui, reglages, jours, semaines } = etat;
+  const dateDebut = reglages.dateDebut;
+  const lundi = lundiDe(aujourdhui);
+  const jour = jours[aujourdhui];
+  const semaine = semaines[lundi];
+  const contexte = { jours, semaines, dateDebut, aujourdhui };
+
+  $('ecran-connexion').hidden = true;
+  $('chargement').hidden = true;
+  $('app').hidden = false;
+
+  const [a, m, j] = aujourdhui.split('-').map(Number);
+  $('date').textContent = new Intl.DateTimeFormat('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date(a, m - 1, j, 12));
+
+  // Score de la semaine
+  const r = calculerScoreSemaine({ lundi, jours, semaine, poids: poids(), objectifSport: objectifSport(), dateDebut, aujourdhui });
+  $('score').textContent = r.score ?? '—';
+  $('jauge-rempli').style.width = `${r.score ?? 0}%`;
+  const precedente = semaines[ajouterJours(lundi, -7)];
+  if (!precedente || precedente.score === null || precedente.score === undefined) $('comparaison').textContent = 'Première semaine';
+  else if (r.score === null) $('comparaison').textContent = `Semaine dernière : ${precedente.score}`;
+  else {
+    const ecart = r.score - precedente.score;
+    $('comparaison').textContent = ecart === 0 ? 'Pareil que la semaine dernière'
+      : `${ecart > 0 ? '▲ +' : '▼ −'}${Math.abs(ecart)} par rapport à la semaine dernière`;
+  }
+  const defi = reglages.defiEnCours;
+  $('defi').hidden = !defi;
+  if (defi) $('defi').textContent = `🎯 Défi : ${defi.libelle}`;
+
+  // Habitudes
+  const tuile = h => {
+    const [emoji, nom] = AFFICHAGE[h];
+    const exclue = estExclue(h, jour, semaine);
+    const fait = !exclue && !!jour?.habitudes?.[h];
+    const b = el('button', `tuile${fait ? ' fait' : ''}${exclue ? ' exclue' : ''}`);
+    b.setAttribute('aria-pressed', fait);
+    b.append(el('span', 'emoji', emoji), el('span', 'nom', nom));
+    let info;
+    if (exclue) info = 'exclue · série en pause';
+    else if (h === 'sport') {
+      const serie = serieSemainesSport({ ...contexte, poids: poids(), objectifSport: objectifSport() });
+      info = `${r.sport?.seances ?? 0}/${objectifSport()} · 🔥 ${serie} sem.`;
+    } else info = `🔥 ${serieJours(h, contexte)}`;
+    b.append(el('span', 'info', info));
+    b.disabled = exclue;
+    b.onclick = () => ecrireJour({ habitudes: { [h]: !fait } });
+    return b;
+  };
+  $('grille-habitudes').replaceChildren(...['eau', 'sport', 'lecture', 'meditation'].map(tuile));
+  $('grille-repas').replaceChildren(...['petitDej', 'dejeuner', 'diner'].map(tuile));
+
+  // Sommeil : pré-rempli avec la dernière nuit saisie tant que celle d'aujourd'hui ne l'est pas.
+  let sommeil = jour?.sommeil;
+  const suggestion = !sommeil?.coucher || !sommeil?.reveil;
+  const precedent = Object.keys(jours).filter(c => c < aujourdhui && jours[c].sommeil?.coucher && jours[c].sommeil?.reveil).sort().pop();
+  if (suggestion) sommeil = precedent ? jours[precedent].sommeil : { coucher: '23:00', reveil: '07:00' };
+  for (const champ of ['coucher', 'reveil']) if (document.activeElement !== $(champ)) $(champ).value = sommeil[champ];
+  $('heures').classList.toggle('suggestion', suggestion);
+  $('sommeil-valider').hidden = !suggestion;
+  const exclu = estExclue('sommeil', jour, semaine);
+  const duree = dureeSommeilMinutes(sommeil.coucher, sommeil.reveil);
+  $('duree').textContent = suggestion ? 'À saisir' : minutesEnTexte(duree);
+  $('sommeil-statut').className = `pastille${suggestion || exclu ? '' : duree >= SOMMEIL_MIN_MINUTES ? ' ok' : ' non'}`;
+  $('sommeil-statut').textContent = exclu ? 'exclu · série en pause' : suggestion ? (precedent ? 'heures de la dernière nuit' : 'heures proposées')
+    : duree >= SOMMEIL_MIN_MINUTES ? '✓ validé' : 'moins de 7 h';
+  $('sommeil-serie').textContent = exclu ? '' : `🔥 ${serieJours('sommeil', contexte)}`;
+
+  // Ménage
+  const menageExclu = !!semaine?.exclusions?.includes('menage');
+  const menageFait = !menageExclu && !!semaine?.menage;
+  $('menage-case').className = `tuile${menageFait ? ' fait' : ''}${menageExclu ? ' exclue' : ''}`;
+  $('menage-case').setAttribute('aria-pressed', menageFait);
+  $('menage-case').disabled = menageExclu;
+  $('menage-info').textContent = menageExclu ? 'exclu cette semaine' : menageFait ? '' : 'à faire cette semaine';
+  $('menage-case').onclick = () => ecrireSemaine({ menage: !menageFait });
+
+  // Tâches : les tâches cochées restent barrées jusqu'à la fin de leur semaine.
+  const dansLaSemaine = t => t.fait && t.faitLe && lundiDe(t.faitLe) === lundi;
+  const visibles = etat.taches.filter(t => !t.fait || dansLaSemaine(t))
+    .sort((x, y) => (x.fait - y.fait) || ((x.creeLe?.toMillis?.() ?? 0) - (y.creeLe?.toMillis?.() ?? 0)));
+  const faites = etat.taches.filter(dansLaSemaine).length;
+  $('compteur-taches').textContent = `${faites} tâche${faites > 1 ? 's' : ''} faite${faites > 1 ? 's' : ''} cette semaine`;
+  $('liste-taches').replaceChildren(...visibles.map(t => {
+    const li = el('li', t.fait ? 'tache-faite' : '');
+    const b = el('button');
+    b.setAttribute('aria-pressed', !!t.fait);
+    b.append(el('span', 'rond', t.fait ? '✓' : ''), el('span', 'texte', t.texte));
+    b.onclick = () => setDoc(ref('tasks', t.id), { fait: !t.fait, faitLe: t.fait ? null : aujourdhui }, { merge: true }).catch(erreur);
+    li.append(b);
+    return li;
+  }));
+}
+
+// Saisies du sommeil et des tâches
+const enregistrerSommeil = () => {
+  if ($('coucher').value && $('reveil').value) ecrireJour({ sommeil: { coucher: $('coucher').value, reveil: $('reveil').value } });
+};
+$('coucher').onchange = enregistrerSommeil;
+$('reveil').onchange = enregistrerSommeil;
+$('sommeil-valider').onclick = enregistrerSommeil;
+$('form-tache').onsubmit = e => {
+  e.preventDefault();
+  const texte = $('nouvelle-tache').value.trim();
+  if (!texte) return;
+  $('nouvelle-tache').value = '';
+  addDoc(col('tasks'), { texte, fait: false, faitLe: null, creeLe: serverTimestamp() }).catch(erreur);
+};
+
+let minuteurToast;
+function erreur(e) {
+  console.error(e);
+  $('toast').textContent = e.code === 'permission-denied' ? 'Ce compte n’a pas accès à Respawn.' : `Pas enregistré : ${e.message}`;
+  $('toast').hidden = false;
+  clearTimeout(minuteurToast);
+  minuteurToast = setTimeout(() => { $('toast').hidden = true; }, 5000);
+}
+
+// Bascule du jour à minuit, heure locale. Vérifiée aussi au retour sur l'app
+// (iPhone en veille, onglet en arrière-plan), car un minuteur peut être retardé.
+function verifierJour() {
+  const cle = cleDuJour(new Date());
+  if (cle === etat.aujourdhui) return;
+  etat.aujourdhui = cle;
+  if (etat.charge.size === 4) { figerSemainesPassees(); rendre(); }
+}
+(function planifierMinuit() {
+  const n = new Date();
+  const minuit = new Date(n.getFullYear(), n.getMonth(), n.getDate() + 1); // minuit local, changement d'heure compris
+  setTimeout(() => { verifierJour(); planifierMinuit(); }, minuit - n + 500);
+})();
+document.addEventListener('visibilitychange', () => { if (!document.hidden) verifierJour(); });
+window.addEventListener('focus', verifierJour);
+
 // ===================== INTERFACE (connexion) =====================
 // Bouton « Se connecter avec Google » (Google Identity Services) puis signInWithCredential :
 // évite les popups et redirections Firebase, peu fiables sur iPhone en mode écran d'accueil.
-const $ = id => document.getElementById(id);
 const attendreGoogle = () => new Promise(ok => {
   const t = setInterval(() => { if (window.google?.accounts?.id) { clearInterval(t); ok(); } }, 100);
 });
-
 attendreGoogle().then(() => {
   google.accounts.id.initialize({
     client_id: GOOGLE_CLIENT_ID,
@@ -219,13 +635,11 @@ attendreGoogle().then(() => {
 });
 
 onAuthStateChanged(auth, u => {
-  $('hors-ligne').hidden = !!u;
-  $('en-ligne').hidden = !u;
-  $('nom').textContent = u ? `${u.displayName} (${u.email})` : '';
-  $('uid').textContent = u?.uid ?? '';
+  arreterEcoute();
+  if (u) { $('chargement').hidden = false; ecouter(u.uid); }
+  else { $('app').hidden = true; $('chargement').hidden = true; $('ecran-connexion').hidden = false; }
 });
 $('deconnexion').onclick = () => signOut(auth);
-
 </script>
 </body>
 </html>
