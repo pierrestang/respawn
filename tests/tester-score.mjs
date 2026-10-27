@@ -6,7 +6,7 @@ const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const debut = html.indexOf('// ===================== LOGIQUE DU SCORE');
 const fin = html.indexOf('// ===================== FIN LOGIQUE DU SCORE');
 const L = new Function(html.slice(debut, fin) +
-  'return { POIDS_DEFAUT, cleDuJour, ajouterJours, lundiDe, joursDeLaSemaine, dureeSommeilMinutes, scoreJour, calculerScoreSemaine, serieJours, serieSemainesSport, etatPersonnage, finDefiMensuel, evaluerDefi, messagePersonnage, phaseDuJour, MESSAGES };')();
+  'return { POIDS_DEFAUT, cleDuJour, ajouterJours, lundiDe, joursDeLaSemaine, dureeSommeilMinutes, scoreJour, calculerScoreSemaine, serieJours, serieSemainesSport, etatPersonnage, finDefiMensuel, evaluerDefi, messagePersonnage, MESSAGES };')();
 
 let echecs = 0;
 const verifier = (nom, obtenu, attendu) => {
@@ -139,7 +139,7 @@ verifier('Seuils : 100, 80, 79, 60, 59, 40, 39, 0, aucun score',
   ['en-forme', 'en-forme', 'content', 'content', 'neutre', 'neutre', 'fatigue', 'fatigue', 'neutre']);
 
 // --- Message du personnage et fond ---
-console.log('\nMessage et fond');
+console.log('\nMessage du personnage');
 const groupeDe = (score, cle) => Object.keys(L.MESSAGES).find(g => L.MESSAGES[g].includes(L.messagePersonnage(score, cle)));
 verifier('Mardi : 90 → en forme, 70 → content, 50 → neutre, 20 → fatigué, aucun score → pause',
   [90, 70, 50, 20, null].map(x => groupeDe(x, '2026-10-27')), ['en-forme', 'content', 'neutre', 'fatigue', 'pause']);
@@ -147,8 +147,6 @@ verifier('Lundi : 10 → message de début de semaine (pas de taquinerie), 85 �
   [10, 85].map(x => groupeDe(x, '2026-10-26')), ['lundi', 'en-forme']);
 verifier('Même jour, même score → même phrase', L.messagePersonnage(50, '2026-10-27') === L.messagePersonnage(52, '2026-10-27'), true);
 verifier('Les phrases varient d\'un jour à l\'autre', new Set(['2026-10-27', '2026-10-28', '2026-10-29', '2026-10-30', '2026-10-31'].map(c => L.messagePersonnage(20, c))).size > 1, true);
-verifier('Phases : 6 h nuit, 7 h jour, 17 h jour, 18 h soir, 20 h soir, 21 h nuit, 0 h nuit',
-  [6, 7, 17, 18, 20, 21, 0].map(L.phaseDuJour), ['nuit', 'jour', 'jour', 'soir', 'soir', 'nuit', 'nuit']);
 
 // --- Défis ---
 console.log('\nDéfis');
