@@ -119,7 +119,7 @@
      Arc du bas (de gauche à droite) : petit-déj, déjeuner, dîner, noms en dessous.
      Sommeil à gauche et ménage à droite, sur les côtés du cercle, noms en dessous. */
   .scene {
-    position: relative; width: calc(100% + 20px); max-width: 378px; height: 428px; margin: 22px auto 0; left: -10px;
+    position: relative; width: calc(100% + 20px); max-width: 378px; height: 428px; margin: 8px auto 0; left: -10px;
     --cy: 210px; --rx: 157px; --ry: 160px; --taille-perso: 168px; --cuvette: 232px;
   }
   /* Neuf boutons tous les 40° : arc du haut, sommeil et ménage sur les côtés, repas sur l'arc du bas. */
@@ -175,10 +175,10 @@
     transform: translate(calc(cos(var(--a)) * var(--rx)), calc(sin(var(--a)) * var(--ry)));
   }
   .libelle {
-    position: absolute; left: 50%; top: calc(100% + 5px); width: 72px; margin-left: -36px;
-    display: grid; justify-items: center; gap: 3px; pointer-events: none;
+    position: absolute; left: 50%; top: calc(100% + 4px); width: 72px; margin-left: -36px;
+    display: grid; justify-items: center; gap: 2px; pointer-events: none;
   }
-  .tuile.haut .libelle { top: auto; bottom: calc(100% + 5px); }
+  .tuile.haut .libelle { top: auto; bottom: calc(100% + 4px); }
   .tuile[data-h="sommeil"] .libelle, .tuile[data-h="menage"] .libelle { width: 62px; margin-left: -31px; }
   .tuile {
     background: none; border: 0; padding: 0; display: block; color: var(--texte); touch-action: manipulation;
@@ -199,8 +199,9 @@
   .tuile:active .icone-habitude { transform: scale(.96); }
   .tuile:focus-visible { outline: none; }
   .tuile:focus-visible .icone-habitude { outline: 2px solid rgba(79, 122, 66, .5); outline-offset: 3px; }
-  .tuile .nom { font-size: 12px; font-weight: 600; line-height: 1.1; transition: color .3s; }
-  .tuile .info { font-size: 11px; color: var(--texte-doux); display: flex; gap: 4px; align-items: center; min-height: 11px; line-height: 1; }
+  .tuile .nom { font-size: 11px; font-weight: 600; line-height: 1.1; transition: color .3s; }
+  .tuile .info { font-size: 9.5px; color: var(--texte-doux); display: flex; gap: 3px; align-items: center; min-height: 10px; line-height: 1; }
+  .tuile .info .serie { font-size: 9.5px; } .tuile .info .serie .icone { width: 9px; height: 9px; }
   .tuile.fait .icone-habitude {
     background: var(--teinte); color: var(--teinte-fonce);
     box-shadow: inset 5px 5px 10px rgba(150, 105, 70, .28), inset -5px -5px 10px rgba(255, 255, 255, .55);
@@ -859,6 +860,29 @@ function icone(nom) {
   svg.append(use);
   return svg;
 }
+// Cadran calé sur l'écran : diamètre = la plus petite valeur entre la largeur de la colonne et la hauteur
+// disponible sous la bande. L'anneau de boutons est serré contre la cuvette, et le personnage occupe
+// environ 75 % de la cuvette. Les valeurs du CSS ne servent que de repli avant ce calcul.
+const NOMS = 30;          // place des noms au-dessus et au-dessous des boutons
+const DEMI_BOUTON = 27;   // boutons ronds de 54 px (zone tactile au-dessus de 44 px)
+const JEU = 6;            // écart entre la cuvette et l'anneau de boutons
+const MARGE_BAS = 16;
+function caleCadran() {
+  const scene = $('scene');
+  if (!scene || $('ecran-jour').hidden) return;
+  scene.style.removeProperty('height');
+  const largeur = scene.getBoundingClientRect().width;
+  const haut = scene.getBoundingClientRect().top + scrollY;
+  const hauteurDispo = innerHeight - haut - MARGE_BAS;
+  const deborde = DEMI_BOUTON + NOMS;   // au-delà du rayon : bouton + nom, en haut et en bas
+  const rayon = Math.max(120, Math.floor(Math.min((largeur - 62) / 2, (hauteurDispo - 2 * deborde) / 2)));
+  const cuvette = 2 * (rayon - DEMI_BOUTON - JEU);
+  for (const [nom, v] of [['--rx', rayon], ['--ry', rayon], ['--cy', rayon + deborde], ['--cuvette', cuvette], ['--taille-perso', Math.round(cuvette * .75)]]) {
+    scene.style.setProperty(nom, `${v}px`);
+  }
+  scene.style.height = `${2 * (rayon + deborde)}px`;
+}
+addEventListener('resize', caleCadran);
 // Boutons autour du personnage (leurs angles sont dans le CSS) ; le ménage, écrit à la semaine, est dans le HTML.
 const ORDRE_SCENE = ['eau', 'sport', 'lecture', 'meditation', 'petitDej', 'dejeuner', 'diner', 'sommeil'];
 const ARC_DU_HAUT = ['eau', 'sport', 'lecture', 'meditation'];
@@ -997,6 +1021,7 @@ function rendre() {
     else b.removeAttribute('aria-current');
   }
   rendreJour();
+  caleCadran();
   rendreHistorique();
   rendreTaches();
   rendreReglages();
