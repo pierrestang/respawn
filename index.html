@@ -108,7 +108,7 @@
      Arc du bas (de gauche à droite) : petit-déj, déjeuner, dîner, noms en dessous.
      Sommeil à gauche et ménage à droite, sur les côtés du cercle, noms en dessous. */
   .scene {
-    position: relative; width: calc(100% + 20px); max-width: 378px; height: 428px; margin: 64px auto 0; left: -10px;
+    position: relative; width: calc(100% + 20px); max-width: 378px; height: 428px; margin: 24px auto 0; left: -10px;
     --cy: 210px; --rx: 157px; --ry: 160px; --taille-perso: 168px; --cuvette: 232px;
   }
   /* Neuf boutons tous les 40° : arc du haut, sommeil et ménage sur les côtés, repas sur l'arc du bas. */
@@ -259,24 +259,35 @@
   #bandeau-correction .bouton { padding: 8px 14px; font-size: 14px; }
 
   /* --- Navigation : en relief, icônes seules, le nom n'apparaît que pour l'onglet actif (en creux) --- */
-  /* Barre verticale fixée en haut à droite : icônes seules, l'onglet actif en creux. */
-  nav {
-    position: fixed; top: calc(12px + env(safe-area-inset-top)); right: max(10px, env(safe-area-inset-right));
-    display: flex; flex-direction: column; gap: 4px; padding: 5px; border-radius: 26px; z-index: 10;
-    background: var(--fond); box-shadow: var(--relief);
+  /* Menu dépliant en haut à droite : un bouton « menu » ; ouvert, les quatre écrans se déploient dessous. */
+  #menu {
+    position: fixed; top: calc(12px + env(safe-area-inset-top)); right: max(10px, env(safe-area-inset-right)); z-index: 10;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
   }
+  #menu-bouton {
+    width: 50px; height: 50px; border: 0; border-radius: 50%; display: grid; place-items: center;
+    background: var(--fond); box-shadow: var(--relief-rond); color: var(--texte); transition: box-shadow .2s;
+  }
+  #menu-bouton .ferme, #menu.ouvert #menu-bouton .ouvre { display: none; }
+  #menu.ouvert #menu-bouton .ferme { display: block; }
+  #menu.ouvert #menu-bouton { box-shadow: var(--creux-mini); background: var(--creux-fond); }
+  nav {
+    display: flex; flex-direction: column; gap: 4px; padding: 5px; border-radius: 26px;
+    background: var(--fond); box-shadow: var(--relief);
+    opacity: 0; visibility: hidden; transform: translateY(-10px) scale(.96); transform-origin: top center; pointer-events: none;
+    transition: opacity .2s ease, transform .2s ease, visibility .2s;
+  }
+  #menu.ouvert nav { opacity: 1; visibility: visible; transform: none; pointer-events: auto; }
   nav button {
     border: 0; background: none; border-radius: 20px; width: 46px; min-height: 46px; padding: 6px 0;
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
     font-weight: 600; color: var(--texte-doux); transition: box-shadow .3s, background .3s;
   }
-  nav .nav-nom { display: none; }
   nav button[aria-current="page"] { background: var(--creux-fond); box-shadow: var(--creux-mini); color: var(--accent-texte); }
-  /* Sur iPhone, le contenu laisse la place de la barre à droite (la bande du bilan sur l'écran du jour, tout le reste ailleurs). */
+  /* Sur iPhone, le contenu laisse la place du bouton menu : la bande à côté de lui, les autres écrans dessous. */
   @media (max-width: 599px) {
     .bande { margin-right: 62px; }
-    #ecran-historique, #ecran-taches, #ecran-reglages { padding-right: 62px; }
-    .cal-ligne { grid-template-columns: 40px repeat(7, 1fr) 34px; gap: 5px; }
+    #ecran-historique, #ecran-taches, #ecran-reglages { padding-top: 62px; }
   }
 
   /* --- Calendrier en pixels : une case par jour en léger relief, verte selon la journée ; vide = en creux --- */
@@ -368,6 +379,8 @@
   <symbol id="i-historique" viewBox="0 0 24 24"><rect x="4" y="5.5" width="16" height="14.5" rx="3.5"/><path d="M4 10h16M8.5 3.5v3.5M15.5 3.5v3.5"/><path d="M8 13.5h.01M12 13.5h.01M16 13.5h.01M8 16.8h.01M12 16.8h.01"/></symbol>
   <symbol id="i-reglages" viewBox="0 0 24 24"><path d="M18.70 10.33 L21.31 10.69 L21.31 13.31 L18.70 13.67 L17.91 15.55 L19.51 17.66 L17.66 19.51 L15.55 17.91 L13.67 18.70 L13.31 21.31 L10.69 21.31 L10.33 18.70 L8.45 17.91 L6.34 19.51 L4.49 17.66 L6.09 15.55 L5.30 13.67 L2.69 13.31 L2.69 10.69 L5.30 10.33 L6.09 8.45 L4.49 6.34 L6.34 4.49 L8.45 6.09 L10.33 5.30 L10.69 2.69 L13.31 2.69 L13.67 5.30 L15.55 6.09 L17.66 4.49 L19.51 6.34 L17.91 8.45Z"/><circle cx="12" cy="12" r="3"/></symbol>
   <symbol id="i-taches" viewBox="0 0 24 24"><path d="M4.5 6.5l1.6 1.6 2.9-3M4.5 12.5l1.6 1.6 2.9-3M4.5 18.5l1.6 1.6 2.9-3M12 7h7.5M12 13h7.5M12 19h7.5"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M5 7.5h14M5 12h14M5 16.5h14"/></symbol>
+  <symbol id="i-fermer" viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></symbol>
   <symbol id="i-defi" viewBox="0 0 24 24"><path d="M6 20.5V4"/><path d="M6 5c3.3-1.6 6.3 1.6 11 0v7.4c-4.7 1.6-7.7-1.6-11 0"/></symbol>
   <symbol id="i-crayon" viewBox="0 0 24 24"><path d="M4.5 19.5l1-4L15.8 5.2a2.1 2.1 0 0 1 3 3L8.5 18.5z"/><path d="M13.8 7.2l3 3"/></symbol>
 </svg>
@@ -473,12 +486,17 @@
  </div>
 </main>
 
-<nav id="navigation" hidden>
-  <button data-ecran="jour" aria-label="Jour"><svg class="icone" aria-hidden="true"><use href="#i-jour"/></svg><span class="nav-nom">Jour</span></button>
-  <button data-ecran="taches" aria-label="Tâches"><svg class="icone" aria-hidden="true"><use href="#i-taches"/></svg><span class="nav-nom">Tâches</span></button>
-  <button data-ecran="historique" aria-label="Historique"><svg class="icone" aria-hidden="true"><use href="#i-historique"/></svg><span class="nav-nom">Historique</span></button>
-  <button data-ecran="reglages" aria-label="Réglages"><svg class="icone" aria-hidden="true"><use href="#i-reglages"/></svg><span class="nav-nom">Réglages</span></button>
-</nav>
+<div id="menu" hidden>
+  <button id="menu-bouton" aria-label="Menu" aria-expanded="false" aria-controls="navigation">
+    <svg class="icone ouvre" aria-hidden="true"><use href="#i-menu"/></svg><svg class="icone ferme" aria-hidden="true"><use href="#i-fermer"/></svg>
+  </button>
+  <nav id="navigation">
+    <button data-ecran="jour" aria-label="Jour"><svg class="icone" aria-hidden="true"><use href="#i-jour"/></svg></button>
+    <button data-ecran="taches" aria-label="Tâches"><svg class="icone" aria-hidden="true"><use href="#i-taches"/></svg></button>
+    <button data-ecran="historique" aria-label="Historique"><svg class="icone" aria-hidden="true"><use href="#i-historique"/></svg></button>
+    <button data-ecran="reglages" aria-label="Réglages"><svg class="icone" aria-hidden="true"><use href="#i-reglages"/></svg></button>
+  </nav>
+</div>
 
 <div id="toast" hidden></div>
 
@@ -1002,7 +1020,7 @@ function rendre() {
   $('ecran-connexion').hidden = true;
   $('chargement').hidden = true;
   $('app').hidden = false;
-  $('navigation').hidden = false;
+  $('menu').hidden = false;
   for (const nom of ['jour', 'historique', 'taches', 'reglages']) $(`ecran-${nom}`).hidden = etat.ecran !== nom;
   for (const b of $('navigation').children) {
     if (b.dataset.ecran === etat.ecran) b.setAttribute('aria-current', 'page');
@@ -1313,10 +1331,21 @@ for (const b of $('excl-mode').children) b.onclick = () => { etat.ui.exclMode = 
 $('excl-date').onchange = () => { if ($('excl-date').value) { etat.ui.exclDate = $('excl-date').value; rendre(); } };
 $('poids-defaut').onclick = () => ecrireReglages({ poids: POIDS_DEFAUT });
 
-// Navigation
+// Navigation : menu dépliant, refermé après le choix d'un écran, en touchant ailleurs ou avec Échap.
+function fermerMenu() {
+  $('menu').classList.remove('ouvert');
+  $('menu-bouton').setAttribute('aria-expanded', 'false');
+}
+$('menu-bouton').onclick = () => {
+  const ouvert = $('menu').classList.toggle('ouvert');
+  $('menu-bouton').setAttribute('aria-expanded', String(ouvert));
+};
+document.addEventListener('pointerdown', e => { if (!$('menu').contains(e.target)) fermerMenu(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') fermerMenu(); });
 for (const b of $('navigation').children) b.onclick = () => {
   etat.ecran = b.dataset.ecran;
   if (etat.ecran === 'jour') etat.jourAffiche = null;
+  fermerMenu();
   rendre();
   scrollTo(0, 0);
 };
@@ -1377,7 +1406,7 @@ attendreGoogle().then(() => {
 onAuthStateChanged(auth, u => {
   arreterEcoute();
   if (u) { $('chargement').hidden = false; ecouter(u.uid); }
-  else { $('app').hidden = true; $('navigation').hidden = true; $('chargement').hidden = true; $('ecran-connexion').hidden = false; }
+  else { $('app').hidden = true; $('menu').hidden = true; fermerMenu(); $('chargement').hidden = true; $('ecran-connexion').hidden = false; }
 });
 $('deconnexion').onclick = () => signOut(auth);
 </script>
