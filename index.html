@@ -25,11 +25,13 @@
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   [hidden] { display: none !important; }
+  /* Fond selon l'heure locale (data-phase posé sur <html>) : ciel clair, lumière dorée, nuit étoilée. */
   html { background: var(--ciel); }
+  html[data-phase="soir"] { background: #f6b77e; }
+  html[data-phase="nuit"] { background: #1f2a4d; }
   body {
     margin: 0; min-height: 100vh; color: var(--brun);
     font-family: 'Nunito', ui-rounded, system-ui, sans-serif; font-weight: 700;
-    /* Ciel de journée (le cycle selon l'heure arrive à l'étape 7) */
     background:
       radial-gradient(60px 26px at 18% 70px, #fff9 60%, transparent 62%),
       radial-gradient(90px 34px at 26% 82px, #fffb 60%, transparent 62%),
@@ -38,6 +40,27 @@
       var(--beige);
     padding: env(safe-area-inset-top) 16px calc(104px + env(safe-area-inset-bottom));
   }
+  html[data-phase="soir"] body {
+    background:
+      radial-gradient(70px 70px at 82% 90px, #fff3c4 40%, #ffd98a55 62%, transparent 75%),
+      radial-gradient(90px 30px at 22% 80px, #ffe2c299 60%, transparent 62%),
+      linear-gradient(#f6b77e 0, #f9d2a0 280px, #f6e3c4 520px, var(--beige) 700px) no-repeat,
+      var(--beige);
+  }
+  html[data-phase="nuit"] body {
+    background:
+      radial-gradient(11px 11px at calc(100% - 30px) 22px, #fdf6d8 96%, transparent 100%),
+      radial-gradient(1.6px 1.6px at 30px 40px, #fff, transparent),
+      radial-gradient(1.2px 1.2px at 120px 90px, #fffd, transparent),
+      radial-gradient(1.8px 1.8px at 200px 30px, #fff, transparent),
+      radial-gradient(1.2px 1.2px at 260px 150px, #fffc, transparent),
+      radial-gradient(1.5px 1.5px at 80px 180px, #fffe, transparent),
+      radial-gradient(1.2px 1.2px at 170px 220px, #fffb, transparent),
+      #1f2a4d;
+    background-size: auto, 220px 200px, 220px 200px, 220px 200px, 220px 200px, 220px 200px, 220px 200px, auto;
+  }
+  html[data-phase="nuit"] #date, html[data-phase="nuit"] #chargement, html[data-phase="nuit"] #message { color: #dfe3f5; }
+  html[data-phase="nuit"] .logo { color: #bfe7a8; text-shadow: 0 3px 0 #0f1838; }
   button, input { font: inherit; color: inherit; }
   button { cursor: pointer; }
 
@@ -79,7 +102,14 @@
     display: grid; place-items: center; font-size: 19px; box-shadow: var(--ombre);
   }
   @keyframes rebond { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
-  #bulle { background: #fff; border-radius: 20px; padding: 10px 14px; font-size: 15px; position: relative; margin-bottom: 8px; }
+  #bulle {
+    background: #fff; border-radius: 20px; padding: 10px 14px; font-size: 15px; position: relative; margin: 0 0 14px;
+    box-shadow: 0 3px 0 var(--sable);
+  }
+  #bulle::after {
+    content: ''; position: absolute; left: 40px; bottom: -10px; width: 20px; height: 20px; background: #fff;
+    transform: rotate(45deg); border-radius: 0 0 6px 0; box-shadow: 3px 3px 0 var(--sable);
+  }
   .score-ligne { display: flex; align-items: baseline; gap: 6px; }
   #score { font-size: 46px; font-weight: 900; line-height: 1; color: var(--feuille-fonce); }
   .sur-100 { font-size: 18px; color: var(--brun-doux); }
@@ -260,10 +290,10 @@
     <p id="date"></p>
     <div id="bandeau-correction" hidden><span id="bandeau-texte"></span><button class="bouton" id="retour-aujourdhui">Aujourd’hui</button></div>
     <section class="carte">
+      <p id="bulle" hidden></p>
       <div class="entete">
         <div class="perso-cadre" aria-hidden="true"><div id="perso">🌱</div><span id="perso-etat" hidden></span></div>
         <div>
-          <p id="bulle" hidden></p>
           <div class="score-ligne">
             <span id="score">0</span><span class="sur-100">/100</span>
             <span class="libelle-score">cette semaine</span>
@@ -534,6 +564,54 @@ function etatPersonnage(score) {
   return score >= 80 ? 'en-forme' : score >= 60 ? 'content' : score >= 40 ? 'neutre' : 'fatigue';
 }
 
+// --- Message du personnage : doux et encourageant, une pointe de taquinerie si la semaine est mauvaise ---
+const MESSAGES = {
+  'en-forme': [
+    'Tu es en feu cette semaine ! Continue comme ça.',
+    'Semaine de champion. Quelle fierté !',
+    'Rien ne t’arrête. J’adore cette énergie !',
+    'On frôle la perfection… tu vises le 100 ?',
+  ],
+  content: [
+    'Belle semaine ! Encore un petit effort et c’est le top.',
+    'Ça roule bien. Je sens qu’on peut grimper encore.',
+    'On est sur la bonne voie, toi et moi.',
+    'Joli rythme ! Quelques cases de plus et on décolle.',
+  ],
+  neutre: [
+    'Semaine moyenne… mais rien n’est joué, on se reprend ?',
+    'La moitié du chemin est faite. L’autre t’attend !',
+    'Je t’ai déjà vu plus en forme… allez, une case de plus ?',
+    'Ni bien ni mal. Et si on surprenait tout le monde ?',
+  ],
+  fatigue: [
+    'Hé, je m’ennuie un peu là… on coche quelque chose ensemble ?',
+    'Semaine molle, hein ? Pas grave, on repart maintenant.',
+    'Je fais la sieste en t’attendant. Réveille-moi avec une case cochée !',
+    'On va dire que c’était une semaine de repos. On repart ?',
+  ],
+  lundi: [
+    'Nouvelle semaine, compteur à zéro. On commence fort ?',
+    'Page blanche ! Tout est possible cette semaine.',
+  ],
+  pause: ['Semaine en pause. Profite bien, je garde la maison !'],
+};
+// Choix stable sur la journée (la phrase ne change pas à chaque tap), différent d'un jour à l'autre.
+// Le lundi, un score bas veut juste dire que la semaine commence : pas de taquinerie.
+function messagePersonnage(score, cle) {
+  const lundi = lundiDe(cle) === cle;
+  const groupe = score === null || score === undefined ? 'pause'
+    : lundi && score < 60 ? 'lundi' : etatPersonnage(score);
+  const liste = MESSAGES[groupe];
+  const graine = [...cle].reduce((h, c) => (h * 31 + c.charCodeAt(0)) % 9973, 7);
+  return liste[graine % liste.length];
+}
+
+// --- Fond selon l'heure locale : ciel clair le jour, lumière dorée le soir, nuit étoilée ---
+function phaseDuJour(heure) {
+  return heure >= 7 && heure < 18 ? 'jour' : heure >= 18 && heure < 21 ? 'soir' : 'nuit';
+}
+
 // --- Défis (sans effet sur le score) ---
 // Fin d'un défi mensuel : la veille du même jour le mois suivant (27 oct. → 26 nov.).
 // Si ce jour n'existe pas (31 janv. → 31 févr.), on prend le dernier jour du mois suivant.
@@ -758,6 +836,8 @@ function rendreJour() {
     if (!img) { img = el('img'); img.alt = ''; $('perso').replaceChildren(img); }
     afficherAnimal(img, animal, etatPersonnage(r.score), $('perso-etat'));
   }
+  $('bulle').hidden = passe;
+  $('bulle').textContent = animal ? messagePersonnage(r.score, aujourdhui) : 'Choisis ton compagnon dans les Réglages 🌿';
   $('jauge-rempli').style.width = `${r.score ?? 0}%`;
   document.querySelector('.libelle-score').textContent = semaineEnCours ? 'cette semaine' : `semaine du ${formatDate(lundi, { day: 'numeric', month: 'short' })}`;
   const lundiPrecedent = ajouterJours(lundi, -7);
@@ -1066,8 +1146,19 @@ function verifierJour() {
   const minuit = new Date(n.getFullYear(), n.getMonth(), n.getDate() + 1); // minuit local, changement d'heure compris
   setTimeout(() => { verifierJour(); planifierMinuit(); }, minuit - n + 500);
 })();
-document.addEventListener('visibilitychange', () => { if (!document.hidden) verifierJour(); });
-window.addEventListener('focus', verifierJour);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) { verifierJour(); appliquerPhase(); } });
+window.addEventListener('focus', () => { verifierJour(); appliquerPhase(); });
+
+// Fond selon l'heure locale, revu chaque minute.
+const COULEUR_BARRE = { jour: '#bfe7f7', soir: '#f6b77e', nuit: '#1f2a4d' };
+function appliquerPhase() {
+  const phase = phaseDuJour(new Date().getHours());
+  if (document.documentElement.dataset.phase === phase) return;
+  document.documentElement.dataset.phase = phase;
+  document.querySelector('meta[name="theme-color"]').content = COULEUR_BARRE[phase];
+}
+appliquerPhase();
+setInterval(appliquerPhase, 60 * 1000);
 
 // ===================== INTERFACE (connexion) =====================
 // Bouton « Se connecter avec Google » (Google Identity Services) puis signInWithCredential :
