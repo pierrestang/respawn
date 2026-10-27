@@ -91,18 +91,7 @@
   #date::first-letter { text-transform: uppercase; }
   .bande-infos { font-size: 11.5px; color: var(--texte-doux); margin: 3px 0 0; }
   .bande-infos b { color: var(--texte); font-weight: 700; }
-  /* iPhone : la bulle s'arrête avant la barre de menu */
-  @media (max-width: 599px) { #ecran-jour #bulle { margin-right: 62px; max-width: none; } }
   .pour-lecteur { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-  /* Bulle du personnage, juste au-dessus du cadran, à droite ; sa queue pointe vers lui. */
-  #bulle {
-    position: relative; width: fit-content; max-width: 78%; margin: 0 6px -6px auto; background: var(--fond); border-radius: 16px; padding: 8px 12px;
-    font-size: 13px; line-height: 1.4; box-shadow: var(--relief-mini); z-index: 1;
-  }
-  #bulle::after {
-    content: ''; position: absolute; left: 20px; bottom: -7px; width: 14px; height: 14px; background: var(--fond);
-    transform: rotate(45deg); border-radius: 0 0 4px 0; box-shadow: 3px 3px 5px rgba(219, 196, 174, .6);
-  }
   /* Anneau de progression autour du score de la semaine */
   .anneau { position: relative; width: 64px; height: 64px; border-radius: 50%; flex: none; box-shadow: var(--relief-mini); display: grid; place-items: center; }
   .anneau::before { content: ''; position: absolute; inset: 8px; border-radius: 50%; background: var(--creux-fond); box-shadow: var(--creux-mini); }
@@ -119,7 +108,7 @@
      Arc du bas (de gauche à droite) : petit-déj, déjeuner, dîner, noms en dessous.
      Sommeil à gauche et ménage à droite, sur les côtés du cercle, noms en dessous. */
   .scene {
-    position: relative; width: calc(100% + 20px); max-width: 378px; height: 428px; margin: 8px auto 0; left: -10px;
+    position: relative; width: calc(100% + 20px); max-width: 378px; height: 428px; margin: 64px auto 0; left: -10px;
     --cy: 210px; --rx: 157px; --ry: 160px; --taille-perso: 168px; --cuvette: 232px;
   }
   /* Neuf boutons tous les 40° : arc du haut, sommeil et ménage sur les côtés, repas sur l'arc du bas. */
@@ -129,7 +118,7 @@
   .tuile[data-h="dejeuner"] { --a: 90deg; } .tuile[data-h="petitDej"] { --a: 130deg; } .tuile[data-h="sommeil"] { --a: 170deg; }
   /* Ordinateur : le même cadran, plus grand et parfaitement rond. */
   @media (min-width: 600px) {
-    .scene { width: 100%; left: 0; max-width: 520px; height: 488px; --cy: 240px; --rx: 190px; --ry: 190px; --taille-perso: 196px; --cuvette: 290px; }
+    .scene { width: 100%; left: 0; margin-top: 8px; max-width: 520px; height: 488px; --cy: 240px; --rx: 190px; --ry: 190px; --taille-perso: 196px; --cuvette: 290px; }
   }
   .cadran, .cuvette { position: absolute; left: 50%; top: var(--cy); border-radius: 50%; transform: translate(-50%, -50%); }
   /* Fin anneau en relief, sur lequel les boutons sont posés */
@@ -408,7 +397,6 @@
         <p class="bande-infos"><span id="libelle-semaine" class="pour-lecteur"></span><span id="comparaison"></span> · <span title="Score du jour : habitudes quotidiennes ; le sport et le ménage comptent dans la semaine."><span id="libelle-jour">aujourd’hui</span> <b id="score-jour">0</b></span></p>
       </div>
     </header>
-    <p id="bulle" hidden></p>
 
     <section class="scene" id="scene">
       <div class="cadran" aria-hidden="true"></div>
@@ -1056,8 +1044,6 @@ function rendreJour() {
   // Personnage : son état suit le score de la semaine affichée (ou une pose d'interaction en cours).
   etatPerso = etatPersonnage(r.score);
   majPersonnage();
-  $('bulle').hidden = passe;
-  $('bulle').textContent = messagePersonnage(r.score, aujourdhui);
   $('libelle-semaine').textContent = semaineEnCours ? 'cette semaine' : `semaine du ${formatDate(lundi, { day: 'numeric', month: 'short' })}`;
   const lundiPrecedent = ajouterJours(lundi, -7);
   const precedente = semaines[lundiPrecedent];
