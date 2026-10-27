@@ -46,7 +46,7 @@
     margin: 0; min-height: 100vh; color: var(--texte); background: var(--fond);
     font-family: 'DM Sans', system-ui, sans-serif; font-weight: 400; font-variant-numeric: tabular-nums;
     -webkit-font-smoothing: antialiased;
-    padding: env(safe-area-inset-top) 16px calc(104px + env(safe-area-inset-bottom));
+    padding: calc(12px + env(safe-area-inset-top)) 16px calc(28px + env(safe-area-inset-bottom));
   }
   button, input { font: inherit; color: inherit; }
   button { cursor: pointer; }
@@ -63,12 +63,12 @@
   #message { color: #9a4a36; max-width: 320px; margin: 0 auto; }
 
   /* --- Mise en page --- */
-  #app { max-width: 560px; margin: 0 auto; padding-top: 6px; }
+  #app { max-width: 560px; margin: 0 auto; }
   #ecran-jour, #ecran-historique, #ecran-taches, #ecran-reglages { display: grid; gap: 18px; }
   .colonne { display: grid; gap: 18px; align-content: start; }
-  #ecran-jour { gap: 14px; }
+  #ecran-jour { gap: 12px; max-width: 520px; margin: 0 auto; }
   @media (min-width: 960px) {
-    #app { max-width: 760px; padding-top: 20px; }
+    #app { padding-top: 20px; }
     #ecran-historique, #ecran-taches, #ecran-reglages { max-width: 640px; margin: 0 auto; }
   }
   .carte { background: var(--fond); border-radius: var(--rond); box-shadow: var(--relief); padding: 16px 18px; position: relative; }
@@ -85,22 +85,30 @@
   .serie .icone { width: 11px; height: 11px; stroke-width: 1.8; color: var(--flamme); }
 
   /* --- Bande de bilan : anneau du score, bulle du personnage, semaine en pastilles --- */
-  #date { text-align: center; font-size: 14px; font-weight: 500; color: var(--texte-doux); margin: 2px 0 0; }
+  #date { font-family: var(--titres); font-variation-settings: 'SOFT' 100; font-size: 17px; font-weight: 600; color: var(--texte); margin: 0; }
   #date::first-letter { text-transform: uppercase; }
   .bande { padding: 14px 16px 12px; }
-  .bande-haut { display: grid; grid-template-columns: auto 1fr auto; gap: 14px; align-items: center; }
+  .bande-haut { display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: end; }
+  @media (max-width: 599px) {
+    .bande-haut { grid-template-columns: auto 1fr; grid-template-areas: "score date" "score infos" "bulle bulle"; gap: 6px 12px; align-items: start; }
+    .bande .bande-score { grid-area: score; }
+    .bande .bande-texte { display: contents; }
+    .bande #date { grid-area: date; align-self: end; } .bande .bande-infos { grid-area: infos; } .bande #bulle { grid-area: bulle; margin: 4px 0 0; }
+  }
+  .bande-score { display: grid; justify-items: center; gap: 10px; }
   .bande-texte { display: grid; gap: 6px; min-width: 0; }
   .bande-infos { font-size: 12.5px; color: var(--texte-doux); line-height: 1.4; }
   .bande-infos b { color: var(--texte); font-weight: 700; }
   #bulle {
     position: relative; background: var(--fond); border-radius: 16px; padding: 9px 12px;
-    font-size: 13px; line-height: 1.4; margin: 0 0 6px; box-shadow: var(--relief-mini);
+    font-size: 13px; line-height: 1.4; margin: 6px 0 0; box-shadow: var(--relief-mini);
   }
-  /* Queue de la bulle, pointée vers le personnage, en dessous */
+  /* Queue de la bulle, pointée vers le personnage, juste en dessous */
   #bulle::after {
-    content: ''; position: absolute; left: 28px; bottom: -7px; width: 14px; height: 14px; background: var(--fond);
+    content: ''; position: absolute; left: 22px; bottom: -7px; width: 14px; height: 14px; background: var(--fond);
     transform: rotate(45deg); border-radius: 0 0 4px 0; box-shadow: 3px 3px 5px rgba(219, 196, 174, .6);
   }
+  .bande-texte { align-self: stretch; display: flex; flex-direction: column; justify-content: space-between; gap: 6px; }
   /* Anneau de progression autour du score de la semaine */
   .anneau { position: relative; width: 88px; height: 88px; border-radius: 50%; flex: none; box-shadow: var(--relief-rond); display: grid; place-items: center; }
   .anneau::before { content: ''; position: absolute; inset: 9px; border-radius: 50%; background: var(--creux-fond); box-shadow: var(--creux-mini); }
@@ -111,9 +119,11 @@
   #score { font-family: var(--titres); font-size: 32px; font-weight: 600; color: var(--texte); font-variant-numeric: tabular-nums lining-nums; }
   .sur-100 { font-size: 9px; color: var(--texte-doux); margin-top: 3px; letter-spacing: .4px; }
 
-  /* Plante en trait simple, élément secondaire (masquée sur les écrans étroits, faute de place) */
-  #plante { width: 34px; height: 48px; flex: none; overflow: visible; align-self: end; }
-  @media (max-width: 599px) { #plante { display: none; } .bande-haut { grid-template-columns: auto 1fr; } }
+  /* Plante en trait simple, élément secondaire, dans la scène à côté de la cuvette */
+  #plante {
+    position: absolute; left: 50%; top: var(--cy); width: 40px; height: 56px; margin: -28px 0 0 -20px; overflow: visible;
+    transform: translate(calc(var(--coin-x) * -1), var(--coin-y));
+  }
   #plante .trait { fill: none; stroke: var(--accent); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
   #plante .pot { fill: none; stroke: var(--texte-doux); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
   #plante .tige { fill: none; stroke: var(--accent); stroke-width: 2.8; stroke-linecap: round; stroke-dasharray: 100; transition: stroke-dashoffset var(--anim) cubic-bezier(.22, 1, .36, 1); }
@@ -121,10 +131,10 @@
   #plante .etape.visible { opacity: 1; transform: scale(1); }
 
   /* Semaine en pastilles : pleine (verte selon la journée), manquée (en creux), à venir (en relief). */
-  .semaine-pastilles { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin: 12px 0 6px; }
+  .semaine-pastilles { display: grid; grid-template-columns: repeat(7, 20px); gap: 4px; margin: 0 0 6px; }
   .pastille-jour {
-    justify-self: center; width: 100%; max-width: 30px; aspect-ratio: 1; border-radius: 50%; position: relative;
-    display: grid; place-items: center; font-size: 11px; font-weight: 600; color: var(--texte-doux);
+    width: 20px; height: 20px; border-radius: 50%; position: relative;
+    display: grid; place-items: center; font-size: 9px; font-weight: 600; color: var(--texte-doux);
     background: var(--fond); box-shadow: var(--relief-mini);
   }
   .pastille-jour.manque { background: var(--creux-fond); box-shadow: var(--creux-mini); }
@@ -137,25 +147,45 @@
   .pastille-jour.n4 { background: #6a9656; color: #14200f; box-shadow: var(--creux-mini); }
   .pastille-jour.n5 { background: var(--accent); color: #fff; box-shadow: var(--creux-mini); }
   .pastille-jour.aujourdhui::after {
-    content: ''; position: absolute; bottom: -7px; left: 50%; width: 4px; height: 4px; border-radius: 50%;
+    content: ''; position: absolute; bottom: -6px; left: 50%; width: 4px; height: 4px; border-radius: 50%;
     background: var(--accent); transform: translateX(-50%);
   }
 
-  /* --- La scène : le personnage au centre sur son disque, les boutons d'habitudes autour ---
-     Chaque bouton est posé au centre de la scène puis décalé sur une ellipse avec cos() et sin() :
-     --i est son rang (0 à 7), --depart et --pas règlent les angles, --rx et --ry les rayons.
-     iPhone : fer à cheval ouvert vers le haut (300°). Ordinateur : cercle complet. */
+  /* --- La scène en cadran : le personnage dans une cuvette en creux, les boutons posés sur un fin anneau en relief ---
+     Chaque bouton est posé au centre de la scène puis décalé sur l'anneau avec cos() et sin() de son angle --a.
+     Arc du haut (de gauche à droite) : eau, sport, lecture, méditation, noms au-dessus.
+     Arc du bas (de gauche à droite) : petit-déj, déjeuner, dîner, noms en dessous.
+     Ménage et plante hors du cercle, dans les coins du bas. */
   .scene {
-    position: relative; width: 100%; max-width: 358px; height: 342px; margin: 0 auto;
-    --cy: 150px; --rx: 141px; --ry: 138px; --depart: -60deg; --pas: calc(300deg / 7); --taille-perso: 128px;
+    position: relative; width: 100%; max-width: 358px; height: 366px; margin: 0 auto;
+    --cy: 179px; --rx: 150px; --ry: 128px; --taille-perso: 160px; --cuvette: 196px;
   }
+  .tuile[data-h="eau"] { --a: -150deg; } .tuile[data-h="sport"] { --a: -110deg; }
+  .tuile[data-h="lecture"] { --a: -70deg; } .tuile[data-h="meditation"] { --a: -30deg; }
+  .tuile[data-h="petitDej"] { --a: 122deg; } .tuile[data-h="dejeuner"] { --a: 90deg; } .tuile[data-h="diner"] { --a: 58deg; }
+  /* Ordinateur : les sept boutons régulièrement espacés sur un cercle complet (360° / 7). */
   @media (min-width: 600px) {
-    .scene { max-width: 520px; height: 370px; --cy: 166px; --rx: 172px; --ry: 132px; --depart: -90deg; --pas: 45deg; --taille-perso: 150px; }
+    .scene { max-width: 520px; height: 420px; --cy: 204px; --rx: 160px; --ry: 160px; --taille-perso: 180px; --cuvette: 246px; }
+    .tuile[data-h="eau"] { --a: -167.14deg; } .tuile[data-h="sport"] { --a: -115.71deg; }
+    .tuile[data-h="lecture"] { --a: -64.29deg; } .tuile[data-h="meditation"] { --a: -12.86deg; }
+    .tuile[data-h="diner"] { --a: 38.57deg; } .tuile[data-h="dejeuner"] { --a: 90deg; } .tuile[data-h="petitDej"] { --a: 141.43deg; }
   }
-  .socle {
-    position: absolute; left: 50%; top: calc(var(--cy) + var(--taille-perso) * .42); transform: translateX(-50%);
-    width: calc(var(--taille-perso) * 1.05); height: calc(var(--taille-perso) * .26); border-radius: 50%;
-    background: var(--fond); box-shadow: var(--relief-rond);
+  .cadran, .cuvette { position: absolute; left: 50%; top: var(--cy); border-radius: 50%; transform: translate(-50%, -50%); }
+  /* Fin anneau en relief, sur lequel les boutons sont posés */
+  .cadran {
+    width: calc(var(--rx) * 2); height: calc(var(--ry) * 2); border: 9px solid var(--fond);
+    box-shadow: 4px 4px 9px var(--ombre-foncee), -4px -4px 9px var(--ombre-claire),
+                inset 4px 4px 9px var(--ombre-foncee), inset -4px -4px 9px var(--ombre-claire);
+  }
+  /* Grande cuvette en creux, où se tient le personnage */
+  .cuvette {
+    width: var(--cuvette); height: var(--cuvette); background: var(--creux-fond);
+    box-shadow: inset 10px 10px 22px var(--ombre-foncee), inset -10px -10px 22px var(--ombre-claire);
+  }
+  .ombre-perso {
+    position: absolute; left: 50%; top: calc(var(--cy) + var(--taille-perso) * .44); transform: translate(-50%, -50%);
+    width: calc(var(--taille-perso) * .52); height: 14px; border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(95, 65, 40, .38), rgba(95, 65, 40, 0));
   }
   .perso-cadre {
     position: absolute; left: 50%; top: var(--cy); width: var(--taille-perso); height: var(--taille-perso);
@@ -163,34 +193,36 @@
   }
   #perso {
     position: relative; width: 100%; height: 100%; display: grid; place-items: center; color: var(--accent);
-    filter: drop-shadow(5px 9px 8px rgba(150, 110, 80, .3)); animation: rebond 3s ease-in-out infinite;
+    filter: drop-shadow(3px 6px 5px rgba(120, 85, 55, .28)); animation: rebond 3s ease-in-out infinite;
     transition: transform var(--anim);
   }
-  #perso img { width: 100%; height: 100%; object-fit: contain; }
-  #perso img.provisoire { width: 92%; height: 92%; }
-  #perso-etat {
-    position: absolute; left: 50%; bottom: -26px; transform: translateX(-50%); white-space: nowrap;
-    font-size: 11px; color: var(--texte-doux); background: var(--fond); padding: 1px 9px; border-radius: 999px; box-shadow: var(--relief-mini);
-  }
+  #perso img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
   @keyframes rebond { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
   .perso-cadre.saute { animation: saut-perso var(--anim) cubic-bezier(.3, 1.6, .5, 1); }
   .perso-cadre.saute-double { animation: saut-double var(--anim) ease-out; }
   @keyframes saut-perso { 0%, 100% { transform: none; } 40% { transform: translateY(-16px) rotate(-6deg); } 70% { transform: translateY(0) rotate(3deg); } }
   @keyframes saut-double { 0%, 50%, 100% { transform: none; } 25% { transform: translateY(-16px) rotate(-6deg); } 75% { transform: translateY(-11px) rotate(6deg); } }
-  /* Mouvement du chat provisoire pendant une interaction (remplacé par ta pose quand l'image existe). */
+  /* Mouvement de remplacement pendant une interaction, tant que la pose n'a pas sa propre image. */
   .perso-cadre[data-pose="boire"] #perso, .perso-cadre[data-pose="manger"] #perso { transform: translateY(8px) rotate(10deg); }
   .perso-cadre[data-pose="dormir"] #perso { transform: translateY(14px) scale(.9, .82); }
   .perso-cadre[data-pose="saluer"] #perso { animation: salut var(--anim) ease-in-out 2; }
   @keyframes salut { 0%, 100% { transform: rotate(0); } 33% { transform: rotate(-7deg); } 66% { transform: rotate(7deg); } }
 
-  /* Boutons d'habitudes : en relief, puis remplis de leur teinte et en creux une fois cochés */
+  /* Boutons d'habitudes : le rond est ancré sur l'anneau, le nom placé vers l'extérieur. */
   .scene .tuile {
-    position: absolute; left: 50%; top: var(--cy); width: 76px; margin: -27px 0 0 -38px;
-    transform: translate(calc(cos(var(--depart) + var(--i) * var(--pas)) * var(--rx)), calc(sin(var(--depart) + var(--i) * var(--pas)) * var(--ry)));
+    position: absolute; left: 50%; top: var(--cy); width: 54px; height: 54px; margin: -27px 0 0 -27px;
+    transform: translate(calc(cos(var(--a)) * var(--rx)), calc(sin(var(--a)) * var(--ry)));
   }
+  .scene #menage-case { transform: translate(var(--coin-x), var(--coin-y)); }
+  .scene { --coin-x: 152px; --coin-y: 102px; }
+  @media (min-width: 600px) { .scene { --coin-x: 222px; --coin-y: 150px; } }
+  .libelle {
+    position: absolute; left: 50%; top: calc(100% + 5px); width: 72px; margin-left: -36px;
+    display: grid; justify-items: center; gap: 3px; pointer-events: none;
+  }
+  .tuile.haut .libelle { top: auto; bottom: calc(100% + 5px); }
   .tuile {
-    background: none; border: 0; padding: 0; display: grid; justify-items: center; align-content: start; gap: 5px;
-    color: var(--texte); touch-action: manipulation;
+    background: none; border: 0; padding: 0; display: block; color: var(--texte); touch-action: manipulation;
     --teinte: #d3e5c6; --teinte-fonce: #3c6431;
   }
   .tuile[data-h="eau"] { --teinte: #cfe1ee; --teinte-fonce: #2c5873; }
@@ -208,7 +240,7 @@
   .tuile:focus-visible { outline: none; }
   .tuile:focus-visible .icone-habitude { outline: 2px solid rgba(79, 122, 66, .5); outline-offset: 3px; }
   .tuile .nom { font-size: 12px; font-weight: 600; line-height: 1.1; transition: color .3s; }
-  .tuile .info { font-size: 11px; color: var(--texte-doux); display: flex; gap: 4px; align-items: center; min-height: 13px; line-height: 1; }
+  .tuile .info { font-size: 11px; color: var(--texte-doux); display: flex; gap: 4px; align-items: center; min-height: 11px; line-height: 1; }
   .tuile.fait .icone-habitude {
     background: var(--teinte); color: var(--teinte-fonce);
     box-shadow: inset 5px 5px 10px rgba(150, 105, 70, .28), inset -5px -5px 10px rgba(255, 255, 255, .55);
@@ -243,7 +275,7 @@
 
   /* --- Sommeil sur une ligne : coucher, réveil, durée, validé ou non --- */
   .carte-sommeil { padding: 12px 16px; }
-  .ligne-sommeil { display: grid; grid-template-columns: auto 1fr 1fr auto; align-items: end; gap: 10px; }
+  .ligne-sommeil { display: grid; grid-template-columns: auto 96px 96px 1fr; align-items: end; gap: 10px; }
   .icone-sommeil { align-self: center; color: var(--texte); padding-top: 14px; }
   .ligne-sommeil label { display: grid; gap: 4px; font-size: 11px; color: var(--texte-doux); min-width: 0; }
   .ligne-sommeil input {
@@ -293,18 +325,26 @@
   #bandeau-correction .bouton { padding: 8px 14px; font-size: 14px; }
 
   /* --- Navigation : en relief, icônes seules, le nom n'apparaît que pour l'onglet actif (en creux) --- */
+  /* Barre verticale fixée en haut à droite ; l'onglet actif est en creux, avec son nom en petit sous l'icône. */
   nav {
-    position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(14px + env(safe-area-inset-bottom));
-    display: flex; gap: 6px; padding: 7px; border-radius: 999px; z-index: 10; background: var(--fond); box-shadow: var(--relief);
+    position: fixed; top: calc(12px + env(safe-area-inset-top)); right: max(10px, env(safe-area-inset-right));
+    display: flex; flex-direction: column; gap: 4px; padding: 5px; border-radius: 26px; z-index: 10;
+    background: var(--fond); box-shadow: var(--relief);
   }
   nav button {
-    border: 0; background: none; border-radius: 999px; padding: 10px 14px; min-height: 46px; min-width: 52px;
-    display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600; color: var(--texte-doux);
-    transition: box-shadow .3s, background .3s;
+    border: 0; background: none; border-radius: 20px; width: 46px; min-height: 46px; padding: 6px 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+    font-weight: 600; color: var(--texte-doux); transition: box-shadow .3s, background .3s;
   }
-  nav .nav-nom { display: none; }
-  nav button[aria-current="page"] { background: var(--creux-fond); box-shadow: var(--creux-mini); color: var(--accent-texte); padding: 10px 18px; }
-  nav button[aria-current="page"] .nav-nom { display: inline; }
+  nav .nav-nom { display: none; font-size: 8.5px; letter-spacing: .1px; line-height: 1; }
+  nav button[aria-current="page"] { background: var(--creux-fond); box-shadow: var(--creux-mini); color: var(--accent-texte); padding: 8px 0 6px; }
+  nav button[aria-current="page"] .nav-nom { display: block; }
+  /* Sur iPhone, le contenu laisse la place de la barre à droite (la bande du bilan sur l'écran du jour, tout le reste ailleurs). */
+  @media (max-width: 599px) {
+    .bande { margin-right: 62px; }
+    #ecran-historique, #ecran-taches, #ecran-reglages { padding-right: 62px; }
+    .cal-ligne { grid-template-columns: 40px repeat(7, 1fr) 34px; gap: 5px; }
+  }
 
   /* --- Calendrier en pixels : une case par jour en léger relief, verte selon la journée ; vide = en creux --- */
   :root { --n1: #cadbb5; --n2: #abc993; --n3: #8ab372; --n4: #6a9656; --n5: #4f7a42; }
@@ -412,45 +452,49 @@
 
 <main id="app" hidden>
  <div id="ecran-jour">
-    <p id="date"></p>
     <div id="bandeau-correction" hidden><svg class="icone" aria-hidden="true"><use href="#i-crayon"/></svg><span id="bandeau-texte"></span><button class="bouton" id="retour-aujourdhui">Aujourd’hui</button></div>
 
     <section class="carte bande">
       <div class="bande-haut">
-        <div class="anneau">
-          <svg viewBox="0 0 88 88" aria-hidden="true"><circle class="anneau-fond" cx="44" cy="44" r="39.5"/><circle class="anneau-plein" id="anneau" cx="44" cy="44" r="39.5" pathLength="100"/></svg>
-          <div class="anneau-texte"><span id="score">0</span><span class="sur-100">SUR 100</span></div>
+        <div class="bande-score">
+          <div class="anneau">
+            <svg viewBox="0 0 88 88" aria-hidden="true"><circle class="anneau-fond" cx="44" cy="44" r="39.5"/><circle class="anneau-plein" id="anneau" cx="44" cy="44" r="39.5" pathLength="100"/></svg>
+            <div class="anneau-texte"><span id="score">0</span><span class="sur-100">SUR 100</span></div>
+          </div>
+          <div class="semaine-pastilles" id="semaine-pastilles"></div>
         </div>
         <div class="bande-texte">
-          <p id="bulle" hidden></p>
+          <p id="date"></p>
           <div class="bande-infos"><span id="libelle-semaine">cette semaine</span> · <span id="comparaison"></span><br>
             <span title="Le score du jour compte les habitudes quotidiennes ; le sport et le ménage comptent dans la semaine."><span id="libelle-jour">Aujourd’hui</span> : <b id="score-jour">0</b>/100</span></div>
+          <p id="bulle" hidden></p>
         </div>
-        <svg id="plante" viewBox="0 0 80 110" aria-hidden="true">
-            <path class="pot" d="M24 88h32l-3.5 17h-25zM21 88h38"/>
-            <path class="tige" pathLength="100" d="M40 88C40 76 38 64 41 52C43.5 41 39.5 31 40 20"/>
-            <path class="trait etape" data-min="10" d="M40 80C32 79 27 74 26 68C33 68 38 72 40 80ZM40 80L31 71.5"/>
-            <path class="trait etape" data-min="30" d="M40.5 69C48 67 53 62 54 56C47 56 42 61 40.5 69ZM40.5 69L49 60"/>
-            <path class="trait etape" data-min="50" d="M41 56C33 55.5 28.5 51 27.5 45C34.5 45 39.5 49 41 56ZM41 56L32 48.5"/>
-            <path class="trait etape" data-min="65" d="M41.5 44C48.5 42 52.5 37.5 53 32C46.5 32.5 42.5 37 41.5 44ZM41.5 44L49 36"/>
-            <path class="trait etape" data-min="75" data-max="89" d="M40 22c-3.5-3-3.5-8 0-11c3.5 3 3.5 8 0 11z"/>
-            <g class="trait etape" data-min="90">
-              <ellipse cx="40" cy="10.5" rx="3.8" ry="6.3" transform="rotate(0 40 17)"/>
-              <ellipse cx="40" cy="10.5" rx="3.8" ry="6.3" transform="rotate(72 40 17)"/>
-              <ellipse cx="40" cy="10.5" rx="3.8" ry="6.3" transform="rotate(144 40 17)"/>
-              <ellipse cx="40" cy="10.5" rx="3.8" ry="6.3" transform="rotate(216 40 17)"/>
-              <ellipse cx="40" cy="10.5" rx="3.8" ry="6.3" transform="rotate(288 40 17)"/>
-              <circle cx="40" cy="17" r="2.6"/>
-            </g>
-          </svg>
       </div>
-      <div class="semaine-pastilles" id="semaine-pastilles"></div>
     </section>
 
     <section class="scene" id="scene">
-      <div class="socle" aria-hidden="true"></div>
-      <div class="perso-cadre" aria-hidden="true"><div id="perso"></div><span id="perso-etat" hidden></span></div>
-      <button class="tuile" id="menage-case" data-h="menage" style="--i: 7" aria-label="Ménage de la semaine"><span class="icone-habitude"><svg class="icone" aria-hidden="true"><use href="#i-menage"/></svg></span><span class="nom">Ménage</span><span class="info" id="menage-info"></span></button>
+      <div class="cadran" aria-hidden="true"></div>
+      <div class="cuvette" aria-hidden="true"></div>
+      <div class="ombre-perso" aria-hidden="true"></div>
+      <div class="perso-cadre" aria-hidden="true"><div id="perso"></div></div>
+        <svg id="plante" viewBox="0 0 80 110" aria-hidden="true">
+          <path class="pot" d="M24 88h32l-3.5 17h-25zM21 88h38"/>
+          <path class="tige" pathLength="100" d="M40 88C40 76 38 64 41 52C43.5 41 39.5 31 40 20"/>
+          <path class="trait etape" data-min="10" d="M40 80C32 79 27 74 26 68C33 68 38 72 40 80ZM40 80L31 71.5"/>
+          <path class="trait etape" data-min="30" d="M40.5 69C48 67 53 62 54 56C47 56 42 61 40.5 69ZM40.5 69L49 60"/>
+          <path class="trait etape" data-min="50" d="M41 56C33 55.5 28.5 51 27.5 45C34.5 45 39.5 49 41 56ZM41 56L32 48.5"/>
+          <path class="trait etape" data-min="65" d="M41.5 44C48.5 42 52.5 37.5 53 32C46.5 32.5 42.5 37 41.5 44ZM41.5 44L49 36"/>
+          <path class="trait etape" data-min="75" data-max="89" d="M40 22c-3.5-3-3.5-8 0-11c3.5 3 3.5 8 0 11z"/>
+          <g class="trait etape" data-min="90">
+            <ellipse cx="40" cy="10.5" rx="3.8" ry="6.3" transform="rotate(0 40 17)"/>
+            <ellipse cx="40" cy="10.5" rx="3.8" ry="6.3" transform="rotate(72 40 17)"/>
+            <ellipse cx="40" cy="10.5" rx="3.8" ry="6.3" transform="rotate(144 40 17)"/>
+            <ellipse cx="40" cy="10.5" rx="3.8" ry="6.3" transform="rotate(216 40 17)"/>
+            <ellipse cx="40" cy="10.5" rx="3.8" ry="6.3" transform="rotate(288 40 17)"/>
+            <circle cx="40" cy="17" r="2.6"/>
+          </g>
+        </svg>
+      <button class="tuile" id="menage-case" data-h="menage" aria-label="Ménage de la semaine"><span class="icone-habitude"><svg class="icone" aria-hidden="true"><use href="#i-menage"/></svg></span><span class="libelle"><span class="nom">Ménage</span><span class="info" id="menage-info"></span></span></button>
     </section>
 
     <section class="carte carte-sommeil">
@@ -897,7 +941,6 @@ const PERSONNAGE_PROVISOIRE = 'images/personnage/base.png';
 // Interaction déclenchée par chaque habitude cochée (le sommeil validé déclenche « dormir »).
 const INTERACTION = { eau: 'boire', petitDej: 'manger', dejeuner: 'manger', diner: 'manger', sport: 'sauter', lecture: 'saluer', meditation: 'saluer', menage: 'saluer' };
 const DUREE_POSE = 1500;
-const BADGE_ETAT = { 'en-forme': 'en forme', content: 'content', neutre: 'neutre', fatigue: 'fatigué' };
 const SVGNS = 'http://www.w3.org/2000/svg';
 function icone(nom) {
   const svg = document.createElementNS(SVGNS, 'svg');
@@ -908,8 +951,9 @@ function icone(nom) {
   svg.append(use);
   return svg;
 }
-// Ordre des boutons autour du personnage (le ménage, statique, est le 8e).
+// Boutons autour du personnage (leurs angles sont dans le CSS) ; le ménage, statique, est à part.
 const ORDRE_SCENE = ['eau', 'sport', 'lecture', 'meditation', 'petitDej', 'dejeuner', 'diner'];
+const ARC_DU_HAUT = ['eau', 'sport', 'lecture', 'meditation'];
 // Un mot sous chaque bouton rond de l'écran du jour.
 const MOT = { eau: 'Eau', sport: 'Sport', lecture: 'Lecture', meditation: 'Méditation', petitDej: 'Petit-déj', dejeuner: 'Déjeuner', diner: 'Dîner' };
 function iconeHabitude(h) {
@@ -941,7 +985,7 @@ function majPersonnage() {
   if (pose) cadre.dataset.pose = pose; else delete cadre.dataset.pose;
   // Sur ta vraie pose, pas de mouvement CSS de remplacement.
   if (pose && imagesTrouvees.get(`images/personnage/${pose}.png`)) delete cadre.dataset.pose;
-  afficherPersonnage(img, pose ?? etatPerso, $('perso-etat'));
+  afficherPersonnage(img, pose ?? etatPerso);
 }
 function jouerPose(nom) {
   if (moinsDeMouvement()) return;
@@ -1035,20 +1079,17 @@ function majPastilles(lundi, jours, semaine, aujourdhui, dateDebut) {
 }
 // Tuiles d'habitudes créées une fois puis mises à jour, pour que le passage en creux reste une transition douce.
 const TUILES = {};
-// Image du personnage : d'abord images/personnage/<nom>.png, sinon l'image de base
-// (avec un badge texte pour l'état, tant que l'état n'a pas sa propre image).
+// Image du personnage : d'abord images/personnage/<nom>.png, sinon l'image de base.
 const imagesTrouvees = new Map(); // chemin local → true (ton image) ou false (provisoire)
-function afficherPersonnage(img, nom, badge) {
+function afficherPersonnage(img, nom) {
   const local = `images/personnage/${nom}.png`;
   if (img.dataset.src === local) return;
   img.dataset.src = local;
   img.classList.remove('provisoire');
-  if (badge) badge.hidden = true;
   const provisoire = () => {
     img.onerror = null;
     img.classList.add('provisoire');
     img.src = PERSONNAGE_PROVISOIRE;
-    if (badge && BADGE_ETAT[nom]) { badge.textContent = BADGE_ETAT[nom]; badge.hidden = false; }
   };
   if (imagesTrouvees.get(local) === false) return provisoire();
   img.onload = () => {
@@ -1137,8 +1178,10 @@ function rendreJour() {
     if (!b) {
       b = el('button', 'tuile');
       b.dataset.h = h;
-      b.style.setProperty('--i', ORDRE_SCENE.indexOf(h));
-      b.append(iconeHabitude(h), el('span', 'nom', MOT[h]), el('span', 'info'));
+      const libelle = el('span', 'libelle');
+      libelle.append(el('span', 'nom', MOT[h]), el('span', 'info'));
+      b.append(iconeHabitude(h), libelle);
+      if (ARC_DU_HAUT.includes(h)) b.classList.add('haut');
       b.setAttribute('aria-label', AFFICHAGE[h]);
       TUILES[h] = b;
       conteneur.insertBefore(b, $('menage-case'));
