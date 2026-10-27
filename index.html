@@ -84,62 +84,34 @@
   .serie { display: inline-flex; align-items: center; gap: 1px; color: var(--texte-doux); font-size: 11px; }
   .serie .icone { width: 11px; height: 11px; stroke-width: 1.8; color: var(--flamme); }
 
-  /* --- Bande de bilan : anneau du score, bulle du personnage, semaine en pastilles --- */
-  #date { font-family: var(--titres); font-variation-settings: 'SOFT' 100; font-size: 17px; font-weight: 600; color: var(--texte); margin: 0; }
+  /* --- Bande du haut, à plat et compacte : un groupe centré (anneau du score, puis date et infos) --- */
+  .bande { display: flex; justify-content: center; align-items: center; gap: 14px; min-height: 80px; padding: 4px 0; }
+  .bande-titre { min-width: 0; }
+  #date { font-family: var(--titres); font-variation-settings: 'SOFT' 100; font-size: 20px; font-weight: 600; color: var(--texte); margin: 0; line-height: 1.15; }
   #date::first-letter { text-transform: uppercase; }
-  .bande { padding: 14px 16px 12px; }
-  .bande-haut { display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: end; }
-  @media (max-width: 599px) {
-    .bande-haut { grid-template-columns: auto 1fr; grid-template-areas: "score date" "score infos" "bulle bulle"; gap: 6px 12px; align-items: start; }
-    .bande .bande-score { grid-area: score; }
-    .bande .bande-texte { display: contents; }
-    .bande #date { grid-area: date; align-self: end; } .bande .bande-infos { grid-area: infos; } .bande #bulle { grid-area: bulle; margin: 4px 0 0; }
-  }
-  .bande-score { display: grid; justify-items: center; gap: 10px; }
-  .bande-texte { display: grid; gap: 6px; min-width: 0; }
-  .bande-infos { font-size: 12.5px; color: var(--texte-doux); line-height: 1.4; }
+  .bande-infos { font-size: 11.5px; color: var(--texte-doux); margin: 3px 0 0; }
   .bande-infos b { color: var(--texte); font-weight: 700; }
+  /* iPhone : la bulle s'arrête avant la barre de menu */
+  @media (max-width: 599px) { #ecran-jour #bulle { margin-right: 62px; max-width: none; } }
+  .pour-lecteur { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  /* Bulle du personnage, juste au-dessus du cadran, à droite ; sa queue pointe vers lui. */
   #bulle {
-    position: relative; background: var(--fond); border-radius: 16px; padding: 9px 12px;
-    font-size: 13px; line-height: 1.4; margin: 6px 0 0; box-shadow: var(--relief-mini);
+    position: relative; width: fit-content; max-width: 78%; margin: 0 6px -6px auto; background: var(--fond); border-radius: 16px; padding: 8px 12px;
+    font-size: 13px; line-height: 1.4; box-shadow: var(--relief-mini); z-index: 1;
   }
-  /* Queue de la bulle, pointée vers le personnage, juste en dessous */
   #bulle::after {
-    content: ''; position: absolute; left: 22px; bottom: -7px; width: 14px; height: 14px; background: var(--fond);
+    content: ''; position: absolute; left: 20px; bottom: -7px; width: 14px; height: 14px; background: var(--fond);
     transform: rotate(45deg); border-radius: 0 0 4px 0; box-shadow: 3px 3px 5px rgba(219, 196, 174, .6);
   }
-  .bande-texte { align-self: stretch; display: flex; flex-direction: column; justify-content: space-between; gap: 6px; }
   /* Anneau de progression autour du score de la semaine */
-  .anneau { position: relative; width: 88px; height: 88px; border-radius: 50%; flex: none; box-shadow: var(--relief-rond); display: grid; place-items: center; }
-  .anneau::before { content: ''; position: absolute; inset: 9px; border-radius: 50%; background: var(--creux-fond); box-shadow: var(--creux-mini); }
+  .anneau { position: relative; width: 64px; height: 64px; border-radius: 50%; flex: none; box-shadow: var(--relief-mini); display: grid; place-items: center; }
+  .anneau::before { content: ''; position: absolute; inset: 8px; border-radius: 50%; background: var(--creux-fond); box-shadow: var(--creux-mini); }
   .anneau svg { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
-  .anneau-fond { fill: none; stroke: #e4d2bf; stroke-width: 7; }
-  .anneau-plein { fill: none; stroke: var(--accent); stroke-width: 7; stroke-linecap: round; stroke-dasharray: 100; stroke-dashoffset: 100; transition: stroke-dashoffset var(--anim) cubic-bezier(.22, 1, .36, 1); }
+  .anneau-fond { fill: none; stroke: #e4d2bf; stroke-width: 6; }
+  .anneau-plein { fill: none; stroke: var(--accent); stroke-width: 6; stroke-linecap: round; stroke-dasharray: 100; stroke-dashoffset: 100; transition: stroke-dashoffset var(--anim) cubic-bezier(.22, 1, .36, 1); }
   .anneau-texte { position: relative; display: grid; justify-items: center; line-height: 1; }
-  #score { font-family: var(--titres); font-size: 32px; font-weight: 600; color: var(--texte); font-variant-numeric: tabular-nums lining-nums; }
-  .sur-100 { font-size: 9px; color: var(--texte-doux); margin-top: 3px; letter-spacing: .4px; }
+  #score { font-family: var(--titres); font-size: 21px; font-weight: 600; color: var(--texte); font-variant-numeric: tabular-nums lining-nums; }
 
-
-  /* Semaine en pastilles : pleine (verte selon la journée), manquée (en creux), à venir (en relief). */
-  .semaine-pastilles { display: grid; grid-template-columns: repeat(7, 20px); gap: 4px; margin: 0 0 6px; }
-  .pastille-jour {
-    width: 20px; height: 20px; border-radius: 50%; position: relative;
-    display: grid; place-items: center; font-size: 9px; font-weight: 600; color: var(--texte-doux);
-    background: var(--fond); box-shadow: var(--relief-mini);
-  }
-  .pastille-jour.manque { background: var(--creux-fond); box-shadow: var(--creux-mini); }
-  .pastille-jour.exclue { box-shadow: none; outline: 1.5px dashed var(--ombre-foncee); outline-offset: -2px; }
-  .pastille-jour.hors { opacity: .35; }
-  .pastille-jour.n0 { background: #dfe3cf; color: var(--texte); box-shadow: var(--creux-mini); }
-  .pastille-jour.n1 { background: #cadbb5; color: var(--texte); box-shadow: var(--creux-mini); }
-  .pastille-jour.n2 { background: #abc993; color: var(--texte); box-shadow: var(--creux-mini); }
-  .pastille-jour.n3 { background: #8ab372; color: var(--texte); box-shadow: var(--creux-mini); }
-  .pastille-jour.n4 { background: #6a9656; color: #14200f; box-shadow: var(--creux-mini); }
-  .pastille-jour.n5 { background: var(--accent); color: #fff; box-shadow: var(--creux-mini); }
-  .pastille-jour.aujourdhui::after {
-    content: ''; position: absolute; bottom: -6px; left: 50%; width: 4px; height: 4px; border-radius: 50%;
-    background: var(--accent); transform: translateX(-50%);
-  }
 
   /* --- La scène en cadran : le personnage dans une cuvette en creux, les boutons posés sur un fin anneau en relief ---
      Chaque bouton est posé au centre de la scène puis décalé sur l'anneau avec cos() et sin() de son angle --a.
@@ -425,23 +397,17 @@
  <div id="ecran-jour">
     <div id="bandeau-correction" hidden><svg class="icone" aria-hidden="true"><use href="#i-crayon"/></svg><span id="bandeau-texte"></span><button class="bouton" id="retour-aujourdhui">Aujourd’hui</button></div>
 
-    <section class="carte bande">
-      <div class="bande-haut">
-        <div class="bande-score">
-          <div class="anneau">
-            <svg viewBox="0 0 88 88" aria-hidden="true"><circle class="anneau-fond" cx="44" cy="44" r="39.5"/><circle class="anneau-plein" id="anneau" cx="44" cy="44" r="39.5" pathLength="100"/></svg>
-            <div class="anneau-texte"><span id="score">0</span><span class="sur-100">SUR 100</span></div>
-          </div>
-          <div class="semaine-pastilles" id="semaine-pastilles"></div>
-        </div>
-        <div class="bande-texte">
-          <p id="date"></p>
-          <div class="bande-infos"><span id="libelle-semaine">cette semaine</span> · <span id="comparaison"></span><br>
-            <span title="Le score du jour compte les habitudes quotidiennes ; le sport et le ménage comptent dans la semaine."><span id="libelle-jour">Aujourd’hui</span> : <b id="score-jour">0</b>/100</span></div>
-          <p id="bulle" hidden></p>
-        </div>
+    <header class="bande">
+      <div class="anneau">
+        <svg viewBox="0 0 64 64" aria-hidden="true"><circle class="anneau-fond" cx="32" cy="32" r="28.5"/><circle class="anneau-plein" id="anneau" cx="32" cy="32" r="28.5" pathLength="100"/></svg>
+        <div class="anneau-texte"><span id="score">0</span></div>
       </div>
-    </section>
+      <div class="bande-titre">
+        <p id="date"></p>
+        <p class="bande-infos"><span id="libelle-semaine" class="pour-lecteur"></span><span id="comparaison"></span> · <span title="Score du jour : habitudes quotidiennes ; le sport et le ménage comptent dans la semaine."><span id="libelle-jour">aujourd’hui</span> <b id="score-jour">0</b></span></p>
+      </div>
+    </header>
+    <p id="bulle" hidden></p>
 
     <section class="scene" id="scene">
       <div class="cadran" aria-hidden="true"></div>
@@ -993,24 +959,6 @@ function etapesDefi(defi, fait, total) {
   }
   return rangee;
 }
-// Semaine en pastilles, du lundi au dimanche : verte selon le score du jour, en creux si manquée, en relief si à venir.
-function majPastilles(lundi, jours, semaine, aujourdhui, dateDebut) {
-  $('semaine-pastilles').replaceChildren(...joursDeLaSemaine(lundi).map(c => {
-    const p = el('span', 'pastille-jour', formatDate(c, { weekday: 'narrow' }).toUpperCase());
-    const libelle = formatDate(c, { weekday: 'long' });
-    if (c < dateDebut) { p.classList.add('hors'); p.title = libelle; }
-    else if (c > aujourdhui) { p.title = `${libelle} : à venir`; }
-    else {
-      const { score } = scoreJour(jours[c], semaine, poidsSemaine(lundi));
-      if (score === null) { p.classList.add('exclue'); p.title = `${libelle} : exclu`; }
-      else if (score === 0) { p.classList.add('manque'); p.title = `${libelle} : manqué`; }
-      else { p.classList.add(`n${niveau(score)}`); p.title = `${libelle} : ${Math.round(score)}/100`; }
-    }
-    if (c === aujourdhui) p.classList.add('aujourdhui');
-    p.setAttribute('aria-label', p.title);
-    return p;
-  }));
-}
 // Tuiles d'habitudes créées une fois puis mises à jour, pour que le passage en creux reste une transition douce.
 const TUILES = {};
 // Image du personnage : d'abord images/personnage/<nom>.png, sinon l'image de base.
@@ -1077,9 +1025,8 @@ function rendreJour() {
   // Score du jour : habitudes quotidiennes seulement (même calcul que la couleur du calendrier).
   const sj = scoreJour(jour, semaine, poidsSemaine(lundi)).score;
   $('score-jour').textContent = sj === null ? '—' : Math.round(sj);
-  $('libelle-jour').textContent = passe ? formatDate(cle, { weekday: 'long', day: 'numeric' }).replace(/^./, c => c.toUpperCase()) : 'Aujourd’hui';
+  $('libelle-jour').textContent = passe ? formatDate(cle, { weekday: 'long' }) : 'aujourd’hui';
   $('anneau').style.strokeDashoffset = 100 - (r.score ?? 0);
-  majPastilles(lundi, jours, semaine, aujourdhui, dateDebut);
 
   // Personnage : son état suit le score de la semaine affichée (ou une pose d'interaction en cours).
   etatPerso = etatPersonnage(r.score);
