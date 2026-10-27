@@ -6,7 +6,7 @@ const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const debut = html.indexOf('// ===================== LOGIQUE DU SCORE');
 const fin = html.indexOf('// ===================== FIN LOGIQUE DU SCORE');
 const L = new Function(html.slice(debut, fin) +
-  'return { POIDS_DEFAUT, cleDuJour, ajouterJours, lundiDe, joursDeLaSemaine, dureeSommeilMinutes, scoreJour, calculerScoreSemaine, serieJours, serieSemainesSport };')();
+  'return { POIDS_DEFAUT, cleDuJour, ajouterJours, lundiDe, joursDeLaSemaine, dureeSommeilMinutes, scoreJour, calculerScoreSemaine, serieJours, serieSemainesSport, etatPersonnage, finDefiMensuel, evaluerDefi };')();
 
 let echecs = 0;
 const verifier = (nom, obtenu, attendu) => {
@@ -131,6 +131,36 @@ verifier('Semaine du 12 avec 2 séances seulement → cassée, série 1',
 verifier('Semaine du 12 avec sport exclu → pause, série 2',
   L.serieSemainesSport({ jours: seances('2026-10-05', '2026-10-07', '2026-10-09', '2026-10-19', '2026-10-21', '2026-10-23'),
     semaines: { '2026-10-12': { exclusions: ['sport'] } }, dateDebut: '2026-10-05', aujourdhui: '2026-10-27' }), 2);
+
+// --- État du personnage ---
+console.log('\nÉtat du personnage');
+verifier('Seuils : 100, 80, 79, 60, 59, 40, 39, 0, aucun score',
+  [100, 80, 79, 60, 59, 40, 39, 0, null].map(L.etatPersonnage),
+  ['en-forme', 'en-forme', 'content', 'content', 'neutre', 'neutre', 'fatigue', 'fatigue', 'neutre']);
+
+// --- Défis ---
+console.log('\nDéfis');
+verifier('Fin du défi mensuel lancé le 27 oct. → 26 nov.', L.finDefiMensuel('2026-10-27'), '2026-11-26');
+verifier('Lancé le 31 janv. → 28 févr.', L.finDefiMensuel('2027-01-31'), '2027-02-28');
+verifier('Lancé le 1er déc. → 31 déc.', L.finDefiMensuel('2026-12-01'), '2026-12-31');
+const defiSport = { type: 'sport-semaine', cible: 4, debut: '2026-10-19', fin: '2026-10-25' };
+const sport4 = seances('2026-10-19', '2026-10-21', '2026-10-23', '2026-10-24');
+verifier('Sport 4 séances : 2 faites mercredi → en cours',
+  L.evaluerDefi(defiSport, { jours: sport4, aujourdhui: '2026-10-21' }), { fait: 2, total: 4, statut: 'en-cours' });
+verifier('Sport 4 séances : 4 faites samedi → réussi',
+  L.evaluerDefi(defiSport, { jours: sport4, aujourdhui: '2026-10-24' }), { fait: 4, total: 4, statut: 'reussi' });
+verifier('Sport 4 séances : 3 seulement, semaine finie → raté',
+  L.evaluerDefi(defiSport, { jours: { ...sport4, '2026-10-24': undefined }, aujourdhui: '2026-10-26' }), { fait: 3, total: 4, statut: 'rate' });
+const defiMedit = { type: 'sans-manquer', habitude: 'meditation', debut: '2026-10-20', fin: '2026-10-24' };
+const medit = Object.fromEntries(['2026-10-20', '2026-10-21', '2026-10-23', '2026-10-24'].map(c => [c, jour()]));
+verifier('Méditation : jeudi 22 manqué → raté',
+  L.evaluerDefi(defiMedit, { jours: medit, aujourdhui: '2026-10-25' }), { fait: 4, total: 5, statut: 'rate' });
+verifier('Méditation : jeudi 22 exclu → réussi à la fin',
+  L.evaluerDefi(defiMedit, { jours: { ...medit, '2026-10-22': jour(TOUT, BIEN_DORMI, ['meditation']) }, aujourdhui: '2026-10-25' }), { fait: 5, total: 5, statut: 'reussi' });
+verifier('Méditation : aujourd\'hui pas encore faite → toujours en cours',
+  L.evaluerDefi(defiMedit, { jours: medit, aujourdhui: '2026-10-22' }), { fait: 2, total: 5, statut: 'en-cours' });
+verifier('Correction : cocher le jeudi oublié → plus raté',
+  L.evaluerDefi(defiMedit, { jours: { ...medit, '2026-10-22': jour() }, aujourdhui: '2026-10-24' }), { fait: 5, total: 5, statut: 'en-cours' });
 
 console.log(echecs ? `\n✗ ${echecs} échec(s)` : '\n✓ Tout est juste');
 process.exit(echecs ? 1 : 0);

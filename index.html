@@ -72,6 +72,12 @@
     animation: rebond 2.4s ease-in-out infinite;
   }
   #perso img { width: 100%; height: 100%; object-fit: cover; }
+  #perso img.provisoire { width: 74%; height: 74%; object-fit: contain; }
+  .perso-cadre { position: relative; width: 104px; }
+  #perso-etat {
+    position: absolute; right: -2px; bottom: -2px; width: 36px; height: 36px; border-radius: 50%; background: #fff;
+    display: grid; place-items: center; font-size: 19px; box-shadow: var(--ombre);
+  }
   @keyframes rebond { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
   #bulle { background: #fff; border-radius: 20px; padding: 10px 14px; font-size: 15px; position: relative; margin-bottom: 8px; }
   .score-ligne { display: flex; align-items: baseline; gap: 6px; }
@@ -201,6 +207,39 @@
   .barre .plein { width: 100%; border-radius: 10px 10px 4px 4px; background: var(--feuille); box-shadow: inset 0 -3px 0 rgba(78,155,79,.35); min-height: 4px; }
   .vide-texte { color: var(--brun-doux); font-size: 14px; }
 
+  /* --- Réglages --- */
+  .note { font-size: 13px; color: var(--brun-doux); margin: 10px 0 0; }
+  .animaux { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .animal {
+    background: #fff; border: 3px solid var(--sable); border-radius: 20px; padding: 8px 4px; display: grid; justify-items: center; gap: 4px;
+    font-size: 12px; box-shadow: 0 3px 0 var(--sable);
+  }
+  .animal img { width: 44px; height: 44px; object-fit: contain; }
+  .animal[aria-pressed="true"] { background: var(--feuille-clair); border-color: var(--feuille); box-shadow: 0 3px 0 var(--feuille-fonce); }
+  .segment { display: flex; background: var(--sable); border-radius: 999px; padding: 4px; gap: 4px; margin-bottom: 10px; }
+  .segment button { flex: 1; border: 0; background: none; border-radius: 999px; padding: 8px 6px; font-weight: 800; color: var(--brun-doux); min-height: 40px; }
+  .segment button[aria-pressed="true"] { background: #fff; color: var(--brun); box-shadow: 0 2px 0 var(--sable-fonce); }
+  .champ { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--brun-doux); }
+  .champ input, .poids input {
+    background: #fff; border: 3px solid var(--sable); border-radius: 14px; padding: 6px 10px; font-weight: 800; min-height: 42px;
+  }
+  .puces { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .puce { border: 3px solid var(--sable); background: #fff; border-radius: 999px; padding: 6px 12px; font-size: 14px; min-height: 40px; }
+  .puce[aria-pressed="true"] { background: var(--soleil); border-color: #e9c45a; }
+  .puce.choisie[aria-pressed="true"] { background: var(--feuille-clair); border-color: var(--feuille); }
+  .puce:disabled { opacity: .5; }
+  .compteur { display: flex; align-items: center; gap: 12px; margin: 6px 0 12px; }
+  .compteur button { width: 44px; height: 44px; border-radius: 50%; border: 3px solid var(--sable); background: #fff; font-size: 22px; font-weight: 900; }
+  .compteur b { font-size: 26px; min-width: 24px; text-align: center; }
+  .defi-actif b { font-size: 17px; }
+  .bouton.secondaire { background: #fff; color: var(--brun); box-shadow: 0 3px 0 var(--sable-fonce); border: 3px solid var(--sable); }
+  .poids { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .poids label { display: grid; gap: 4px; font-size: 13px; color: var(--brun-doux); }
+  .poids input { width: 100%; text-align: center; font-size: 17px; }
+  #reglage-compte { font-size: 14px; color: var(--brun-doux); margin: 0 0 6px; }
+  .liste-defis { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; font-size: 14px; }
+  .liste-defis li { background: #fff; border-radius: 16px; padding: 10px 12px; }
+
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 </style>
 <script src="https://accounts.google.com/gsi/client" async></script>
@@ -222,7 +261,7 @@
     <div id="bandeau-correction" hidden><span id="bandeau-texte"></span><button class="bouton" id="retour-aujourdhui">Aujourd’hui</button></div>
     <section class="carte">
       <div class="entete">
-        <div id="perso" aria-hidden="true">🌱</div>
+        <div class="perso-cadre" aria-hidden="true"><div id="perso">🌱</div><span id="perso-etat" hidden></span></div>
         <div>
           <p id="bulle" hidden></p>
           <div class="score-ligne">
@@ -274,7 +313,6 @@
       <ul id="liste-taches"></ul>
     </section>
 
-    <div class="pied"><button id="deconnexion">Se déconnecter</button></div>
   </div>
  </div>
 
@@ -290,12 +328,47 @@
       <h2 class="etiquette">Évolution</h2>
       <div id="graphique"></div>
     </section>
+    <section class="carte" id="carte-defis" hidden>
+      <h2 class="etiquette">Défis réussis</h2>
+      <ul class="liste-defis" id="defis-reussis"></ul>
+    </section>
  </div>
 
  <div id="ecran-reglages" hidden>
     <section class="carte">
-      <h2 class="etiquette">Réglages</h2>
-      <p class="vide-texte">Bientôt : exclusions, défis et choix de l’animal.</p>
+      <h2 class="etiquette">Ton compagnon</h2>
+      <div class="animaux" id="animaux"></div>
+      <p class="note">Illustrations provisoires : Twemoji (CC-BY 4.0). Pour mettre tes images, dépose-les dans <b>images/animaux/</b> sous la forme <b>animal-état.png</b> (ex. renard-en-forme.png, renard-content.png, renard-neutre.png, renard-fatigue.png).</p>
+    </section>
+
+    <section class="carte">
+      <h2 class="etiquette">Exclusions</h2>
+      <div class="segment" id="excl-mode">
+        <button data-mode="semaine">Toute la semaine</button>
+        <button data-mode="jour">Un jour</button>
+      </div>
+      <label class="champ">Date <input type="date" id="excl-date"></label>
+      <p class="note" id="excl-periode"></p>
+      <div class="puces" id="excl-puces"></div>
+      <p class="note">Une habitude exclue sort du score (100 reste atteignable) et sa série est mise en pause.</p>
+    </section>
+
+    <section class="carte">
+      <h2 class="etiquette">Défi</h2>
+      <div id="defi-zone"></div>
+    </section>
+
+    <section class="carte">
+      <h2 class="etiquette">Pondérations</h2>
+      <div class="poids" id="poids"></div>
+      <p class="note" id="poids-total"></p>
+      <p><button class="bouton secondaire" id="poids-defaut">Revenir aux valeurs d’origine</button></p>
+    </section>
+
+    <section class="carte">
+      <h2 class="etiquette">Compte</h2>
+      <p id="reglage-compte"></p>
+      <button id="deconnexion">Se déconnecter</button>
     </section>
  </div>
 </main>
@@ -454,6 +527,41 @@ function serieSemainesSport({ jours = {}, semaines = {}, poids = POIDS_DEFAUT,
   }
   return serie;
 }
+
+// --- État du personnage selon le score de la semaine ---
+function etatPersonnage(score) {
+  if (score === null || score === undefined) return 'neutre';
+  return score >= 80 ? 'en-forme' : score >= 60 ? 'content' : score >= 40 ? 'neutre' : 'fatigue';
+}
+
+// --- Défis (sans effet sur le score) ---
+// Fin d'un défi mensuel : la veille du même jour le mois suivant (27 oct. → 26 nov.).
+// Si ce jour n'existe pas (31 janv. → 31 févr.), on prend le dernier jour du mois suivant.
+function finDefiMensuel(debut) {
+  const [a, m, j] = debut.split('-').map(Number);
+  const dernierDuMoisSuivant = new Date(Date.UTC(a, m + 1, 0)).getUTCDate();
+  const memeJour = new Date(Date.UTC(a, m, Math.min(j, dernierDuMoisSuivant))).toISOString().slice(0, 10);
+  return j > dernierDuMoisSuivant ? memeJour : ajouterJours(memeJour, -1);
+}
+// defi : { type: 'sport-semaine', cible, debut, fin } ou { type: 'sans-manquer', habitude, debut, fin }.
+// Un jour exclu ne fait pas rater un défi. Retourne { fait, total, statut: 'en-cours' | 'reussi' | 'rate' }.
+function evaluerDefi(defi, { jours = {}, semaines = {}, aujourdhui }) {
+  const periode = [];
+  for (let c = defi.debut; c <= defi.fin; c = ajouterJours(c, 1)) periode.push(c);
+  const termine = aujourdhui > defi.fin;
+  if (defi.type === 'sport-semaine') {
+    const fait = periode.filter(c => c <= aujourdhui && jours[c]?.habitudes?.sport).length;
+    return { fait, total: defi.cible, statut: fait >= defi.cible ? 'reussi' : termine ? 'rate' : 'en-cours' };
+  }
+  let fait = 0, rate = false;
+  for (const c of periode) {
+    if (c > aujourdhui) break;
+    const ok = estExclue(defi.habitude, jours[c], semaines[lundiDe(c)]) || valeurHabitude(defi.habitude, jours[c]);
+    if (ok) fait++;
+    else if (c !== aujourdhui) rate = true;
+  }
+  return { fait, total: periode.length, statut: rate ? 'rate' : termine ? 'reussi' : 'en-cours' };
+}
 // ===================== FIN LOGIQUE DU SCORE =====================
 
 </script>
@@ -462,7 +570,7 @@ function serieSemainesSport({ jours = {}, semaines = {}, poids = POIDS_DEFAUT,
 // ===================== DONNÉES =====================
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js';
 import { getAuth, GoogleAuthProvider, signInWithCredential, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js';
-import { getFirestore, collection, doc, onSnapshot, setDoc, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js';
+import { getFirestore, collection, doc, onSnapshot, setDoc, addDoc, updateDoc, arrayUnion, serverTimestamp } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js';
 
 // Configuration publique (aucun secret) : seules les règles Firestore protègent les données.
 const app = initializeApp({
@@ -479,17 +587,22 @@ const db = getFirestore(app);
 const GOOGLE_CLIENT_ID = '565047413369-2bi3f5bqfsao5hgdg271gv7g2prdhqrc.apps.googleusercontent.com';
 
 // État en mémoire, alimenté en temps réel par Firestore (synchronise iPhone et ordinateur).
-const etat = { uid: null, aujourdhui: cleDuJour(new Date()), ecran: 'jour', jourAffiche: null, reglages: null, jours: {}, semaines: {}, taches: [], charge: new Set() };
+const etat = { uid: null, aujourdhui: cleDuJour(new Date()), ecran: 'jour', jourAffiche: null,
+  ui: { exclMode: 'semaine', exclDate: null, defiType: 'sport-semaine', defiCible: 4, defiHabitude: 'meditation', abandon: false }, reglages: null, jours: {}, semaines: {}, taches: [], charge: new Set() };
 let desabonnements = [];
 
 const ref = (...chemin) => doc(db, 'users', etat.uid, ...chemin);
 const col = nom => collection(db, 'users', etat.uid, nom);
 const poids = () => ({ ...POIDS_DEFAUT, ...etat.reglages?.poids });
+// Un changement de poids ne s'applique qu'à partir de la semaine en cours :
+// une semaine terminée garde les poids avec lesquels elle a été figée.
+const poidsSemaine = lundi => lundi < lundiDe(etat.aujourdhui) && etat.semaines[lundi]?.poids
+  ? { ...POIDS_DEFAUT, ...etat.semaines[lundi].poids } : poids();
 const objectifSport = () => etat.reglages?.objectifSport ?? OBJECTIF_SPORT;
 
 function ecouter(uid) {
   etat.uid = uid;
-  const pret = nom => { etat.charge.add(nom); if (etat.charge.size === 4) { figerSemainesPassees(); rendre(); } };
+  const pret = nom => { etat.charge.add(nom); if (etat.charge.size === 4) { figerSemainesPassees(); archiverDefi(); rendre(); } };
   desabonnements = [
     onSnapshot(ref('settings', 'main'), s => {
       // Premier lancement : la date de début est aujourd'hui.
@@ -529,17 +642,28 @@ function figerSemainesPassees() {
   const dateDebut = etat.reglages.dateDebut;
   const lundiCourant = lundiDe(etat.aujourdhui);
   for (let lundi = lundiDe(dateDebut); lundi < lundiCourant; lundi = ajouterJours(lundi, 7)) {
-    const r = calculerScoreSemaine({ lundi, jours: etat.jours, semaine: etat.semaines[lundi], poids: poids(),
+    const deja = etat.semaines[lundi];
+    const p = deja?.poids ?? poids();
+    const r = calculerScoreSemaine({ lundi, jours: etat.jours, semaine: deja, poids: p,
                                      objectifSport: objectifSport(), dateDebut, aujourdhui: etat.aujourdhui });
     const detail = { sport: r.sport, menage: r.menage, scoresJours: r.scoresJours };
-    const deja = etat.semaines[lundi];
-    if (deja?.fige && deja.score === r.score && stable(deja.detail) === stable(detail)) continue;
-    setDoc(ref('weeks', lundi), { score: r.score, detail, fige: true, calculeLe: serverTimestamp() }, { merge: true }).catch(erreur);
+    if (deja?.fige && deja.score === r.score && stable(deja.detail) === stable(detail) && stable(deja.poids) === stable(p)) continue;
+    setDoc(ref('weeks', lundi), { score: r.score, detail, poids: p, fige: true, calculeLe: serverTimestamp() }, { merge: true }).catch(erreur);
   }
 }
 
 // Jour affiché sur l'écran du jour : aujourd'hui, ou un jour passé en cours de correction.
 const jourVu = () => etat.jourAffiche ?? etat.aujourdhui;
+const ecrireReglages = champs => updateDoc(ref('settings', 'main'), champs).catch(erreur);
+
+// Défi terminé : on garde son résultat dans l'historique et on libère la place.
+function archiverDefi() {
+  const defi = etat.reglages.defiEnCours;
+  if (!defi || etat.aujourdhui <= defi.fin) return;
+  const { statut } = evaluerDefi(defi, { jours: etat.jours, semaines: etat.semaines, aujourdhui: etat.aujourdhui });
+  ecrireReglages({ defiEnCours: null, defisPasses: arrayUnion({ ...defi, reussi: statut === 'reussi' }) });
+}
+
 const ecrireJour = champs => setDoc(ref('days', jourVu()), { ...champs, majLe: serverTimestamp() }, { merge: true }).catch(erreur);
 const ecrireSemaine = champs => setDoc(ref('weeks', lundiDe(jourVu())), champs, { merge: true }).catch(erreur);
 
@@ -555,7 +679,37 @@ const el = (balise, classe, texte) => {
 const AFFICHAGE = {
   eau: ['💧', '2 L d’eau'], sport: ['🏃', 'Sport 30 min'], lecture: ['📖', 'Lecture'], meditation: ['🧘', 'Méditation'],
   petitDej: ['🥐', 'Petit-déj'], dejeuner: ['🥗', 'Déjeuner'], diner: ['🍲', 'Dîner'],
+  sommeil: ['😴', 'Sommeil'], menage: ['🧹', 'Ménage'],
 };
+const AVEC_ARTICLE = {
+  sommeil: 'tes 7 h de sommeil', eau: 'tes 2 L d’eau', lecture: 'la lecture', meditation: 'la méditation',
+  petitDej: 'le petit-déjeuner', dejeuner: 'le déjeuner', diner: 'le dîner',
+};
+const ANIMAUX = {
+  tigre: ['Tigre', '1f42f'], aigle: ['Aigle', '1f985'], chat: ['Chat', '1f431'], loup: ['Loup', '1f43a'],
+  renard: ['Renard', '1f98a'], lion: ['Lion', '1f981'], panthere: ['Panthère noire', '1f408-200d-2b1b'], hibou: ['Hibou', '1f989'],
+};
+const BADGE_ETAT = { 'en-forme': '💪', content: '😊', neutre: '😐', fatigue: '💤' };
+// Image d'un animal : d'abord images/animaux/<animal>-<état>.png (tes images),
+// sinon l'illustration provisoire Twemoji avec un badge pour l'état.
+const imagesTrouvees = new Map(); // chemin local → true (ton image) ou false (illustration provisoire)
+function afficherAnimal(img, animal, etatPerso, badge) {
+  const local = `images/animaux/${animal}-${etatPerso}.png`;
+  if (img.dataset.src === local) return;
+  img.dataset.src = local;
+  img.classList.remove('provisoire');
+  if (badge) badge.hidden = true;
+  const provisoire = () => {
+    img.onerror = null;
+    img.classList.add('provisoire');
+    img.src = `https://cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/svg/${ANIMAUX[animal][1]}.svg`;
+    if (badge) { badge.textContent = BADGE_ETAT[etatPerso]; badge.hidden = false; }
+  };
+  if (imagesTrouvees.get(local) === false) return provisoire();
+  img.onload = () => { if (!img.classList.contains('provisoire')) imagesTrouvees.set(local, true); };
+  img.onerror = () => { imagesTrouvees.set(local, false); provisoire(); };
+  img.src = local;
+}
 const dateDe = cle => { const [a, m, j] = cle.split('-').map(Number); return new Date(a, m - 1, j, 12); };
 const formatDate = (cle, options) => new Intl.DateTimeFormat('fr-FR', options).format(dateDe(cle));
 const minutesEnTexte = m => `${Math.floor(m / 60)} h ${String(m % 60).padStart(2, '0')}`;
@@ -572,6 +726,7 @@ function rendre() {
   }
   rendreJour();
   rendreHistorique();
+  rendreReglages();
 }
 
 function rendreJour() {
@@ -592,8 +747,17 @@ function rendreJour() {
   $('carte-taches').hidden = passe;
 
   // Score de la semaine du jour affiché
-  const r = calculerScoreSemaine({ lundi, jours, semaine, poids: poids(), objectifSport: objectifSport(), dateDebut, aujourdhui });
+  const r = calculerScoreSemaine({ lundi, jours, semaine, poids: poidsSemaine(lundi), objectifSport: objectifSport(), dateDebut, aujourdhui });
   $('score').textContent = r.score ?? '—';
+
+  // Personnage : son état suit le score de la semaine affichée.
+  const animal = ANIMAUX[reglages.animal] ? reglages.animal : null;
+  if (!animal) { $('perso').textContent = '🌱'; $('perso-etat').hidden = true; }
+  else {
+    let img = $('perso').querySelector('img');
+    if (!img) { img = el('img'); img.alt = ''; $('perso').replaceChildren(img); }
+    afficherAnimal(img, animal, etatPersonnage(r.score), $('perso-etat'));
+  }
   $('jauge-rempli').style.width = `${r.score ?? 0}%`;
   document.querySelector('.libelle-score').textContent = semaineEnCours ? 'cette semaine' : `semaine du ${formatDate(lundi, { day: 'numeric', month: 'short' })}`;
   const lundiPrecedent = ajouterJours(lundi, -7);
@@ -605,9 +769,12 @@ function rendreJour() {
     $('comparaison').textContent = ecart === 0 ? 'Pareil que la semaine précédente'
       : `${ecart > 0 ? '▲ +' : '▼ −'}${Math.abs(ecart)} par rapport à la semaine précédente`;
   }
-  const defi = semaineEnCours ? reglages.defiEnCours : null;
+  const defi = passe ? null : reglages.defiEnCours;
   $('defi').hidden = !defi;
-  if (defi) $('defi').textContent = `🎯 Défi : ${defi.libelle}`;
+  if (defi) {
+    const { fait, total, statut } = evaluerDefi(defi, contexte);
+    $('defi').textContent = `🎯 ${defi.libelle} · ${fait}/${total}${statut === 'reussi' ? ' · réussi ✓' : statut === 'rate' ? ' · raté cette fois' : ''}`;
+  }
 
   // Habitudes
   const tuile = h => {
@@ -685,7 +852,7 @@ function rendreHistorique() {
     ligne.append(el('span', 'cal-semaine', formatDate(lundi, { day: 'numeric', month: 'short' })));
     for (const c of joursDeLaSemaine(lundi)) {
       if (c < dateDebut || c > aujourdhui) { ligne.append(el('span', 'cal-case vide')); continue; }
-      const { score } = scoreJour(jours[c], semaines[lundi], poids());
+      const { score } = scoreJour(jours[c], semaines[lundi], poidsSemaine(lundi));
       const b = el('button', `cal-case${score === null ? ' exclue' : ` n${niveau(score)}`}${c === aujourdhui ? ' aujourdhui' : ''}`);
       b.setAttribute('aria-label', `${formatDate(c, { weekday: 'long', day: 'numeric', month: 'long' })} : ${score === null ? 'exclu' : `${Math.round(score)} %`}`);
       b.title = b.getAttribute('aria-label');
@@ -719,6 +886,139 @@ function rendreHistorique() {
   }));
   $('graphique').scrollLeft = $('graphique').scrollWidth;
 }
+
+function rendreDefisReussis() {
+  const court = c => formatDate(c, { day: 'numeric', month: 'short' });
+  const reussis = (etat.reglages.defisPasses ?? []).filter(d => d.reussi).sort((x, y) => x.fin < y.fin ? 1 : -1);
+  $('carte-defis').hidden = !reussis.length;
+  $('defis-reussis').replaceChildren(...reussis.map(d => el('li', '', d.type === 'sport-semaine'
+    ? `🏆 ${d.cible} séances de sport · semaine du ${court(d.debut)}`
+    : `🏆 ${d.libelle} · du ${court(d.debut)} au ${court(d.fin)}`)));
+}
+
+// ===================== INTERFACE (réglages) =====================
+function rendreReglages() {
+  const { aujourdhui, reglages, jours, semaines, ui } = etat;
+  rendreDefisReussis();
+
+  // Animal
+  $('animaux').replaceChildren(...Object.entries(ANIMAUX).map(([id, [nom]]) => {
+    const b = el('button', 'animal');
+    b.setAttribute('aria-pressed', reglages.animal === id);
+    const img = el('img'); img.alt = '';
+    afficherAnimal(img, id, 'en-forme');
+    b.append(img, el('span', '', nom));
+    b.onclick = () => ecrireReglages({ animal: id });
+    return b;
+  }));
+
+  // Exclusions : pour la semaine d'une date, ou pour un jour précis.
+  const date = ui.exclDate ?? aujourdhui;
+  if (document.activeElement !== $('excl-date')) $('excl-date').value = date;
+  for (const b of $('excl-mode').children) b.setAttribute('aria-pressed', b.dataset.mode === ui.exclMode);
+  const lundi = lundiDe(date);
+  const exclSemaine = semaines[lundi]?.exclusions ?? [];
+  const exclJour = jours[date]?.exclusions ?? [];
+  const parSemaine = ui.exclMode === 'semaine';
+  $('excl-periode').textContent = parSemaine
+    ? `Semaine du ${formatDate(lundi, { day: 'numeric', month: 'long' })} au ${formatDate(ajouterJours(lundi, 6), { day: 'numeric', month: 'long' })}`
+    : formatDate(date, { weekday: 'long', day: 'numeric', month: 'long' });
+  const liste = parSemaine ? exclSemaine : exclJour;
+  const habitudes = ['sommeil', 'eau', 'sport', 'lecture', 'meditation', 'petitDej', 'dejeuner', 'diner', ...(parSemaine ? ['menage'] : [])];
+  $('excl-puces').replaceChildren(...habitudes.map(h => {
+    const viaSemaine = !parSemaine && exclSemaine.includes(h);
+    const actif = liste.includes(h) || viaSemaine;
+    const b = el('button', 'puce', `${AFFICHAGE[h][0]} ${AFFICHAGE[h][1]}${viaSemaine ? ' (toute la semaine)' : ''}`);
+    b.setAttribute('aria-pressed', actif);
+    b.disabled = viaSemaine;
+    b.onclick = () => {
+      const nouvelle = actif ? liste.filter(x => x !== h) : [...liste, h];
+      if (parSemaine) setDoc(ref('weeks', lundi), { exclusions: nouvelle }, { merge: true }).catch(erreur);
+      else setDoc(ref('days', date), { exclusions: nouvelle, majLe: serverTimestamp() }, { merge: true }).catch(erreur);
+    };
+    return b;
+  }));
+
+  // Défi : un seul à la fois.
+  const defi = reglages.defiEnCours;
+  const court = c => formatDate(c, { day: 'numeric', month: 'short' });
+  if (defi) {
+    const { fait, total, statut } = evaluerDefi(defi, { jours, semaines, aujourdhui });
+    const bloc = el('div', 'defi-actif');
+    bloc.append(el('b', '', `🎯 ${defi.libelle}`),
+      el('p', 'note', `Du ${court(defi.debut)} au ${court(defi.fin)} · ${fait}/${total}${statut === 'reussi' ? ' · réussi ✓' : statut === 'rate' ? ' · raté cette fois' : ''}`));
+    const abandon = el('button', 'bouton secondaire', ui.abandon ? 'Touche encore pour confirmer' : 'Abandonner le défi');
+    abandon.onclick = () => {
+      if (!ui.abandon) { ui.abandon = true; rendre(); setTimeout(() => { ui.abandon = false; rendre(); }, 4000); return; }
+      ui.abandon = false;
+      ecrireReglages({ defiEnCours: null });
+    };
+    const p = el('p'); p.append(abandon);
+    bloc.append(p);
+    $('defi-zone').replaceChildren(bloc);
+  } else {
+    const segment = el('div', 'segment');
+    for (const [type, nom] of [['sport-semaine', 'Sport cette semaine'], ['sans-manquer', 'Un mois sans manquer']]) {
+      const b = el('button', '', nom);
+      b.setAttribute('aria-pressed', ui.defiType === type);
+      b.onclick = () => { ui.defiType = type; rendre(); };
+      segment.append(b);
+    }
+    const options = el('div');
+    if (ui.defiType === 'sport-semaine') {
+      const compteur = el('div', 'compteur');
+      const moins = el('button', '', '−'), plus = el('button', '', '+');
+      moins.setAttribute('aria-label', 'Une séance de moins'); plus.setAttribute('aria-label', 'Une séance de plus');
+      moins.onclick = () => { ui.defiCible = Math.max(1, ui.defiCible - 1); rendre(); };
+      plus.onclick = () => { ui.defiCible = Math.min(7, ui.defiCible + 1); rendre(); };
+      compteur.append(moins, el('b', '', ui.defiCible), plus, el('span', 'note', `séance${ui.defiCible > 1 ? 's' : ''} du ${court(lundiDe(aujourdhui))} au ${court(ajouterJours(lundiDe(aujourdhui), 6))}`));
+      options.append(compteur);
+    } else {
+      const puces = el('div', 'puces');
+      for (const h of Object.keys(AVEC_ARTICLE)) {
+        const b = el('button', 'puce choisie', `${AFFICHAGE[h][0]} ${AFFICHAGE[h][1]}`);
+        b.setAttribute('aria-pressed', ui.defiHabitude === h);
+        b.onclick = () => { ui.defiHabitude = h; rendre(); };
+        puces.append(b);
+      }
+      options.append(puces, el('p', 'note', `Du ${court(aujourdhui)} au ${court(finDefiMensuel(aujourdhui))}`));
+    }
+    const lancer = el('button', 'bouton', 'Lancer le défi');
+    lancer.onclick = () => {
+      const debut = ui.defiType === 'sport-semaine' ? lundiDe(aujourdhui) : aujourdhui;
+      ecrireReglages({ defiEnCours: ui.defiType === 'sport-semaine'
+        ? { type: 'sport-semaine', cible: ui.defiCible, debut, fin: ajouterJours(debut, 6), libelle: `${ui.defiCible} séances de sport cette semaine` }
+        : { type: 'sans-manquer', habitude: ui.defiHabitude, debut, fin: finDefiMensuel(debut), libelle: `Un mois sans manquer ${AVEC_ARTICLE[ui.defiHabitude]}` } });
+    };
+    const p = el('p'); p.append(lancer);
+    $('defi-zone').replaceChildren(segment, options, p);
+  }
+
+  // Pondérations
+  const pd = poids();
+  const ordre = ['sport', 'sommeil', 'eau', 'petitDej', 'dejeuner', 'diner', 'lecture', 'meditation', 'menage'];
+  if (!$('poids').contains(document.activeElement)) {
+    $('poids').replaceChildren(...ordre.map(k => {
+      const label = el('label', '', AFFICHAGE[k][1]);
+      const input = el('input');
+      Object.assign(input, { type: 'number', min: 0, max: 100, step: 1, inputMode: 'numeric', value: pd[k] });
+      input.onchange = () => {
+        const v = Math.max(0, Math.min(100, Math.round(Number(input.value) || 0)));
+        ecrireReglages({ [`poids.${k}`]: v });
+      };
+      label.append(input);
+      return label;
+    }));
+  }
+  const total = ordre.reduce((t, k) => t + pd[k], 0);
+  $('poids-total').textContent = `Total : ${total}. Le score reste sur 100 quel que soit le total. Un changement s’applique à partir de la semaine en cours ; les semaines passées gardent leurs poids.`;
+
+  $('reglage-compte').textContent = `Connecté : ${auth.currentUser?.email ?? ''}`;
+}
+
+for (const b of $('excl-mode').children) b.onclick = () => { etat.ui.exclMode = b.dataset.mode; rendre(); };
+$('excl-date').onchange = () => { if ($('excl-date').value) { etat.ui.exclDate = $('excl-date').value; rendre(); } };
+$('poids-defaut').onclick = () => ecrireReglages({ poids: POIDS_DEFAUT });
 
 // Navigation
 for (const b of $('navigation').children) b.onclick = () => {
@@ -759,7 +1059,7 @@ function verifierJour() {
   const cle = cleDuJour(new Date());
   if (cle === etat.aujourdhui) return;
   etat.aujourdhui = cle;
-  if (etat.charge.size === 4) { figerSemainesPassees(); rendre(); }
+  if (etat.charge.size === 4) { figerSemainesPassees(); archiverDefi(); rendre(); }
 }
 (function planifierMinuit() {
   const n = new Date();
