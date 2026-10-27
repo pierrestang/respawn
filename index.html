@@ -66,11 +66,9 @@
   #app { max-width: 560px; margin: 0 auto; padding-top: 6px; }
   #ecran-jour, #ecran-historique, #ecran-reglages { display: grid; gap: 18px; }
   .colonne { display: grid; gap: 18px; align-content: start; }
-  /* Ordinateur : personnage, score et défi dans une colonne fixe ; saisie et tâches dans la colonne principale. */
+  #ecran-jour { gap: 14px; }
   @media (min-width: 960px) {
-    #app { max-width: 1080px; padding-top: 28px; }
-    #ecran-jour { grid-template-columns: 380px 1fr; align-items: start; column-gap: 36px; }
-    #ecran-jour > .colonne:first-child { position: sticky; top: 28px; }
+    #app { max-width: 760px; padding-top: 20px; }
     #ecran-historique, #ecran-reglages { max-width: 640px; margin: 0 auto; }
   }
   .carte { background: var(--fond); border-radius: var(--rond); box-shadow: var(--relief); padding: 16px 18px; position: relative; }
@@ -86,73 +84,47 @@
   .serie { display: inline-flex; align-items: center; gap: 1px; color: var(--texte-doux); font-size: 11px; }
   .serie .icone { width: 11px; height: 11px; stroke-width: 1.8; color: var(--flamme); }
 
-  /* --- En-tête : personnage, anneau du score, semaine --- */
+  /* --- Bande de bilan : anneau du score, bulle du personnage, semaine en pastilles --- */
   #date { text-align: center; font-size: 14px; font-weight: 500; color: var(--texte-doux); margin: 2px 0 0; }
   #date::first-letter { text-transform: uppercase; }
-  .carte-perso { margin-top: 30px; }
-  .perso-zone { display: grid; grid-template-columns: 110px 1fr; gap: 12px; align-items: end; }
-  /* Personnage sans cadre, qui déborde du haut de sa carte. */
-  .perso-cadre { position: relative; width: 110px; height: 110px; margin-top: -50px; }
-  /* Petit tapis en creux sous l'animal */
-  .perso-cadre::before {
-    content: ''; position: absolute; left: 8px; right: 8px; bottom: -2px; height: 20px; border-radius: 50%;
-    background: var(--creux-fond); box-shadow: var(--creux-mini);
-  }
-  #perso { position: relative;
-    width: 100%; height: 100%; display: grid; place-items: center; color: var(--accent);
-    filter: drop-shadow(6px 10px 9px rgba(140, 125, 105, .4)); animation: rebond 3s ease-in-out infinite;
-  }
-  #perso img { width: 100%; height: 100%; object-fit: contain; }
-  #perso img.provisoire { width: 90%; height: 90%; }
-  #perso > .icone { width: 64px; height: 64px; stroke-width: 1.1; }
-  #perso-etat {
-    position: absolute; left: 50%; bottom: -10px; transform: translateX(-50%); white-space: nowrap;
-    font-size: 11px; color: var(--texte-doux); background: var(--fond); padding: 1px 9px; border-radius: 999px; box-shadow: var(--relief-mini);
-    bottom: -16px;
-  }
-  .perso-cadre.saute { animation: saut-perso var(--anim) cubic-bezier(.3, 1.6, .5, 1); }
-  .perso-cadre.saute-double { animation: saut-double var(--anim) ease-out; }
-  @keyframes saut-perso { 0%, 100% { transform: none; } 40% { transform: translateY(-14px) rotate(-6deg); } 70% { transform: translateY(0) rotate(3deg); } }
-  @keyframes saut-double { 0%, 50%, 100% { transform: none; } 25% { transform: translateY(-14px) rotate(-6deg); } 75% { transform: translateY(-10px) rotate(6deg); } }
-  @keyframes rebond { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+  .bande { padding: 14px 16px 12px; }
+  .bande-haut { display: grid; grid-template-columns: auto 1fr auto; gap: 14px; align-items: center; }
+  .bande-texte { display: grid; gap: 6px; min-width: 0; }
+  .bande-infos { font-size: 12.5px; color: var(--texte-doux); line-height: 1.4; }
+  .bande-infos b { color: var(--texte); font-weight: 700; }
   #bulle {
-    position: relative; background: var(--fond); border-radius: 18px; padding: 10px 13px; align-self: center;
-    font-size: 13.5px; line-height: 1.4; margin: 0 0 0 6px; box-shadow: var(--relief-rond);
+    position: relative; background: var(--fond); border-radius: 16px; padding: 9px 12px;
+    font-size: 13px; line-height: 1.4; margin: 0 0 6px; box-shadow: var(--relief-mini);
   }
-  /* Queue de la bulle, pointée vers la bouche de l'animal */
-  #bulle::before {
-    content: ''; position: absolute; left: -9px; top: 22px; width: 16px; height: 16px; background: var(--fond);
-    transform: rotate(45deg) skew(8deg, 8deg); border-radius: 0 0 0 4px; box-shadow: -4px 4px 6px rgba(219, 196, 174, .55);
+  /* Queue de la bulle, pointée vers le personnage, en dessous */
+  #bulle::after {
+    content: ''; position: absolute; left: 28px; bottom: -7px; width: 14px; height: 14px; background: var(--fond);
+    transform: rotate(45deg); border-radius: 0 0 4px 0; box-shadow: 3px 3px 5px rgba(219, 196, 174, .6);
   }
-  .score-zone { display: flex; align-items: center; gap: 18px; margin-top: 16px; }
   /* Anneau de progression autour du score de la semaine */
-  .anneau { position: relative; width: 112px; height: 112px; border-radius: 50%; flex: none; box-shadow: var(--relief); display: grid; place-items: center; }
-  .anneau::before { content: ''; position: absolute; inset: 11px; border-radius: 50%; background: var(--creux-fond); box-shadow: var(--creux); }
+  .anneau { position: relative; width: 88px; height: 88px; border-radius: 50%; flex: none; box-shadow: var(--relief-rond); display: grid; place-items: center; }
+  .anneau::before { content: ''; position: absolute; inset: 9px; border-radius: 50%; background: var(--creux-fond); box-shadow: var(--creux-mini); }
   .anneau svg { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
-  .anneau-fond { fill: none; stroke: #d6cbb9; stroke-width: 8; }
-  .anneau-plein { fill: none; stroke: var(--accent); stroke-width: 8; stroke-linecap: round; stroke-dasharray: 100; stroke-dashoffset: 100; transition: stroke-dashoffset var(--anim) cubic-bezier(.22, 1, .36, 1); }
+  .anneau-fond { fill: none; stroke: #e4d2bf; stroke-width: 7; }
+  .anneau-plein { fill: none; stroke: var(--accent); stroke-width: 7; stroke-linecap: round; stroke-dasharray: 100; stroke-dashoffset: 100; transition: stroke-dashoffset var(--anim) cubic-bezier(.22, 1, .36, 1); }
   .anneau-texte { position: relative; display: grid; justify-items: center; line-height: 1; }
-  #score { font-family: var(--titres); font-size: 40px; font-weight: 600; color: var(--texte); font-variant-numeric: tabular-nums lining-nums; }
-  .sur-100 { font-size: 11px; color: var(--texte-doux); margin-top: 4px; letter-spacing: .4px; }
-  .score-cote { display: grid; gap: 2px; min-width: 0; justify-items: start; }
-  .score-sous { font-family: var(--titres); font-size: 17px; font-weight: 600; }
-  #comparaison { font-size: 12.5px; color: var(--texte-doux); }
-  .score-secondaire { font-size: 12.5px; color: var(--texte-doux); margin-top: 2px; }
-  .score-secondaire b { color: var(--texte); font-weight: 700; }
+  #score { font-family: var(--titres); font-size: 32px; font-weight: 600; color: var(--texte); font-variant-numeric: tabular-nums lining-nums; }
+  .sur-100 { font-size: 9px; color: var(--texte-doux); margin-top: 3px; letter-spacing: .4px; }
 
-  /* Plante en trait simple, élément secondaire */
-  #plante { width: 38px; height: 52px; flex: none; overflow: visible; margin-bottom: 2px; }
-  #plante .trait { fill: none; stroke: var(--accent); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
-  #plante .pot { fill: none; stroke: var(--texte-doux); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
-  #plante .tige { fill: none; stroke: var(--accent); stroke-width: 2.6; stroke-linecap: round; stroke-dasharray: 100; transition: stroke-dashoffset var(--anim) cubic-bezier(.22, 1, .36, 1); }
+  /* Plante en trait simple, élément secondaire (masquée sur les écrans étroits, faute de place) */
+  #plante { width: 34px; height: 48px; flex: none; overflow: visible; align-self: end; }
+  @media (max-width: 599px) { #plante { display: none; } .bande-haut { grid-template-columns: auto 1fr; } }
+  #plante .trait { fill: none; stroke: var(--accent); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+  #plante .pot { fill: none; stroke: var(--texte-doux); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+  #plante .tige { fill: none; stroke: var(--accent); stroke-width: 2.8; stroke-linecap: round; stroke-dasharray: 100; transition: stroke-dashoffset var(--anim) cubic-bezier(.22, 1, .36, 1); }
   #plante .etape { opacity: 0; transform: scale(.5); transform-box: fill-box; transform-origin: center bottom; transition: opacity var(--anim), transform var(--anim) cubic-bezier(.22, 1, .36, 1); }
   #plante .etape.visible { opacity: 1; transform: scale(1); }
 
   /* Semaine en pastilles : pleine (verte selon la journée), manquée (en creux), à venir (en relief). */
-  .semaine-pastilles { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin: 16px 0 6px; }
+  .semaine-pastilles { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin: 12px 0 6px; }
   .pastille-jour {
-    justify-self: center; width: 100%; max-width: 32px; aspect-ratio: 1; border-radius: 50%; position: relative;
-    display: grid; place-items: center; font-size: 12px; font-weight: 600; color: var(--texte-doux);
+    justify-self: center; width: 100%; max-width: 30px; aspect-ratio: 1; border-radius: 50%; position: relative;
+    display: grid; place-items: center; font-size: 11px; font-weight: 600; color: var(--texte-doux);
     background: var(--fond); box-shadow: var(--relief-mini);
   }
   .pastille-jour.manque { background: var(--creux-fond); box-shadow: var(--creux-mini); }
@@ -165,27 +137,60 @@
   .pastille-jour.n4 { background: #6a9656; color: #14200f; box-shadow: var(--creux-mini); }
   .pastille-jour.n5 { background: var(--accent); color: #fff; box-shadow: var(--creux-mini); }
   .pastille-jour.aujourdhui::after {
-    content: ''; position: absolute; bottom: -8px; left: 50%; width: 5px; height: 5px; border-radius: 50%;
+    content: ''; position: absolute; bottom: -7px; left: 50%; width: 4px; height: 4px; border-radius: 50%;
     background: var(--accent); transform: translateX(-50%);
   }
 
-  /* Défi en cours, sous le personnage */
-  .carte-defi { padding: 14px 18px; }
-  #defi { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 8px 10px; font-size: 14px; }
-  #defi .icone { width: 20px; height: 20px; color: var(--accent); }
-  .etapes-defi { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px; }
-  .etape-defi { width: 14px; height: 14px; border-radius: 50%; background: var(--fond); box-shadow: var(--relief-mini); }
-  .etapes-defi.serre { gap: 4px; }
-  .etapes-defi.serre .etape-defi { width: 8px; height: 8px; box-shadow: 1px 1px 3px var(--ombre-foncee), -1px -1px 3px var(--ombre-claire); }
-  .etape-defi.ok { background: var(--accent); box-shadow: none; }
-  .etape-defi.rate { background: var(--creux-fond); box-shadow: var(--creux-mini); }
+  /* --- La scène : le personnage au centre sur son disque, les boutons d'habitudes autour ---
+     Chaque bouton est posé au centre de la scène puis décalé sur une ellipse avec cos() et sin() :
+     --i est son rang (0 à 7), --depart et --pas règlent les angles, --rx et --ry les rayons.
+     iPhone : fer à cheval ouvert vers le haut (300°). Ordinateur : cercle complet. */
+  .scene {
+    position: relative; width: 100%; max-width: 358px; height: 342px; margin: 0 auto;
+    --cy: 150px; --rx: 141px; --ry: 138px; --depart: -60deg; --pas: calc(300deg / 7); --taille-perso: 128px;
+  }
+  @media (min-width: 600px) {
+    .scene { max-width: 520px; height: 370px; --cy: 166px; --rx: 172px; --ry: 132px; --depart: -90deg; --pas: 45deg; --taille-perso: 150px; }
+  }
+  .socle {
+    position: absolute; left: 50%; top: calc(var(--cy) + var(--taille-perso) * .42); transform: translateX(-50%);
+    width: calc(var(--taille-perso) * 1.05); height: calc(var(--taille-perso) * .26); border-radius: 50%;
+    background: var(--fond); box-shadow: var(--relief-rond);
+  }
+  .perso-cadre {
+    position: absolute; left: 50%; top: var(--cy); width: var(--taille-perso); height: var(--taille-perso);
+    margin: calc(var(--taille-perso) / -2) 0 0 calc(var(--taille-perso) / -2);
+  }
+  #perso {
+    position: relative; width: 100%; height: 100%; display: grid; place-items: center; color: var(--accent);
+    filter: drop-shadow(5px 9px 8px rgba(150, 110, 80, .3)); animation: rebond 3s ease-in-out infinite;
+    transition: transform var(--anim);
+  }
+  #perso img { width: 100%; height: 100%; object-fit: contain; }
+  #perso img.provisoire { width: 92%; height: 92%; }
+  #perso-etat {
+    position: absolute; left: 50%; bottom: -26px; transform: translateX(-50%); white-space: nowrap;
+    font-size: 11px; color: var(--texte-doux); background: var(--fond); padding: 1px 9px; border-radius: 999px; box-shadow: var(--relief-mini);
+  }
+  @keyframes rebond { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+  .perso-cadre.saute { animation: saut-perso var(--anim) cubic-bezier(.3, 1.6, .5, 1); }
+  .perso-cadre.saute-double { animation: saut-double var(--anim) ease-out; }
+  @keyframes saut-perso { 0%, 100% { transform: none; } 40% { transform: translateY(-16px) rotate(-6deg); } 70% { transform: translateY(0) rotate(3deg); } }
+  @keyframes saut-double { 0%, 50%, 100% { transform: none; } 25% { transform: translateY(-16px) rotate(-6deg); } 75% { transform: translateY(-11px) rotate(6deg); } }
+  /* Mouvement du chat provisoire pendant une interaction (remplacé par ta pose quand l'image existe). */
+  .perso-cadre[data-pose="boire"] #perso, .perso-cadre[data-pose="manger"] #perso { transform: translateY(8px) rotate(10deg); }
+  .perso-cadre[data-pose="dormir"] #perso { transform: translateY(14px) scale(.9, .82); }
+  .perso-cadre[data-pose="saluer"] #perso { animation: salut var(--anim) ease-in-out 2; }
+  @keyframes salut { 0%, 100% { transform: rotate(0); } 33% { transform: rotate(-7deg); } 66% { transform: rotate(7deg); } }
 
-  /* --- Saisie du jour : boutons ronds (relief), en creux une fois cochés --- */
-  .habitudes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px 6px; }
-  @media (min-width: 600px) { .habitudes { grid-template-columns: repeat(8, 1fr); } }
+  /* Boutons d'habitudes : en relief, puis remplis de leur teinte et en creux une fois cochés */
+  .scene .tuile {
+    position: absolute; left: 50%; top: var(--cy); width: 76px; margin: -27px 0 0 -38px;
+    transform: translate(calc(cos(var(--depart) + var(--i) * var(--pas)) * var(--rx)), calc(sin(var(--depart) + var(--i) * var(--pas)) * var(--ry)));
+  }
   .tuile {
     background: none; border: 0; padding: 0; display: grid; justify-items: center; align-content: start; gap: 5px;
-    color: var(--texte); touch-action: manipulation; position: relative;
+    color: var(--texte); touch-action: manipulation;
     --teinte: #d3e5c6; --teinte-fonce: #3c6431;
   }
   .tuile[data-h="eau"] { --teinte: #cfe1ee; --teinte-fonce: #2c5873; }
@@ -196,14 +201,13 @@
   .icone-habitude {
     position: relative; width: 54px; height: 54px; border-radius: 50%; display: grid; place-items: center;
     background: var(--fond); box-shadow: var(--relief-rond); color: var(--texte);
-    transition: box-shadow .3s ease, background .3s ease, color .3s ease, transform .15s;
+    transition: box-shadow .3s ease, background .3s ease, color .3s ease;
   }
   .icone-habitude .icone { width: 26px; height: 26px; }
   .tuile:active .icone-habitude { transform: scale(.96); }
   .tuile:focus-visible { outline: none; }
   .tuile:focus-visible .icone-habitude { outline: 2px solid rgba(79, 122, 66, .5); outline-offset: 3px; }
   .tuile .nom { font-size: 12px; font-weight: 600; line-height: 1.1; transition: color .3s; }
-  .tuile:focus-visible { outline: none; }
   .tuile .info { font-size: 11px; color: var(--texte-doux); display: flex; gap: 4px; align-items: center; min-height: 13px; line-height: 1; }
   .tuile.fait .icone-habitude {
     background: var(--teinte); color: var(--teinte-fonce);
@@ -214,20 +218,32 @@
     content: '✓'; position: absolute; top: -3px; right: -3px; width: 18px; height: 18px; border-radius: 50%;
     background: var(--teinte-fonce); color: #fff; font-size: 10px; font-weight: 700; display: grid; place-items: center;
   }
+  .tuile.exclue { opacity: .45; }
+  .tuile.exclue .icone-habitude { box-shadow: none; outline: 1.5px dashed var(--ombre-foncee); outline-offset: -2px; }
   .tuile.rebond .icone-habitude { animation: rebond-bouton var(--anim) cubic-bezier(.3, 1.6, .5, 1); }
   @keyframes rebond-bouton { 0% { transform: scale(1); } 35% { transform: scale(.86); } 70% { transform: scale(1.06); } 100% { transform: scale(1); } }
-  /* Étincelles et confettis : petites pastilles qui partent du bouton, retirées après l'animation. */
+  /* Étincelles et confettis : partent du bouton touché vers le personnage, retirés après l'animation. */
   .etincelle {
     position: absolute; left: 50%; top: 27px; width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 50%;
-    background: var(--c); pointer-events: none; animation: etincelle var(--anim) ease-out forwards;
+    background: var(--c); pointer-events: none; z-index: 2; animation: etincelle var(--anim) ease-out forwards;
   }
   .etincelle.confetti { width: 7px; height: 4px; border-radius: 2px; }
   @keyframes etincelle { from { transform: translate(0, 0) scale(1); opacity: 1; } to { transform: translate(var(--dx), var(--dy)) rotate(var(--r, 0deg)) scale(.4); opacity: 0; } }
-  .tuile.exclue { opacity: .45; }
-  .tuile.exclue .icone-habitude { box-shadow: none; outline: 1.5px dashed var(--ombre-foncee); outline-offset: -2px; }
+
+  /* Défi en cours, discret, sous le sommeil */
+  .carte-defi { padding: 12px 16px; }
+  #defi { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 8px 10px; font-size: 13px; }
+  #defi .icone { width: 18px; height: 18px; color: var(--accent); }
+  .etapes-defi { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px; }
+  .etape-defi { width: 12px; height: 12px; border-radius: 50%; background: var(--fond); box-shadow: var(--relief-mini); }
+  .etapes-defi.serre { gap: 4px; }
+  .etapes-defi.serre .etape-defi { width: 7px; height: 7px; box-shadow: 1px 1px 3px var(--ombre-foncee), -1px -1px 3px var(--ombre-claire); }
+  .etape-defi.ok { background: var(--accent); box-shadow: none; }
+  .etape-defi.rate { background: var(--creux-fond); box-shadow: var(--creux-mini); }
 
   /* --- Sommeil sur une ligne : coucher, réveil, durée, validé ou non --- */
-  .ligne-sommeil { display: grid; grid-template-columns: auto 1fr 1fr auto; align-items: end; gap: 10px; margin-top: 16px; }
+  .carte-sommeil { padding: 12px 16px; }
+  .ligne-sommeil { display: grid; grid-template-columns: auto 1fr 1fr auto; align-items: end; gap: 10px; }
   .icone-sommeil { align-self: center; color: var(--texte); padding-top: 14px; }
   .ligne-sommeil label { display: grid; gap: 4px; font-size: 11px; color: var(--texte-doux); min-width: 0; }
   .ligne-sommeil input {
@@ -324,13 +340,6 @@
 
   /* --- Réglages : mêmes reliefs ; un choix actif passe en creux --- */
   .note { font-size: 12.5px; color: var(--texte-doux); margin: 14px 0 0; line-height: 1.5; }
-  .animaux { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-  .animal {
-    background: var(--fond); border: 0; border-radius: 20px; padding: 10px 4px 8px; display: grid; justify-items: center; gap: 4px;
-    font-size: 12px; box-shadow: var(--relief-rond); transition: box-shadow .3s, background .3s;
-  }
-  .animal img { width: 44px; height: 44px; object-fit: contain; }
-  .animal[aria-pressed="true"] { background: var(--creux-fond); box-shadow: var(--creux); color: var(--accent-texte); font-weight: 700; }
   .segment { display: flex; background: var(--creux-fond); box-shadow: var(--creux-mini); border-radius: 999px; padding: 5px; gap: 4px; margin-bottom: 14px; }
   .segment button { flex: 1; border: 0; background: none; border-radius: 999px; padding: 8px 6px; font-weight: 600; color: var(--texte-doux); min-height: 40px; transition: box-shadow .3s, background .3s; }
   .segment button[aria-pressed="true"] { background: var(--fond); color: var(--texte); box-shadow: var(--relief-mini); }
@@ -402,21 +411,21 @@
 
 <main id="app" hidden>
  <div id="ecran-jour">
-  <div class="colonne">
     <p id="date"></p>
     <div id="bandeau-correction" hidden><svg class="icone" aria-hidden="true"><use href="#i-crayon"/></svg><span id="bandeau-texte"></span><button class="bouton" id="retour-aujourdhui">Aujourd’hui</button></div>
-    <section class="carte carte-perso">
-      <div class="perso-zone">
-        <div class="perso-cadre" aria-hidden="true"><div id="perso"></div><span id="perso-etat" hidden></span></div>
-        <p id="bulle" hidden></p>
-      </div>
-      <div class="score-zone">
+
+    <section class="carte bande">
+      <div class="bande-haut">
         <div class="anneau">
-          <svg viewBox="0 0 112 112" aria-hidden="true"><circle class="anneau-fond" cx="56" cy="56" r="50"/><circle class="anneau-plein" id="anneau" cx="56" cy="56" r="50" pathLength="100"/></svg>
+          <svg viewBox="0 0 88 88" aria-hidden="true"><circle class="anneau-fond" cx="44" cy="44" r="39.5"/><circle class="anneau-plein" id="anneau" cx="44" cy="44" r="39.5" pathLength="100"/></svg>
           <div class="anneau-texte"><span id="score">0</span><span class="sur-100">SUR 100</span></div>
         </div>
-        <div class="score-cote">
-            <svg id="plante" viewBox="0 0 80 110" aria-hidden="true">
+        <div class="bande-texte">
+          <p id="bulle" hidden></p>
+          <div class="bande-infos"><span id="libelle-semaine">cette semaine</span> · <span id="comparaison"></span><br>
+            <span title="Le score du jour compte les habitudes quotidiennes ; le sport et le ménage comptent dans la semaine."><span id="libelle-jour">Aujourd’hui</span> : <b id="score-jour">0</b>/100</span></div>
+        </div>
+        <svg id="plante" viewBox="0 0 80 110" aria-hidden="true">
             <path class="pot" d="M24 88h32l-3.5 17h-25zM21 88h38"/>
             <path class="tige" pathLength="100" d="M40 88C40 76 38 64 41 52C43.5 41 39.5 31 40 20"/>
             <path class="trait etape" data-min="10" d="M40 80C32 79 27 74 26 68C33 68 38 72 40 80ZM40 80L31 71.5"/>
@@ -433,21 +442,17 @@
               <circle cx="40" cy="17" r="2.6"/>
             </g>
           </svg>
-          <div class="score-sous" id="libelle-semaine">cette semaine</div>
-          <div id="comparaison"></div>
-          <div class="score-secondaire" title="Le score du jour compte les habitudes quotidiennes ; le sport et le ménage comptent dans la semaine."><span id="libelle-jour">Aujourd’hui</span> : <b id="score-jour">0</b>/100</div>
-        </div>
       </div>
       <div class="semaine-pastilles" id="semaine-pastilles"></div>
     </section>
-    <section class="carte carte-defi" id="carte-defi" hidden><div id="defi"></div></section>
-  </div>
 
-  <div class="colonne">
-    <section class="carte">
-      <div class="habitudes" id="grille-habitudes">
-        <button class="tuile" id="menage-case" data-h="menage"><span class="icone-habitude"><svg class="icone" aria-hidden="true"><use href="#i-menage"/></svg></span><span class="nom">Ménage</span><span class="info" id="menage-info"></span></button>
-      </div>
+    <section class="scene" id="scene">
+      <div class="socle" aria-hidden="true"></div>
+      <div class="perso-cadre" aria-hidden="true"><div id="perso"></div><span id="perso-etat" hidden></span></div>
+      <button class="tuile" id="menage-case" data-h="menage" style="--i: 7" aria-label="Ménage de la semaine"><span class="icone-habitude"><svg class="icone" aria-hidden="true"><use href="#i-menage"/></svg></span><span class="nom">Ménage</span><span class="info" id="menage-info"></span></button>
+    </section>
+
+    <section class="carte carte-sommeil">
       <div class="ligne-sommeil" id="heures">
         <span class="icone-sommeil" aria-hidden="true"><svg class="icone"><use href="#i-sommeil"/></svg></span>
         <label>Coucher <input type="time" id="coucher"></label>
@@ -461,6 +466,8 @@
       </div>
     </section>
 
+    <section class="carte carte-defi" id="carte-defi" hidden><div id="defi"></div></section>
+
     <section class="carte" id="carte-taches">
       <h2 class="titre-carte">Tâches</h2>
       <div id="compteur-taches"></div>
@@ -470,7 +477,6 @@
       </form>
       <ul id="liste-taches"></ul>
     </section>
-  </div>
  </div>
 
  <div id="ecran-historique" hidden>
@@ -492,12 +498,6 @@
  </div>
 
  <div id="ecran-reglages" hidden>
-    <section class="carte">
-      <h2 class="titre-carte">Ton compagnon</h2>
-      <div class="animaux" id="animaux"></div>
-      <p class="note">Illustrations provisoires : Twemoji (CC-BY 4.0). Pour mettre tes images, dépose-les dans <b>images/animaux/</b> sous la forme <b>animal-état.png</b> (ex. renard-en-forme.png, renard-content.png, renard-neutre.png, renard-fatigue.png).</p>
-    </section>
-
     <section class="carte">
       <h2 class="titre-carte">Exclusions</h2>
       <div class="segment" id="excl-mode">
@@ -884,10 +884,14 @@ const AVEC_ARTICLE = {
   sommeil: 'tes 7 h de sommeil', eau: 'tes 2 L d’eau', lecture: 'la lecture', meditation: 'la méditation',
   petitDej: 'le petit-déjeuner', dejeuner: 'le déjeuner', diner: 'le dîner',
 };
-const ANIMAUX = {
-  tigre: ['Tigre', '1f42f'], aigle: ['Aigle', '1f985'], chat: ['Chat', '1f431'], loup: ['Loup', '1f43a'],
-  renard: ['Renard', '1f98a'], lion: ['Lion', '1f981'], panthere: ['Panthère noire', '1f408-200d-2b1b'], hibou: ['Hibou', '1f989'],
-};
+// Personnage : un fichier par état et par interaction dans images/personnage/ (PNG à fond transparent).
+//   États : en-forme.png, content.png, neutre.png, fatigue.png
+//   Interactions : boire.png, manger.png, dormir.png, sauter.png, saluer.png
+// Tant qu'un fichier manque, l'image de base (base.png) s'affiche à sa place.
+const PERSONNAGE_PROVISOIRE = 'images/personnage/base.png';
+// Interaction déclenchée par chaque habitude cochée (le sommeil validé déclenche « dormir »).
+const INTERACTION = { eau: 'boire', petitDej: 'manger', dejeuner: 'manger', diner: 'manger', sport: 'sauter', lecture: 'saluer', meditation: 'saluer', menage: 'saluer' };
+const DUREE_POSE = 1500;
 const BADGE_ETAT = { 'en-forme': 'en forme', content: 'content', neutre: 'neutre', fatigue: 'fatigué' };
 const SVGNS = 'http://www.w3.org/2000/svg';
 function icone(nom) {
@@ -899,6 +903,8 @@ function icone(nom) {
   svg.append(use);
   return svg;
 }
+// Ordre des boutons autour du personnage (le ménage, statique, est le 8e).
+const ORDRE_SCENE = ['eau', 'sport', 'lecture', 'meditation', 'petitDej', 'dejeuner', 'diner'];
 // Un mot sous chaque bouton rond de l'écran du jour.
 const MOT = { eau: 'Eau', sport: 'Sport', lecture: 'Lecture', meditation: 'Méditation', petitDej: 'Petit-déj', dejeuner: 'Déjeuner', diner: 'Dîner' };
 function iconeHabitude(h) {
@@ -921,11 +927,33 @@ function majPlante(score) {
     e.classList.toggle('visible', s >= Number(e.dataset.min) && (!e.dataset.max || s <= Number(e.dataset.max)));
   }
 }
+// Pose d'interaction affichée DUREE_POSE ms, puis retour à l'état lié au score.
+let etatPerso = 'neutre', pose = null, minuteurPose = 0;
+function majPersonnage() {
+  let img = $('perso').querySelector('img');
+  if (!img) { img = el('img'); img.alt = ''; $('perso').replaceChildren(img); }
+  const cadre = document.querySelector('.perso-cadre');
+  if (pose) cadre.dataset.pose = pose; else delete cadre.dataset.pose;
+  // Sur ta vraie pose, pas de mouvement CSS de remplacement.
+  if (pose && imagesTrouvees.get(`images/personnage/${pose}.png`)) delete cadre.dataset.pose;
+  afficherPersonnage(img, pose ?? etatPerso, $('perso-etat'));
+}
+function jouerPose(nom) {
+  if (moinsDeMouvement()) return;
+  pose = nom;
+  majPersonnage();
+  clearTimeout(minuteurPose);
+  minuteurPose = setTimeout(() => { pose = null; majPersonnage(); }, DUREE_POSE);
+}
 const moinsDeMouvement = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 // Coche : le bouton rebondit, des étincelles de sa teinte partent et l'animal saute.
 // Série de 7 jours : confettis plus fournis et double saut. Rien de tout cela ne bloque la saisie.
-function celebrer(bouton, sept) {
+function celebrer(bouton, sept, interaction) {
   if (moinsDeMouvement()) return;
+  // Direction du bouton vers le personnage, pour que les étincelles partent vers lui.
+  const rb = bouton.getBoundingClientRect(), rp = document.querySelector('.perso-cadre').getBoundingClientRect();
+  const versX = rp.left + rp.width / 2 - (rb.left + rb.width / 2), versY = rp.top + rp.height / 2 - (rb.top + 27);
+  const versAngle = Math.atan2(versY, versX), versDistance = Math.hypot(versX, versY);
   bouton.classList.remove('rebond'); void bouton.offsetWidth; bouton.classList.add('rebond');
   bouton.addEventListener('animationend', () => bouton.classList.remove('rebond'), { once: true });
   const teinte = getComputedStyle(bouton).getPropertyValue('--teinte-fonce');
@@ -933,8 +961,8 @@ function celebrer(bouton, sept) {
   const n = sept ? 18 : 7;
   for (let i = 0; i < n; i++) {
     const e = el('span', `etincelle${sept ? ' confetti' : ''}`);
-    const angle = (i / n) * 2 * Math.PI + Math.random() * .5;
-    const distance = (sept ? 46 : 30) + Math.random() * 14;
+    const angle = versAngle + (Math.random() - .5) * (sept ? 1.6 : 1);
+    const distance = versDistance * (sept ? .55 : .45) + Math.random() * 18;
     e.style.setProperty('--c', couleurs[i % couleurs.length]);
     e.style.setProperty('--dx', `${Math.cos(angle) * distance}px`);
     e.style.setProperty('--dy', `${Math.sin(angle) * distance}px`);
@@ -943,6 +971,7 @@ function celebrer(bouton, sept) {
     setTimeout(() => e.remove(), 500);
   }
   const cadre = document.querySelector('.perso-cadre');
+  if (interaction) jouerPose(interaction);
   const classe = sept ? 'saute-double' : 'saute';
   cadre.classList.remove('saute', 'saute-double'); void cadre.offsetWidth; cadre.classList.add(classe);
   cadre.addEventListener('animationend', () => cadre.classList.remove(classe), { once: true });
@@ -1001,11 +1030,11 @@ function majPastilles(lundi, jours, semaine, aujourdhui, dateDebut) {
 }
 // Tuiles d'habitudes créées une fois puis mises à jour, pour que le passage en creux reste une transition douce.
 const TUILES = {};
-// Image d'un animal : d'abord images/animaux/<animal>-<état>.png (tes images),
-// sinon l'illustration provisoire Twemoji avec un badge pour l'état.
-const imagesTrouvees = new Map(); // chemin local → true (ton image) ou false (illustration provisoire)
-function afficherAnimal(img, animal, etatPerso, badge) {
-  const local = `images/animaux/${animal}-${etatPerso}.png`;
+// Image du personnage : d'abord images/personnage/<nom>.png, sinon l'image de base
+// (avec un badge texte pour l'état, tant que l'état n'a pas sa propre image).
+const imagesTrouvees = new Map(); // chemin local → true (ton image) ou false (provisoire)
+function afficherPersonnage(img, nom, badge) {
+  const local = `images/personnage/${nom}.png`;
   if (img.dataset.src === local) return;
   img.dataset.src = local;
   img.classList.remove('provisoire');
@@ -1013,11 +1042,15 @@ function afficherAnimal(img, animal, etatPerso, badge) {
   const provisoire = () => {
     img.onerror = null;
     img.classList.add('provisoire');
-    img.src = `https://cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/svg/${ANIMAUX[animal][1]}.svg`;
-    if (badge) { badge.textContent = BADGE_ETAT[etatPerso]; badge.hidden = false; }
+    img.src = PERSONNAGE_PROVISOIRE;
+    if (badge && BADGE_ETAT[nom]) { badge.textContent = BADGE_ETAT[nom]; badge.hidden = false; }
   };
   if (imagesTrouvees.get(local) === false) return provisoire();
-  img.onload = () => { if (!img.classList.contains('provisoire')) imagesTrouvees.set(local, true); };
+  img.onload = () => {
+    if (img.classList.contains('provisoire')) return;
+    imagesTrouvees.set(local, true);
+    img.closest('.perso-cadre')?.setAttribute('data-image', 'oui');
+  };
   img.onerror = () => { imagesTrouvees.set(local, false); provisoire(); };
   img.src = local;
 }
@@ -1069,16 +1102,11 @@ function rendreJour() {
   $('anneau').style.strokeDashoffset = 100 - (r.score ?? 0);
   majPastilles(lundi, jours, semaine, aujourdhui, dateDebut);
 
-  // Personnage : son état suit le score de la semaine affichée.
-  const animal = ANIMAUX[reglages.animal] ? reglages.animal : null;
-  if (!animal) { $('perso').replaceChildren(icone('jour')); $('perso-etat').hidden = true; }
-  else {
-    let img = $('perso').querySelector('img');
-    if (!img) { img = el('img'); img.alt = ''; $('perso').replaceChildren(img); }
-    afficherAnimal(img, animal, etatPersonnage(r.score), $('perso-etat'));
-  }
+  // Personnage : son état suit le score de la semaine affichée (ou une pose d'interaction en cours).
+  etatPerso = etatPersonnage(r.score);
+  majPersonnage();
   $('bulle').hidden = passe;
-  $('bulle').textContent = animal ? messagePersonnage(r.score, aujourdhui) : 'Choisis ton compagnon dans les Réglages.';
+  $('bulle').textContent = messagePersonnage(r.score, aujourdhui);
   $('libelle-semaine').textContent = semaineEnCours ? 'cette semaine' : `semaine du ${formatDate(lundi, { day: 'numeric', month: 'short' })}`;
   const lundiPrecedent = ajouterJours(lundi, -7);
   const precedente = semaines[lundiPrecedent];
@@ -1104,6 +1132,7 @@ function rendreJour() {
     if (!b) {
       b = el('button', 'tuile');
       b.dataset.h = h;
+      b.style.setProperty('--i', ORDRE_SCENE.indexOf(h));
       b.append(iconeHabitude(h), el('span', 'nom', MOT[h]), el('span', 'info'));
       b.setAttribute('aria-label', AFFICHAGE[h]);
       TUILES[h] = b;
@@ -1126,12 +1155,12 @@ function rendreJour() {
         // Série de 7 jours atteinte par cette coche : petite célébration.
         const apres = { ...jours, [cle]: { ...jour, habitudes: { ...jour?.habitudes, [h]: true } } };
         const sept = !passe && h !== 'sport' && serieJours(h, { ...contexte, jours: apres }) === 7;
-        celebrer(b, sept);
+        celebrer(b, sept, INTERACTION[h]);
       }
       ecrireJour({ habitudes: { [h]: !fait } });
     };
   };
-  for (const h of ['eau', 'sport', 'lecture', 'meditation', 'petitDej', 'dejeuner', 'diner']) tuile(h, $('grille-habitudes'));
+  for (const h of ORDRE_SCENE) tuile(h, $('scene'));
 
   // Sommeil : pré-rempli avec la dernière nuit saisie tant que celle d'aujourd'hui ne l'est pas.
   let sommeil = jour?.sommeil;
@@ -1158,7 +1187,7 @@ function rendreJour() {
   $('menage-case').disabled = menageExclu;
   $('menage-info').textContent = menageExclu ? 'exclu' : 'hebdo';
   $('menage-case').onclick = () => {
-    if (!menageFait) celebrer($('menage-case'), false);
+    if (!menageFait) celebrer($('menage-case'), false, INTERACTION.menage);
     ecrireSemaine({ menage: !menageFait });
   };
 
@@ -1245,17 +1274,6 @@ function rendreDefisReussis() {
 function rendreReglages() {
   const { aujourdhui, reglages, jours, semaines, ui } = etat;
   rendreDefisReussis();
-
-  // Animal
-  $('animaux').replaceChildren(...Object.entries(ANIMAUX).map(([id, [nom]]) => {
-    const b = el('button', 'animal');
-    b.setAttribute('aria-pressed', reglages.animal === id);
-    const img = el('img'); img.alt = '';
-    afficherAnimal(img, id, 'en-forme');
-    b.append(img, el('span', '', nom));
-    b.onclick = () => ecrireReglages({ animal: id });
-    return b;
-  }));
 
   // Exclusions : pour la semaine d'une date, ou pour un jour précis.
   const date = ui.exclDate ?? aujourdhui;
@@ -1380,7 +1398,10 @@ $('retour-aujourdhui').onclick = () => { etat.jourAffiche = null; rendre(); scro
 
 // Saisies du sommeil et des tâches
 const enregistrerSommeil = () => {
-  if ($('coucher').value && $('reveil').value) ecrireJour({ sommeil: { coucher: $('coucher').value, reveil: $('reveil').value } });
+  if (!$('coucher').value || !$('reveil').value) return;
+  // Sommeil validé (7 h ou plus) : le personnage s'endort un instant.
+  if (dureeSommeilMinutes($('coucher').value, $('reveil').value) >= SOMMEIL_MIN_MINUTES) jouerPose('dormir');
+  ecrireJour({ sommeil: { coucher: $('coucher').value, reveil: $('reveil').value } });
 };
 $('coucher').onchange = enregistrerSommeil;
 $('reveil').onchange = enregistrerSommeil;
