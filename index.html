@@ -102,14 +102,14 @@
   #score { font-family: var(--titres); font-size: 21px; font-weight: 600; color: var(--texte); font-variant-numeric: tabular-nums lining-nums; }
 
 
-  /* --- La scène en cadran : le personnage dans une cuvette en creux, les boutons posés sur un fin anneau en relief ---
+  /* --- La scène : le jardin du personnage derrière une ouverture ronde, les boutons d'habitudes flottant autour ---
      Chaque bouton est posé au centre de la scène puis décalé sur l'anneau avec cos() et sin() de son angle --a.
      Arc du haut (de gauche à droite) : eau, sport, lecture, méditation, noms au-dessus.
      Arc du bas (de gauche à droite) : petit-déj, déjeuner, dîner, noms en dessous.
      Sommeil à gauche et ménage à droite, sur les côtés du cercle, noms en dessous. */
   .scene {
-    position: relative; width: calc(100% + 20px); max-width: 378px; height: 428px; margin: 24px auto 0; left: -10px;
-    --cy: 210px; --rx: 157px; --ry: 160px; --taille-perso: 168px; --cuvette: 232px;
+    position: relative; width: calc(100% + 32px); height: 428px; margin: 24px 0 0; left: -16px;
+    --cy: 210px; --rx: 157px; --ry: 160px; --hublot: 204px; --bord: 12px;
   }
   /* Neuf boutons tous les 40° : arc du haut, sommeil et ménage sur les côtés, repas sur l'arc du bas. */
   .tuile[data-h="eau"] { --a: -150deg; } .tuile[data-h="sport"] { --a: -110deg; }
@@ -118,28 +118,46 @@
   .tuile[data-h="dejeuner"] { --a: 90deg; } .tuile[data-h="petitDej"] { --a: 130deg; } .tuile[data-h="sommeil"] { --a: 170deg; }
   /* Ordinateur : le même cadran, plus grand et parfaitement rond. */
   @media (min-width: 600px) {
-    .scene { width: 100%; left: 0; margin-top: 8px; max-width: 520px; height: 488px; --cy: 240px; --rx: 190px; --ry: 190px; --taille-perso: 196px; --cuvette: 290px; }
+    .scene { width: 544px; left: -12px; margin-top: 8px; max-width: none; height: 488px; --cy: 240px; --rx: 190px; --ry: 190px; --hublot: 358px; }
   }
-  .cadran, .cuvette { position: absolute; left: 50%; top: var(--cy); border-radius: 50%; transform: translate(-50%, -50%); }
-  /* Fin anneau en relief, sur lequel les boutons sont posés */
-  .cadran {
-    width: calc(var(--rx) * 2); height: calc(var(--ry) * 2); border: 9px solid var(--fond);
-    box-shadow: 4px 4px 9px var(--ombre-foncee), -4px -4px 9px var(--ombre-claire),
-                inset 4px 4px 9px var(--ombre-foncee), inset -4px -4px 9px var(--ombre-claire);
+  .hublot { position: absolute; left: 50%; top: var(--cy); border-radius: 50%; transform: translate(-50%, -50%); }
+  /* Le jardin du personnage, vu à travers un trou dans la page (niveau 2, en retrait).
+     - Rebord (.hublot) : 12 px de la couleur de la page, en relief doux vers l'extérieur, petit biseau vers l'intérieur.
+     - Jardin (.jardin) : images/jardin.jpg (carrée), rognée au centre, agrandie de 8 % pour que son bord ne se voie
+       jamais ; tant qu'elle manque, fond vert sauge avec une ellipse d'herbe plus claire en bas.
+     - Ombres (.ombres), par-dessus tout : ombre portée nette en haut à gauche, lumière légère en bas à droite,
+       vignettage des bords. Le personnage est dans l'ouverture : ses mouvements ne dépassent jamais le bord.
+     - Parallaxe (--px, --py entre -1 et 1) : le jardin bouge de 8 px au plus, le personnage de moitié moins. */
+  .hublot {
+    width: var(--hublot); height: var(--hublot); background: var(--fond);
+    box-shadow: 6px 6px 14px var(--ombre-foncee), -6px -6px 14px var(--ombre-claire);
   }
-  /* Grande cuvette en creux, où se tient le personnage */
-  .cuvette {
-    width: var(--cuvette); height: var(--cuvette); background: var(--creux-fond);
-    box-shadow: inset 10px 10px 22px var(--ombre-foncee), inset -10px -10px 22px var(--ombre-claire);
+  .ouverture {
+    position: absolute; inset: var(--bord); border-radius: 50%; overflow: hidden;
+    background:
+      radial-gradient(ellipse 78% 30% at 50% 86%, #dfe8cf 0%, #d3e0c1 55%, rgba(211, 224, 193, 0) 72%),
+      linear-gradient(#c3d0b8, #b7c7ab);
+    /* Biseau : arête sombre au bord du trou, reflet clair sur le bas du rebord (éclairé d'en haut). */
+    box-shadow: 0 0 0 1.5px rgba(160, 128, 98, .45), 0 3px 3px 1px rgba(255, 250, 242, .85), 0 -2px 3px 1px rgba(150, 115, 85, .35);
+  }
+  .jardin {
+    position: absolute; inset: -4%; background: url("images/jardin.jpg") center / cover no-repeat;
+    translate: calc(var(--px, 0) * -8px) calc(var(--py, 0) * -8px); transition: translate .35s ease-out;
+  }
+  .ombres {
+    position: absolute; inset: 0; border-radius: 50%; pointer-events: none;
+    background: radial-gradient(circle, rgba(45, 30, 18, 0) 56%, rgba(45, 30, 18, .18) 100%);
+    box-shadow: inset 6px 14px 28px rgba(95, 60, 32, .35), inset 2px 5px 9px rgba(95, 60, 32, .3), inset -5px -7px 14px rgba(255, 246, 228, .22);
   }
   .ombre-perso {
-    position: absolute; left: 50%; top: calc(var(--cy) + var(--taille-perso) * .44); transform: translate(-50%, -50%);
-    width: calc(var(--taille-perso) * .52); height: 14px; border-radius: 50%;
-    background: radial-gradient(closest-side, rgba(95, 65, 40, .38), rgba(95, 65, 40, 0));
+    position: absolute; left: 50%; top: 84%; transform: translate(-50%, -50%);
+    width: 34%; height: 5%; border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(45, 55, 30, .42), rgba(45, 55, 30, 0));
   }
+  /* Personnage : environ 65 % de la hauteur de l'ouverture, les pieds sur l'herbe. */
   .perso-cadre {
-    position: absolute; left: 50%; top: var(--cy); width: var(--taille-perso); height: var(--taille-perso);
-    margin: calc(var(--taille-perso) / -2) 0 0 calc(var(--taille-perso) / -2);
+    position: absolute; left: 50%; bottom: 15%; width: 65%; height: 65%; transform: translateX(-50%);
+    translate: calc(var(--px, 0) * -4px) calc(var(--py, 0) * -4px); transition: translate .35s ease-out;
   }
   #perso {
     position: relative; width: 100%; height: 100%; display: grid; place-items: center; color: var(--accent);
@@ -150,8 +168,8 @@
   @keyframes rebond { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
   .perso-cadre.saute { animation: saut-perso var(--anim) cubic-bezier(.3, 1.6, .5, 1); }
   .perso-cadre.saute-double { animation: saut-double var(--anim) ease-out; }
-  @keyframes saut-perso { 0%, 100% { transform: none; } 40% { transform: translateY(-16px) rotate(-6deg); } 70% { transform: translateY(0) rotate(3deg); } }
-  @keyframes saut-double { 0%, 50%, 100% { transform: none; } 25% { transform: translateY(-16px) rotate(-6deg); } 75% { transform: translateY(-11px) rotate(6deg); } }
+  @keyframes saut-perso { 0%, 100% { transform: translateX(-50%); } 40% { transform: translateX(-50%) translateY(-16px) rotate(-6deg); } 70% { transform: translateX(-50%) rotate(3deg); } }
+  @keyframes saut-double { 0%, 50%, 100% { transform: translateX(-50%); } 25% { transform: translateX(-50%) translateY(-16px) rotate(-6deg); } 75% { transform: translateX(-50%) translateY(-11px) rotate(6deg); } }
   /* Mouvement de remplacement pendant une interaction, tant que la pose n'a pas sa propre image. */
   .perso-cadre[data-pose="boire"] #perso, .perso-cadre[data-pose="manger"] #perso { transform: translateY(8px) rotate(10deg); }
   .perso-cadre[data-pose="dormir"] #perso { transform: translateY(14px) scale(.9, .82); }
@@ -168,7 +186,7 @@
     display: grid; justify-items: center; gap: 2px; pointer-events: none;
   }
   .tuile.haut .libelle { top: auto; bottom: calc(100% + 4px); }
-  .tuile[data-h="sommeil"] .libelle, .tuile[data-h="menage"] .libelle { width: 62px; margin-left: -31px; }
+  .tuile[data-h="sommeil"] .libelle, .tuile[data-h="menage"] .libelle { width: 56px; margin-left: -28px; }
   .tuile {
     background: none; border: 0; padding: 0; display: block; color: var(--texte); touch-action: manipulation;
     --teinte: #d3e5c6; --teinte-fonce: #3c6431;
@@ -412,10 +430,14 @@
     </header>
 
     <section class="scene" id="scene">
-      <div class="cadran" aria-hidden="true"></div>
-      <div class="cuvette" aria-hidden="true"></div>
-      <div class="ombre-perso" aria-hidden="true"></div>
-      <div class="perso-cadre" aria-hidden="true"><div id="perso"></div></div>
+      <div class="hublot" aria-hidden="true">
+        <div class="ouverture">
+          <div class="jardin"></div>
+          <div class="ombre-perso"></div>
+          <div class="perso-cadre"><div id="perso"></div></div>
+          <div class="ombres"></div>
+        </div>
+      </div>
         <button class="tuile" id="menage-case" data-h="menage" aria-label="Ménage de la semaine"><span class="icone-habitude"><svg class="icone" aria-hidden="true"><use href="#i-menage"/></svg></span><span class="libelle"><span class="nom">Ménage</span><span class="info" id="menage-info"></span></span></button>
     </section>
 
@@ -866,12 +888,14 @@ function icone(nom) {
   svg.append(use);
   return svg;
 }
-// Cadran calé sur l'écran : diamètre = la plus petite valeur entre la largeur de la colonne et la hauteur
-// disponible sous la bande. L'anneau de boutons est serré contre la cuvette, et le personnage occupe
-// environ 75 % de la cuvette. Les valeurs du CSS ne servent que de repli avant ce calcul.
+// Cadran calé sur l'écran : diamètre = la plus petite valeur entre la largeur disponible et la hauteur
+// disponible sous la bande. Le trou du jardin est réduit d'autant qu'il faut pour garder 24 px entre son
+// rebord et chaque bouton. Les valeurs du CSS ne servent que de repli avant ce calcul.
 const NOMS = 30;          // place des noms au-dessus et au-dessous des boutons
 const DEMI_BOUTON = 27;   // boutons ronds de 54 px (zone tactile au-dessus de 44 px)
-const JEU = 6;            // écart entre la cuvette et l'anneau de boutons
+const PORTEE = 39;        // bouton + pastille de validation (en haut à droite) : jusqu'à 39 px du centre
+const ESPACE = 24;        // au moins 24 px entre le rebord et chaque bouton
+const BORD = 12;          // épaisseur du rebord du trou
 const MARGE_BAS = 16;
 function caleCadran() {
   const scene = $('scene');
@@ -881,14 +905,35 @@ function caleCadran() {
   const haut = scene.getBoundingClientRect().top + scrollY;
   const hauteurDispo = innerHeight - haut - MARGE_BAS;
   const deborde = DEMI_BOUTON + NOMS;   // au-delà du rayon : bouton + nom, en haut et en bas
-  const rayon = Math.max(120, Math.floor(Math.min((largeur - 62) / 2, (hauteurDispo - 2 * deborde) / 2)));
-  const cuvette = 2 * (rayon - DEMI_BOUTON - JEU);
-  for (const [nom, v] of [['--rx', rayon], ['--ry', rayon], ['--cy', rayon + deborde], ['--cuvette', cuvette], ['--taille-perso', Math.round(cuvette * .75)]]) {
+  // Largeur : les boutons des côtés (et leur pastille) restent dans l'écran.
+  const rayon = Math.max(120, Math.floor(Math.min((largeur - 64) / 2, (hauteurDispo - 2 * deborde) / 2)));
+  const hublot = 2 * (rayon - PORTEE - ESPACE);
+  for (const [nom, v] of [['--rx', rayon], ['--ry', rayon], ['--cy', rayon + deborde], ['--hublot', hublot], ['--bord', BORD]]) {
     scene.style.setProperty(nom, `${v}px`);
   }
   scene.style.height = `${2 * (rayon + deborde)}px`;
 }
 addEventListener('resize', caleCadran);
+// Parallaxe légère : la souris (ordinateur) ou l'inclinaison du téléphone (si l'appareil la fournit)
+// déplace le jardin en sens inverse ; coupée si l'appareil demande moins de mouvement.
+function parallaxe(nx, ny) {
+  const o = document.querySelector('.ouverture');
+  if (!o) return;
+  const borne = v => Math.max(-1, Math.min(1, v));
+  o.style.setProperty('--px', borne(nx).toFixed(3));
+  o.style.setProperty('--py', borne(ny).toFixed(3));
+}
+addEventListener('pointermove', e => {
+  if (e.pointerType !== 'mouse' || moinsDeMouvement()) return;
+  const r = document.querySelector('.hublot')?.getBoundingClientRect();
+  if (!r?.width) return;
+  parallaxe((e.clientX - r.left - r.width / 2) / (r.width / 2), (e.clientY - r.top - r.height / 2) / (r.height / 2));
+});
+document.addEventListener('pointerleave', () => parallaxe(0, 0));
+addEventListener('deviceorientation', e => {
+  if (moinsDeMouvement() || e.gamma === null || e.beta === null) return;
+  parallaxe(e.gamma / 30, (e.beta - 45) / 30);
+});
 // Boutons autour du personnage (leurs angles sont dans le CSS) ; le ménage, écrit à la semaine, est dans le HTML.
 const ORDRE_SCENE = ['eau', 'sport', 'lecture', 'meditation', 'petitDej', 'dejeuner', 'diner', 'sommeil'];
 const ARC_DU_HAUT = ['eau', 'sport', 'lecture', 'meditation'];
