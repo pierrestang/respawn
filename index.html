@@ -115,7 +115,10 @@
   .sur-100 { font-size: 18px; color: var(--brun-doux); }
   .libelle-score { font-size: 14px; color: var(--brun-doux); margin-left: auto; }
   .jauge { height: 18px; border-radius: 999px; background: var(--sable); margin: 10px 0 8px; overflow: hidden; box-shadow: inset 0 2px 0 rgba(107,84,64,.12); }
-  #jauge-rempli {
+  #score-jour { font-size: 32px; font-weight: 900; line-height: 1; color: var(--feuille-fonce); }
+  .jauge.petite { height: 12px; margin: 8px 0 4px; }
+  .note-score { font-size: 12px; color: var(--brun-doux); margin: 0 0 12px; }
+  #jauge-rempli, #jauge-jour {
     height: 100%; width: 0; border-radius: 999px;
     background: linear-gradient(90deg, var(--feuille), #a9de8c);
     box-shadow: inset 0 -3px 0 rgba(78,155,79,.35);
@@ -295,8 +298,14 @@
         <div class="perso-cadre" aria-hidden="true"><div id="perso">🌱</div><span id="perso-etat" hidden></span></div>
         <div>
           <div class="score-ligne">
+            <span id="score-jour">0</span><span class="sur-100">/100</span>
+            <span class="libelle-score" id="libelle-jour">aujourd’hui</span>
+          </div>
+          <div class="jauge petite"><div id="jauge-jour"></div></div>
+          <p class="note-score">Le sport et le ménage comptent dans la semaine.</p>
+          <div class="score-ligne">
             <span id="score">0</span><span class="sur-100">/100</span>
-            <span class="libelle-score">cette semaine</span>
+            <span class="libelle-score" id="libelle-semaine">cette semaine</span>
           </div>
           <div class="jauge"><div id="jauge-rempli"></div></div>
           <div id="comparaison"></div>
@@ -828,6 +837,12 @@ function rendreJour() {
   const r = calculerScoreSemaine({ lundi, jours, semaine, poids: poidsSemaine(lundi), objectifSport: objectifSport(), dateDebut, aujourdhui });
   $('score').textContent = r.score ?? '—';
 
+  // Score du jour : habitudes quotidiennes seulement (même calcul que la couleur du calendrier).
+  const sj = scoreJour(jour, semaine, poidsSemaine(lundi)).score;
+  $('score-jour').textContent = sj === null ? '—' : Math.round(sj);
+  $('jauge-jour').style.width = `${sj ?? 0}%`;
+  $('libelle-jour').textContent = passe ? formatDate(cle, { weekday: 'long', day: 'numeric' }) : 'aujourd’hui';
+
   // Personnage : son état suit le score de la semaine affichée.
   const animal = ANIMAUX[reglages.animal] ? reglages.animal : null;
   if (!animal) { $('perso').textContent = '🌱'; $('perso-etat').hidden = true; }
@@ -839,7 +854,7 @@ function rendreJour() {
   $('bulle').hidden = passe;
   $('bulle').textContent = animal ? messagePersonnage(r.score, aujourdhui) : 'Choisis ton compagnon dans les Réglages 🌿';
   $('jauge-rempli').style.width = `${r.score ?? 0}%`;
-  document.querySelector('.libelle-score').textContent = semaineEnCours ? 'cette semaine' : `semaine du ${formatDate(lundi, { day: 'numeric', month: 'short' })}`;
+  $('libelle-semaine').textContent = semaineEnCours ? 'cette semaine' : `semaine du ${formatDate(lundi, { day: 'numeric', month: 'short' })}`;
   const lundiPrecedent = ajouterJours(lundi, -7);
   const precedente = semaines[lundiPrecedent];
   if (lundiPrecedent < lundiDe(dateDebut) || precedente?.score === null || precedente?.score === undefined) $('comparaison').textContent = 'Première semaine';
