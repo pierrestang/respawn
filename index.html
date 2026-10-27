@@ -64,12 +64,12 @@
 
   /* --- Mise en page --- */
   #app { max-width: 560px; margin: 0 auto; padding-top: 6px; }
-  #ecran-jour, #ecran-historique, #ecran-reglages { display: grid; gap: 18px; }
+  #ecran-jour, #ecran-historique, #ecran-taches, #ecran-reglages { display: grid; gap: 18px; }
   .colonne { display: grid; gap: 18px; align-content: start; }
   #ecran-jour { gap: 14px; }
   @media (min-width: 960px) {
     #app { max-width: 760px; padding-top: 20px; }
-    #ecran-historique, #ecran-reglages { max-width: 640px; margin: 0 auto; }
+    #ecran-historique, #ecran-taches, #ecran-reglages { max-width: 640px; margin: 0 auto; }
   }
   .carte { background: var(--fond); border-radius: var(--rond); box-shadow: var(--relief); padding: 16px 18px; position: relative; }
   .titre-carte { font-family: var(--titres); font-size: 21px; font-weight: 600; margin: 0 0 16px; }
@@ -394,6 +394,7 @@
   <symbol id="i-jour" viewBox="0 0 24 24"><path d="M5 19C5 10.5 10.5 5 19 5c0 8.5-5.5 14-14 14z"/><path d="M5 19l8.5-8.5"/></symbol>
   <symbol id="i-historique" viewBox="0 0 24 24"><rect x="4" y="5.5" width="16" height="14.5" rx="3.5"/><path d="M4 10h16M8.5 3.5v3.5M15.5 3.5v3.5"/><path d="M8 13.5h.01M12 13.5h.01M16 13.5h.01M8 16.8h.01M12 16.8h.01"/></symbol>
   <symbol id="i-reglages" viewBox="0 0 24 24"><path d="M4.5 7h15M4.5 12h15M4.5 17h15"/><circle cx="9" cy="7" r="1.9"/><circle cx="15" cy="12" r="1.9"/><circle cx="8" cy="17" r="1.9"/></symbol>
+  <symbol id="i-taches" viewBox="0 0 24 24"><path d="M4.5 6.5l1.6 1.6 2.9-3M4.5 12.5l1.6 1.6 2.9-3M4.5 18.5l1.6 1.6 2.9-3M12 7h7.5M12 13h7.5M12 19h7.5"/></symbol>
   <symbol id="i-defi" viewBox="0 0 24 24"><path d="M6 20.5V4"/><path d="M6 5c3.3-1.6 6.3 1.6 11 0v7.4c-4.7 1.6-7.7-1.6-11 0"/></symbol>
   <symbol id="i-crayon" viewBox="0 0 24 24"><path d="M4.5 19.5l1-4L15.8 5.2a2.1 2.1 0 0 1 3 3L8.5 18.5z"/><path d="M13.8 7.2l3 3"/></symbol>
 </svg>
@@ -468,15 +469,6 @@
 
     <section class="carte carte-defi" id="carte-defi" hidden><div id="defi"></div></section>
 
-    <section class="carte" id="carte-taches">
-      <h2 class="titre-carte">Tâches</h2>
-      <div id="compteur-taches"></div>
-      <form id="form-tache" autocomplete="off">
-        <input id="nouvelle-tache" placeholder="Nouvelle tâche…" enterkeyhint="done" maxlength="200">
-        <button class="bouton" aria-label="Ajouter">+</button>
-      </form>
-      <ul id="liste-taches"></ul>
-    </section>
  </div>
 
  <div id="ecran-historique" hidden>
@@ -494,6 +486,18 @@
     <section class="carte" id="carte-defis" hidden>
       <h2 class="titre-carte">Défis réussis</h2>
       <ul class="liste-defis" id="defis-reussis"></ul>
+    </section>
+ </div>
+
+ <div id="ecran-taches" hidden>
+    <section class="carte" id="carte-taches">
+      <h2 class="titre-carte">Tâches</h2>
+      <div id="compteur-taches"></div>
+      <form id="form-tache" autocomplete="off">
+        <input id="nouvelle-tache" placeholder="Nouvelle tâche…" enterkeyhint="done" maxlength="200">
+        <button class="bouton" aria-label="Ajouter">+</button>
+      </form>
+      <ul id="liste-taches"></ul>
     </section>
  </div>
 
@@ -533,6 +537,7 @@
 <nav id="navigation" hidden>
   <button data-ecran="jour" aria-label="Jour"><svg class="icone" aria-hidden="true"><use href="#i-jour"/></svg><span class="nav-nom">Jour</span></button>
   <button data-ecran="historique" aria-label="Historique"><svg class="icone" aria-hidden="true"><use href="#i-historique"/></svg><span class="nav-nom">Historique</span></button>
+  <button data-ecran="taches" aria-label="Tâches"><svg class="icone" aria-hidden="true"><use href="#i-taches"/></svg><span class="nav-nom">Tâches</span></button>
   <button data-ecran="reglages" aria-label="Réglages"><svg class="icone" aria-hidden="true"><use href="#i-reglages"/></svg><span class="nav-nom">Réglages</span></button>
 </nav>
 
@@ -1063,13 +1068,14 @@ function rendre() {
   $('chargement').hidden = true;
   $('app').hidden = false;
   $('navigation').hidden = false;
-  for (const nom of ['jour', 'historique', 'reglages']) $(`ecran-${nom}`).hidden = etat.ecran !== nom;
+  for (const nom of ['jour', 'historique', 'taches', 'reglages']) $(`ecran-${nom}`).hidden = etat.ecran !== nom;
   for (const b of $('navigation').children) {
     if (b.dataset.ecran === etat.ecran) b.setAttribute('aria-current', 'page');
     else b.removeAttribute('aria-current');
   }
   rendreJour();
   rendreHistorique();
+  rendreTaches();
   rendreReglages();
 }
 
@@ -1088,7 +1094,6 @@ function rendreJour() {
   $('date').textContent = formatDate(cle, { weekday: 'long', day: 'numeric', month: 'long' });
   $('bandeau-correction').hidden = !passe;
   if (passe) $('bandeau-texte').textContent = `Tu modifies ${formatDate(cle, { weekday: 'long', day: 'numeric', month: 'long' })}`;
-  $('carte-taches').hidden = passe;
 
   // Score de la semaine du jour affiché
   const r = calculerScoreSemaine({ lundi, jours, semaine, poids: poidsSemaine(lundi), objectifSport: objectifSport(), dateDebut, aujourdhui });
@@ -1190,8 +1195,11 @@ function rendreJour() {
     if (!menageFait) celebrer($('menage-case'), false, INTERACTION.menage);
     ecrireSemaine({ menage: !menageFait });
   };
+}
 
-  // Tâches : les tâches cochées restent barrées jusqu'à la fin de leur semaine.
+// Tâches (écran dédié, hors score) : les tâches cochées restent barrées jusqu'à la fin de leur semaine.
+function rendreTaches() {
+  const { aujourdhui } = etat;
   const dansLaSemaine = t => t.fait && t.faitLe && lundiDe(t.faitLe) === lundiDe(aujourdhui);
   const visibles = etat.taches.filter(t => !t.fait || dansLaSemaine(t))
     .sort((x, y) => (x.fait - y.fait) || ((x.creeLe?.toMillis?.() ?? 0) - (y.creeLe?.toMillis?.() ?? 0)));
