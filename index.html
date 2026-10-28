@@ -522,7 +522,15 @@
       left: 0; right: 0; bottom: 0; height: calc(var(--barre) + env(safe-area-inset-bottom)); border-radius: 24px 24px 0 0;
       padding: 6px calc(10px + env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) calc(10px + env(safe-area-inset-left));
     }
+    /* Prolongement du fond sous la barre : si le navigateur laisse une bande sous le bas de la fenêtre (barre d'outils de
+       Safari, bas de l'écran en mode application), elle reste de la couleur de la barre, qui paraît ainsi toucher le bas. */
+    #navigation::after { content: ''; position: absolute; left: 0; right: 0; top: 100%; height: 120px; background: var(--fond); }
     body { padding-bottom: calc(var(--barre) + 16px + env(safe-area-inset-bottom)); }
+  }
+  /* Web app installée sur l'iPhone : la fenêtre peut s'arrêter avant le bas réel de l'écran ; la barre est alors posée
+     d'après la grande hauteur de l'écran (100lvh), pour descendre jusqu'en bas. */
+  @media (max-width: 768px) and (display-mode: standalone) {
+    #navigation { bottom: auto; top: calc(100lvh - var(--barre) - env(safe-area-inset-bottom)); }
   }
   /* Ordinateur : sur tous les écrans, les icônes sont posées sur une bande courbe en haut à gauche (positions données par
      placerMenu) ; sans script, un rail vertical au même endroit. Le contenu reste centré sur la page, avec la même marge
