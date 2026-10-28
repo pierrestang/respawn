@@ -20,6 +20,7 @@
      ont du relief ; tout le reste est plat : surfaces claires bordées d'un filet fin, aplats teintés pour les choix actifs.
      Chaque habitude a sa teinte ; le vert est réservé au score et au calendrier. */
   :root {
+    --bouton: 48px;   /* diamètre des boutons d'habitudes (42 px sur iPhone) */
     --fond: #f7ebdf; --creux-fond: #efdfd0;
     --ombre-claire: #fff9f3; --ombre-foncee: #dbc4ae;
     --accent: #4f7a42; --accent-texte: #426635;
@@ -300,7 +301,7 @@
      --pastel : teinte du disque ; --encre : icône.
      Toujours à plat, dans sa teinte ; validé, il porte la pastille cochée. */
   .scene .tuile {
-    position: absolute; left: 0; top: 0; width: 48px; height: 48px; margin: -24px 0 0 -24px;
+    position: absolute; left: 0; top: 0; width: var(--bouton); height: var(--bouton); margin: calc(var(--bouton) / -2) 0 0 calc(var(--bouton) / -2);
     transform: translate(var(--x, 0), var(--y, 0));
   }
   .tuile {
@@ -316,11 +317,11 @@
   .tuile[data-h="menage"] { --pastel: #e3d4c6; --encre: #6a4e3a; }   /* argile */
   /* Disque plat dans la teinte pastel de l'habitude. */
   .icone-habitude {
-    position: relative; width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; color: var(--encre);
+    position: relative; width: var(--bouton); height: var(--bouton); border-radius: 50%; display: grid; place-items: center; color: var(--encre);
     background: var(--pastel);
   }
   /* Icône Phosphor « regular », 22 px (46 % du disque). */
-  .icone-habitude .icone { width: 22px; height: 22px; }
+  .icone-habitude .icone { width: calc(var(--bouton) * .46); height: calc(var(--bouton) * .46); }
   .tuile:focus-visible { outline: none; }
   .tuile:focus-visible .icone-habitude { outline: 2px solid rgba(79, 122, 66, .5); outline-offset: 3px; }
   /* Validation : 200 ms, très léger rebond (coupé si l'appareil demande moins de mouvement). */
@@ -337,7 +338,7 @@
   .tuile.exclue .icone-habitude { background: none; outline: 1.5px dashed var(--ombre-foncee); outline-offset: -1.5px; }
   /* Étincelles et confettis : partent du bouton touché vers le personnage, retirés après l'animation. */
   .etincelle {
-    position: absolute; left: 50%; top: 24px; width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 50%;
+    position: absolute; left: 50%; top: calc(var(--bouton) / 2); width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 50%;
     background: var(--c); pointer-events: none; z-index: 2; animation: etincelle var(--anim) ease-out forwards;
   }
   .etincelle.confetti { width: 7px; height: 4px; border-radius: 2px; }
@@ -515,14 +516,14 @@
   #navigation button[aria-current="page"] .actif { opacity: 1; }
   #navigation button[aria-current="page"] .inactif { opacity: 0; }
   .courbe-menu { display: none; }
-  /* Mobile : barre fixe en bas, décollée des bords, au-dessus de la barre d'accueil de l'iPhone ;
-     le contenu garde de la place en dessous pour ne pas passer sous la barre. */
+  /* Mobile : barre collée en bas de l'écran, sur toute la largeur, coins du haut arrondis ; elle descend sous la barre
+     d'accueil de l'iPhone, ses icônes restent au-dessus. Le contenu garde de la place pour ne pas passer dessous. */
   @media (max-width: 768px) {
     #navigation {
-      left: calc(14px + env(safe-area-inset-left)); right: calc(14px + env(safe-area-inset-right));
-      bottom: calc(12px + env(safe-area-inset-bottom)); height: var(--barre);
+      left: 0; right: 0; bottom: 0; height: calc(var(--barre) + env(safe-area-inset-bottom)); border-radius: 24px 24px 0 0;
+      padding: 6px calc(10px + env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) calc(10px + env(safe-area-inset-left));
     }
-    body { padding-bottom: calc(var(--barre) + 28px + env(safe-area-inset-bottom)); }
+    body { padding-bottom: calc(var(--barre) + 16px + env(safe-area-inset-bottom)); }
   }
   /* Ordinateur : sur tous les écrans, les icônes sont posées sur une bande courbe en haut à gauche (positions données par
      placerMenu) ; sans script, un rail vertical au même endroit. Le contenu reste centré sur la page, avec la même marge
@@ -606,6 +607,7 @@
   .liste-defis li { display: flex; align-items: center; gap: 10px; background: var(--plat-fond); border-radius: 12px; padding: 12px 14px; box-shadow: var(--filet); }
   .liste-defis .icone { width: 18px; height: 18px; color: var(--accent); }
 
+  @media (max-width: 599px) { :root { --bouton: 42px; } }
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
   /* Onglet caché : la vie du jardin s'arrête. */
   .onglet-cache .scene * { animation-play-state: paused !important; }
@@ -1261,16 +1263,16 @@ function icone(nom) {
 // ils sont posés sur sa ligne médiane, à intervalles égaux sur tout le tour (arrondi du haut, côtés et bas),
 // dans l'ordre de TOUR, en partant du sommet et dans le sens des aiguilles d'une montre.
 const TOUR = ['eau', 'petitDej', 'dejeuner', 'diner', 'sport', 'menage', 'sommeil', 'meditation', 'lecture'];   // les trois repas ensemble, à droite, dans l'ordre de la journée
-const RAYON_BOUTON = 24;            // boutons ronds de 48 px
+const RAYON_BOUTON = 24;            // boutons ronds de 48 px (21 sur iPhone : --bouton à 42 px)
 const ARCHE_MAX = 640;
 const MARGE = 18;                   // entre l’arche et le bord de l’écran (sur iPhone, où l’arche prend toute la largeur)
 const MARGE_BAS = 24;               // sous l'arche
-const HAUTEUR_ARCHE_MOBILE = 1;     // sur iPhone, part de la hauteur disponible (au-dessus de la barre de navigation) prise par l'arche
+const HAUTEUR_ARCHE_MOBILE = .88;   // sur iPhone, part de la hauteur disponible (au-dessus de la barre de navigation) prise par l'arche
 const ESPACE_BARRE = 12;            // sur mobile, entre le bas de l'arche et la barre de navigation
 function caleCadran() {
   const scene = $('scene');
   if (!scene || $('ecran-jour').hidden) return;
-  const r = RAYON_BOUTON;
+  const r = innerWidth < 600 ? 21 : RAYON_BOUTON;
   const largeur = scene.getBoundingClientRect().width;
   // L'écran du jour est figé : la scène prend la hauteur restante, moins le défi en cours s'il est affiché dessous.
   const defi = $('carte-defi');
