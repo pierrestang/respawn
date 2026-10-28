@@ -515,22 +515,24 @@
   #navigation button[aria-current="page"] .actif { opacity: 1; }
   #navigation button[aria-current="page"] .inactif { opacity: 0; }
   .courbe-menu { display: none; }
-  /* Mobile : barre collée en bas de l'écran, sur toute la largeur, coins du haut arrondis ; elle descend sous la barre
-     d'accueil de l'iPhone, ses icônes restent au-dessus. Le contenu garde de la place pour ne pas passer dessous. */
+  /* Mobile : barre collée en bas de l'écran, sur toute la largeur, coins du haut arrondis. Ses icônes descendent près du
+     bas : elles n'empiètent que d'une vingtaine de pixels sur la zone de la barre d'accueil de l'iPhone (--sous-barre).
+     Le contenu garde de la place pour ne pas passer dessous. */
+  :root { --sous-barre: max(6px, calc(env(safe-area-inset-bottom) - 22px)); }
   @media (max-width: 768px) {
     #navigation {
-      left: 0; right: 0; bottom: 0; height: calc(var(--barre) + env(safe-area-inset-bottom)); border-radius: 24px 24px 0 0;
-      padding: 6px calc(10px + env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) calc(10px + env(safe-area-inset-left));
+      left: 0; right: 0; bottom: 0; height: calc(var(--barre) + var(--sous-barre)); border-radius: 24px 24px 0 0;
+      padding: 6px calc(10px + env(safe-area-inset-right)) var(--sous-barre) calc(10px + env(safe-area-inset-left));
     }
     /* Prolongement du fond sous la barre : si le navigateur laisse une bande sous le bas de la fenêtre (barre d'outils de
        Safari, bas de l'écran en mode application), elle reste de la couleur de la barre, qui paraît ainsi toucher le bas. */
     #navigation::after { content: ''; position: absolute; left: 0; right: 0; top: 100%; height: 120px; background: var(--fond); }
-    body { padding-bottom: calc(var(--barre) + 16px + env(safe-area-inset-bottom)); }
+    body { padding-bottom: calc(var(--barre) + 16px + var(--sous-barre)); }
   }
   /* Web app installée sur l'iPhone : la fenêtre peut s'arrêter avant le bas réel de l'écran ; la barre est alors posée
      d'après la grande hauteur de l'écran (100lvh), pour descendre jusqu'en bas. */
   @media (max-width: 768px) and (display-mode: standalone) {
-    #navigation { bottom: auto; top: calc(100lvh - var(--barre) - env(safe-area-inset-bottom)); }
+    #navigation { bottom: auto; top: calc(100lvh - var(--barre) - var(--sous-barre)); }
   }
   /* Ordinateur : sur tous les écrans, les icônes sont posées sur une bande courbe en haut à gauche (positions données par
      placerMenu) ; sans script, un rail vertical au même endroit. Le contenu reste centré sur la page, avec la même marge
