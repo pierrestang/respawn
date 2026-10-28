@@ -175,13 +175,12 @@
   .hublot { animation: camera-x 6s ease-in-out infinite alternate, camera-y 8.5s ease-in-out infinite alternate; }
   @keyframes camera-x { from { --bx: -1; } to { --bx: 1; } }
   @keyframes camera-y { from { --by: -1; } to { --by: 1; } }
-  /* Un plan : il se balance de --balance px avec la caméra et glisse de --glisse px à l'opposé de l'inclinaison
-     (le plus proche bouge le plus) ; il déborde du cercle de ces deux amplitudes, de deux fois son flou et de 10 px, pour ne jamais découvrir
-     ses bords. Son flou, son assombrissement et son opacité sont posés par le script. */
+  /* Un plan : il se balance de --balance px avec la caméra (pas de parallaxe) ; il déborde du cadre de cette amplitude,
+     de deux fois son flou et de 10 px, pour ne jamais découvrir ses bords. Son flou, son assombrissement et son opacité
+     sont posés par le script. */
   .plan {
-    position: absolute; inset: calc(-10px - (var(--glisse, 0) + var(--balance, 0) + var(--flou, 0) * 2) * 1px); pointer-events: none;
-    translate: calc((var(--bx) * var(--balance, 0) - var(--px, 0) * var(--glisse, 0)) * 1px)
-               calc((var(--by) * var(--balance, 0) * .35 - var(--py, 0) * var(--glisse, 0)) * 1px);
+    position: absolute; inset: calc(-10px - (var(--balance, 0) + var(--flou, 0) * 2) * 1px); pointer-events: none;
+    translate: calc(var(--bx) * var(--balance, 0) * 1px) calc(var(--by) * var(--balance, 0) * .35px);
   }
   /* Travelling d'entrée (1,2 s, ralenti à la fin) : chaque plan part un peu agrandi (--entree) et revient à sa taille. */
   .monde.entree .plan[data-plan] { animation: travelling 1.2s cubic-bezier(.2, .7, .2, 1) both; }
@@ -190,7 +189,7 @@
   /* Devant : une touffe d'herbes recadrée, centrée sous les pieds du personnage. --largeur : sa largeur et --bas :
      la descente de sa base sous les pieds, toutes deux en fraction de --taille (elle n'en cache que le bas).
      Le plan déborde de l'arche de --m ; les calculs se font donc dans l'arche. Elle se balance dans la brise (< 1°). */
-  .plan[data-plan="devant"] { --m: calc((10 + var(--glisse) + var(--balance)) * 1px); }
+  .plan[data-plan="devant"] { --m: calc((10 + var(--balance)) * 1px); }
   .plan[data-plan="devant"] img {
     position: absolute; left: calc(var(--m) + (100% - 2 * var(--m)) * var(--pieds-x));
     top: calc(var(--m) + (100% - 2 * var(--m)) * var(--pieds-y) + var(--taille) * var(--bas));
@@ -1175,7 +1174,7 @@ const VERSION_MONDE = 2;
 // Le monde du personnage, vu par le hublot : des plans empilés, du plus lointain au plus proche.
 //   image : ton illustration, à déposer sous ce nom (PNG à fond transparent, sauf le fond) ;
 //           tant qu'elle manque, l'image provisoire s'affiche à sa place, ou le plan est simplement sauté.
-//   balance : balancement continu de la caméra, en px ; glisse : déplacement avec l'inclinaison du téléphone, en px.
+//   balance : balancement continu de la caméra, en px (pas de parallaxe : rien ne suit l'inclinaison ni la souris).
 //   entree : agrandissement de départ du travelling d'entrée.
 //   flou (px), sombre (luminosité), opacite : profondeur de champ et premier plan hors de la mise au point.
 //   largeur, bas : pour devant.png (touffe recadrée), sa largeur et la descente de sa base sous les pieds, en fraction de --taille.
@@ -1184,7 +1183,7 @@ const VERSION_MONDE = 2;
 // ajoute un plan pour cet élément après le sien.
 const MONDE = [
   { plan: 'fond', image: 'images/monde/fond.jpg', provisoire: 'images/jardin.jpg', flou: 1.2 },   // immobile : ni balancement, ni parallaxe, ni travelling
-  { plan: 'personnage', balance: 11, glisse: 14 },
+  { plan: 'personnage', balance: 11 },
 ];
 // Place du personnage dans l'arche : tout près, coupé par le bas du jardin juste au-dessus du nombril (on ne voit plus
 // ses pieds). Ses pieds (x, y, en fraction du monde) sont donc sous le bas du monde, de sousPieds × taille : l'écart
@@ -1201,8 +1200,7 @@ function construireMonde() {
   for (const p of MONDE) {
     const plan = el('div', 'plan');
     plan.dataset.plan = p.plan;
-    plan.style.setProperty('--glisse', p.glisse ?? 0);   // 0 : plan immobile
-    plan.style.setProperty('--balance', p.balance ?? 0);
+    plan.style.setProperty('--balance', p.balance ?? 0);   // 0 : plan immobile
     if (p.entree) plan.style.setProperty('--entree', p.entree);
     if (p.flou) plan.style.setProperty('--flou', p.flou);
     const filtres = [p.flou && `blur(${p.flou}px)`, p.sombre && `brightness(${p.sombre})`].filter(Boolean);
@@ -1334,43 +1332,6 @@ function placerMenu() {
   nav.querySelector('.courbe-menu path').setAttribute('d', `M${x1.toFixed(1)},${y1.toFixed(1)} A${rho.toFixed(1)},${rho.toFixed(1)} 0 0 0 ${x2.toFixed(1)},${y2.toFixed(1)}`);
 }
 addEventListener('resize', placerMenu);
-// Parallaxe : l'inclinaison du téléphone déplace le regard (la souris, elle, ne fait rien bouger) ; chaque plan du monde glisse
-// en sens inverse de son nombre de px (MONDE). Mouvement lissé image par image ;
-// coupé si l'appareil demande moins de mouvement.
-const regard = { x: 0, y: 0, vx: 0, vy: 0, image: 0 };
-const borne = v => Math.max(-1, Math.min(1, v));
-function viser(nx, ny) {
-  [regard.x, regard.y] = moinsDeMouvement() ? [0, 0] : [borne(nx), borne(ny)];
-  if (!regard.image) regard.image = requestAnimationFrame(glisser);
-}
-function glisser() {
-  regard.vx += (regard.x - regard.vx) * .08;
-  regard.vy += (regard.y - regard.vy) * .08;
-  const hublot = document.querySelector('.hublot');
-  hublot.style.setProperty('--px', regard.vx.toFixed(4));
-  hublot.style.setProperty('--py', regard.vy.toFixed(4));
-  regard.image = Math.abs(regard.x - regard.vx) + Math.abs(regard.y - regard.vy) > .001 ? requestAnimationFrame(glisser) : 0;
-}
-// Inclinaison : écart à la position de repos, qui suit lentement la main (le téléphone peut être tenu à tout angle).
-let repos = null;
-addEventListener('deviceorientation', e => {
-  if (e.beta === null || e.gamma === null) return;
-  const angle = screen.orientation?.angle ?? 0;
-  const [x, y] = angle === 90 ? [e.beta, -e.gamma] : angle === 270 ? [-e.beta, e.gamma] : [e.gamma, e.beta];
-  repos ??= { x, y };
-  repos.x += (x - repos.x) * .02;
-  repos.y += (y - repos.y) * .02;
-  viser((x - repos.x) / 15, (y - repos.y) / 15);
-});
-// Sur iPhone, l'inclinaison n'arrive qu'après une autorisation, demandée une fois, au premier toucher sur l'écran du jour.
-if (typeof window.DeviceOrientationEvent?.requestPermission === 'function') {
-  const demander = () => {
-    if ($('app').hidden || $('ecran-jour').hidden) return;
-    removeEventListener('touchend', demander);
-    DeviceOrientationEvent.requestPermission().catch(() => {});
-  };
-  addEventListener('touchend', demander);
-}
 function iconeHabitude(h) {
   const span = el('span', 'icone-habitude');
   span.append(icone(h));
