@@ -23,7 +23,7 @@
   :root {
     --fond: #f7ebdf; --creux-fond: #efdfd0;
     --ombre-claire: #fff9f3; --ombre-foncee: #dbc4ae;
-    --accent: #4f7a42; --accent-texte: #426635; --flamme: #c8641c;
+    --accent: #4f7a42; --accent-texte: #426635;
     --texte: #3d3129; --texte-doux: #64554a;
     --relief: 9px 9px 20px var(--ombre-foncee), -9px -9px 20px var(--ombre-claire);
     --relief-rond: 6px 6px 14px var(--ombre-foncee), -6px -6px 14px var(--ombre-claire);
@@ -82,8 +82,6 @@
 
   /* --- Icônes : trait fin, une seule couleur --- */
   .icone { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; flex: none; }
-  .serie { display: inline-flex; align-items: center; gap: 1px; color: var(--texte-doux); font-size: 11px; }
-  .serie .icone { width: 11px; height: 11px; stroke-width: 1.8; color: var(--flamme); }
 
   /* --- Bande du haut, à plat et compacte : un groupe centré (anneau du score, puis date et infos) --- */
   .bande { display: flex; justify-content: center; align-items: center; gap: 14px; min-height: 80px; padding: 4px 0; }
@@ -94,168 +92,268 @@
   .bande-infos b { color: var(--texte); font-weight: 700; }
   .pour-lecteur { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   /* Anneau de progression autour du score de la semaine */
-  .anneau { position: relative; width: 64px; height: 64px; border-radius: 50%; flex: none; box-shadow: var(--relief-mini); display: grid; place-items: center; }
-  .anneau::before { content: ''; position: absolute; inset: 8px; border-radius: 50%; background: var(--creux-fond); box-shadow: var(--creux-mini); }
-  .anneau svg { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
-  .anneau-fond { fill: none; stroke: #e4d2bf; stroke-width: 6; }
-  .anneau-plein { fill: none; stroke: var(--accent); stroke-width: 6; stroke-linecap: round; stroke-dasharray: 100; stroke-dashoffset: 100; transition: stroke-dashoffset var(--anim) cubic-bezier(.22, 1, .36, 1); }
+  /* Anneau : disque en relief ; la piste est une rainure en creux, l'arc vert y est posé en léger relief. */
+  .anneau {
+    position: relative; width: 64px; height: 64px; border-radius: 50%; flex: none; display: grid; place-items: center;
+    background: var(--creux-fond);
+    box-shadow: 4px 5px 10px var(--ombre-foncee), -4px -4px 9px var(--ombre-claire),
+                inset 2px 2px 4px var(--ombre-foncee), inset -2px -2px 4px var(--ombre-claire);
+  }
+  .anneau::before { content: ''; position: absolute; inset: 9px; border-radius: 50%; background: var(--fond); box-shadow: var(--relief-mini); }
+  .anneau svg { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); overflow: visible; }
+  .anneau-fond { fill: none; stroke: none; }
+  .anneau-plein {
+    fill: none; stroke: var(--accent); stroke-width: 7.5; stroke-linecap: round;
+    filter: drop-shadow(-.6px .8px .8px rgba(40, 60, 30, .4)); stroke-dasharray: 100; stroke-dashoffset: 100; transition: stroke-dashoffset var(--anim) cubic-bezier(.22, 1, .36, 1); }
   .anneau-texte { position: relative; display: grid; justify-items: center; line-height: 1; }
   #score { font-family: var(--titres); font-size: 21px; font-weight: 600; color: var(--texte); font-variant-numeric: tabular-nums lining-nums; }
 
 
-  /* --- La scène : le jardin du personnage derrière une ouverture ronde, les boutons d'habitudes flottant autour ---
-     Chaque bouton est posé au centre de la scène puis décalé sur l'anneau avec cos() et sin() de son angle --a.
-     Arc du haut (de gauche à droite) : eau, sport, lecture, méditation, noms au-dessus.
-     Arc du bas (de gauche à droite) : petit-déj, déjeuner, dîner, noms en dessous.
-     Sommeil à gauche et ménage à droite, sur les côtés du cercle, noms en dessous. */
+  /* --- La scène : une arche sur le monde du personnage, les boutons d'habitudes en deux colonnes de part et d'autre ---
+     L'arche est un puits creusé dans la page, du dessous de la date jusqu'un peu au-dessus du bas de l'écran : un cadre
+     en pâte tout autour, la paroi qui plonge, le monde au fond.
+     Le monde est fait de plans empilés (liste MONDE dans le script).
+     Tailles et positions calculées par caleCadran() : --ax, --ay (coin haut gauche de l'arche), --hublot (sa largeur,
+     cadre compris), --ah (sa hauteur), --x, --y (centre de chaque bouton), --lx, --ly (son nom). */
   .scene {
-    position: relative; width: calc(100% + 32px); height: 428px; margin: 24px 0 0; left: -16px;
-    --cy: 210px; --rx: 157px; --ry: 160px; --hublot: 300px; --rail: 213px;
+    position: relative; width: calc(100% + 32px); height: 560px; margin: 8px 0 0; left: -16px;
+    --ax: 80px; --ay: 6px; --hublot: 230px; --ah: 554px;
   }
-  /* Boutons, étiquettes et rail : positions calculées par caleCadran() (variables --x, --y, --lx, --ly). */
+  /* L'arche se cale elle-même sur le bas de l'écran (caleCadran) : pas de marge de page sous l'écran du jour. */
+  body:has(#ecran-jour:not([hidden])) { padding-bottom: 0; }
   @media (min-width: 600px) {
-    .scene { width: min(900px, 100vw - 40px); left: calc((100% - min(900px, 100vw - 40px)) / 2); margin-top: 4px; max-width: none; height: 488px; --cy: 240px; --rail: 275px; --hublot: 424px; }
+    .scene { width: min(900px, 100vw - 40px); left: calc((100% - min(900px, 100vw - 40px)) / 2); margin-top: 4px; max-width: none; }
   }
-  /* Rail circulaire discret, en creux doux, centré sur l'ouverture et passant par le centre des boutons.
-     Complet sur écran large ; sur écran étroit, seuls les deux arcs sous les rangées (--a1 en haut, --a2 en bas). */
-  .rail {
-    position: absolute; left: 50%; top: var(--cy); width: calc(var(--rail) * 2 + 10px); height: calc(var(--rail) * 2 + 10px);
-    transform: translate(-50%, -50%); border-radius: 50%; border: 10px solid var(--creux-fond);
-    box-shadow: inset 2px 2px 4px var(--ombre-foncee), inset -2px -2px 4px var(--ombre-claire),
-                2px 2px 3px var(--ombre-claire), -1px -1px 3px rgba(219, 196, 174, .6);
+  /* Cadre en pâte épais et bombé (18 à 22 px), un peu plus clair que la page, posé sur elle :
+     profil de petit tube (clair au milieu, plus foncé vers les deux bords), plus clair en haut à gauche,
+     lumière douce en haut à gauche, ombre diffuse en bas à droite, fin liseré plus foncé contre la page. */
+  /* L'arche, creusée dans un mur épais, de la couleur de la page : le relief ne vient que des ombres (brun chaud) et des
+     lumières (blanc), la lumière venant du haut à gauche. Au premier plan le cadre (--cadre), d'un seul bloc tout autour, bas compris ;
+     en retrait, une embrasure profonde d'un seul bloc (--profondeur de large), qui plonge vers le jardin au fond.
+     Tous les arrondis du haut sont concentriques : chaque niveau a pour rayon celui de l'arche moins son retrait.
+     Sur un écran étroit, cadre et embrasure se resserrent pour laisser de la place au jardin. */
+  .hublot {
+    position: absolute; left: var(--ax); top: var(--ay); width: var(--hublot); height: var(--ah);
+    --cadre: var(--cadre-arche, clamp(18px, calc(var(--hublot) * .048), 26px));   /* posé par caleCadran() : assez épais pour les boutons */
+    --profondeur: clamp(10px, calc(var(--hublot) * .055), 29px);
+    --rayon: calc(var(--hublot) / 2);
+    --fond-arche: calc(var(--cadre) + var(--profondeur));          /* retrait du jardin (cadre + embrasure), sur les quatre côtés */
+    --rayon-monde: calc(var(--rayon) - var(--fond-arche));
+    --argile: var(--fond);   /* teinte de l'arche (cadre et embrasure) : celle de la page */
+    border-radius: var(--rayon) var(--rayon) 0 0; background: var(--argile);
+    /* Relief : l'arche sort de la page — ombre en bas à droite (une large, une serrée), lumière en haut à gauche. */
+    box-shadow: 0 10px 22px rgba(120, 90, 60, .24), 2px 3px 6px rgba(120, 90, 60, .12), -6px -6px 14px rgba(255, 255, 255, .8);
   }
-  .rail.arcs {
-    -webkit-mask: conic-gradient(#000 0deg calc(var(--a1) * 1deg), transparent 0 calc((180 - var(--a2)) * 1deg), #000 0 calc((180 + var(--a2)) * 1deg), transparent 0 calc((360 - var(--a1)) * 1deg), #000 0);
-    mask: conic-gradient(#000 0deg calc(var(--a1) * 1deg), transparent 0 calc((180 - var(--a2)) * 1deg), #000 0 calc((180 + var(--a2)) * 1deg), transparent 0 calc((360 - var(--a1)) * 1deg), #000 0);
+  /* Embrasure : un mur épais d'un seul bloc, de la même teinte que le cadre, qui plonge vers le jardin. Sa profondeur ne vient
+     que de la lumière : l'ombre que projette le cadre en haut à gauche, un assombrissement continu à mesure qu'on
+     s'approche du jardin (plus fort en haut et à gauche, d'où vient la lumière), le mur de droite un peu éclairé,
+     et en bas un sol en perspective, clair près du cadre et plus sombre vers le jardin. */
+  .embrasure {
+    position: absolute; inset: var(--cadre); pointer-events: none; background: var(--argile);
+    border-radius: calc(var(--rayon) - var(--cadre)) calc(var(--rayon) - var(--cadre)) 0 0;
+    box-shadow: inset 7px 9px 14px rgba(120, 90, 60, .16),
+                inset calc(var(--profondeur) * .5) calc(var(--profondeur) * .4) calc(var(--profondeur) * .7) rgba(120, 90, 60, .12),   /* voûte et mur gauche à l'ombre */
+                inset calc(var(--profondeur) * -.45) 0 calc(var(--profondeur) * .6) rgba(255, 255, 255, .5);                         /* mur droit éclairé */
   }
-  .hublot { position: absolute; left: 50%; top: var(--cy); border-radius: 50%; transform: translate(-50%, -50%); }
-  /* Le jardin du personnage, vu à travers un trou dans la page. Trois plans, de l'arrière vers l'avant :
-     - le jardin (images/jardin.jpg), flou de 1,5 px et un peu assombri pour paraître plus loin, agrandi de 8 % ;
-       tant qu'il manque, fond vert sauge avec une ellipse d'herbe plus claire en bas ;
-     - le personnage, net, accordé aux couleurs du jardin ;
-     - l'avant-plan (images/avant-plan.png, fond transparent), devant ses pieds, qui peut déborder un peu du trou ;
-       tant qu'il manque, ce plan est simplement absent.
-     Par-dessus : l'ombre intérieure, le vignettage et la paroi du trou (7 px, l'épaisseur de la page).
-     Parallaxe (--px, --py entre -1 et 1) : le jardin bouge de 8 px au plus, le personnage de moitié moins. */
-  .hublot { width: var(--hublot); height: var(--hublot); }
-  .ouverture {
-    position: absolute; inset: 0; border-radius: 50%; overflow: hidden;
-    background:
-      radial-gradient(ellipse 78% 30% at 50% 86%, #dfe8cf 0%, #d3e0c1 55%, rgba(211, 224, 193, 0) 72%),
-      linear-gradient(#c3d0b8, #b7c7ab);
+  /* Sol : trapèze dont les bords filent des coins du cadre vers ceux du jardin. */
+  .embrasure::before {
+    content: ''; position: absolute; inset: 0;
+    clip-path: polygon(0 100%, 100% 100%, calc(100% - var(--profondeur)) calc(100% - var(--profondeur)), var(--profondeur) calc(100% - var(--profondeur)));
+    background: linear-gradient(to top, rgba(255, 255, 255, .4), rgba(255, 255, 255, .1) 45%, rgba(120, 90, 60, .14));
   }
-  .jardin {
-    position: absolute; inset: -4%; background: url("images/jardin.jpg") center / cover no-repeat;
-    filter: blur(1.5px) brightness(.92);
-    translate: calc(var(--px, 0) * -8px) calc(var(--py, 0) * -8px); transition: translate .35s ease-out;
+  /* Assombrissement vers le fond : une ombre autour de l'ouverture du jardin, plus forte en haut à gauche. */
+  .embrasure::after {
+    content: ''; position: absolute; inset: var(--profondeur);
+    border-radius: var(--rayon-monde) var(--rayon-monde) 0 0;
+    box-shadow: -7px -9px calc(var(--profondeur) * .7) 3px rgba(120, 90, 60, .38), 5px 2px calc(var(--profondeur) * .5) 0 rgba(120, 90, 60, .16);
   }
-  /* Paroi intérieure du trou : anneau fin de 7 px, gris chaud neutre, plus sombre en haut à gauche, plus clair en bas à droite. */
-  .paroi {
-    position: absolute; inset: 0; border-radius: 50%; pointer-events: none;
-    background: linear-gradient(135deg, rgba(120, 104, 88, .34) 0%, rgba(120, 104, 88, .2) 38%, rgba(160, 145, 128, .08) 62%, rgba(255, 250, 242, .45) 100%);
-    -webkit-mask: radial-gradient(circle closest-side, transparent calc(100% - 7px), #000 calc(100% - 6px));
-    mask: radial-gradient(circle closest-side, transparent calc(100% - 7px), #000 calc(100% - 6px));
+  /* Le monde : un seul conteneur en arche, au fond de l'embrasure, qui contient tout le décor (plans, personnage,
+     pollen, pétales, lumière, puits et bulle) ; rien de ce qu'il contient n'est visible hors de lui. Ses coins du bas
+     sont droits, posés sur le bas de l'embrasure. Ses dimensions servent d'unités (cqw, cqh) pour la taille du personnage. */
+  .monde {
+    position: absolute; inset: var(--fond-arche); border-radius: var(--rayon-monde) var(--rayon-monde) 0 0;
+    overflow: hidden; clip-path: inset(0 round var(--rayon-monde) var(--rayon-monde) 0 0); isolation: isolate;
+    container-type: size; background: #b9c8ac;
   }
-  .avant-plan {
-    position: absolute; left: 50%; bottom: -6%; width: 112%; transform: translateX(-50%); pointer-events: none;
-    translate: calc(var(--px, 0) * 3px) calc(var(--py, 0) * 3px); transition: translate .35s ease-out;
+  /* Caméra : un balancement continu, très lent (cycle de 12 s horizontalement), --bx et --by entre -1 et 1. */
+  @property --bx { syntax: '<number>'; inherits: true; initial-value: 0; }
+  @property --by { syntax: '<number>'; inherits: true; initial-value: 0; }
+  .hublot { animation: camera-x 6s ease-in-out infinite alternate, camera-y 8.5s ease-in-out infinite alternate; }
+  @keyframes camera-x { from { --bx: -1; } to { --bx: 1; } }
+  @keyframes camera-y { from { --by: -1; } to { --by: 1; } }
+  /* Un plan : il se balance de --balance px avec la caméra et glisse de --glisse px à l'opposé de l'inclinaison
+     (le plus proche bouge le plus) ; il déborde du cercle de ces deux amplitudes, de deux fois son flou et de 10 px, pour ne jamais découvrir
+     ses bords. Son flou, son assombrissement et son opacité sont posés par le script. */
+  .plan {
+    position: absolute; inset: calc(-10px - (var(--glisse, 0) + var(--balance, 0) + var(--flou, 0) * 2) * 1px); pointer-events: none;
+    translate: calc((var(--bx) * var(--balance, 0) - var(--px, 0) * var(--glisse, 0)) * 1px)
+               calc((var(--by) * var(--balance, 0) * .35 - var(--py, 0) * var(--glisse, 0)) * 1px);
   }
-  .ombres {
-    position: absolute; inset: 0; border-radius: 50%; pointer-events: none;
-    background: radial-gradient(circle, rgba(45, 30, 18, 0) 56%, rgba(45, 30, 18, .18) 100%);
-    box-shadow: inset 6px 14px 28px rgba(95, 60, 32, .35), inset 2px 5px 9px rgba(95, 60, 32, .3), inset -5px -7px 14px rgba(255, 246, 228, .22);
+  /* Travelling d'entrée (1,2 s, ralenti à la fin) : chaque plan part un peu agrandi (--entree) et revient à sa taille. */
+  .monde.entree .plan[data-plan] { animation: travelling 1.2s cubic-bezier(.2, .7, .2, 1) both; }
+  @keyframes travelling { from { scale: var(--entree, 1); } }
+  .plan img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 100%; }   /* bas de l'image calé en bas */
+  /* Devant : une touffe d'herbes recadrée, centrée sous les pieds du personnage. --largeur : sa largeur et --bas :
+     la descente de sa base sous les pieds, toutes deux en fraction de --taille (elle n'en cache que le bas).
+     Le plan déborde de l'arche de --m ; les calculs se font donc dans l'arche. Elle se balance dans la brise (< 1°). */
+  .plan[data-plan="devant"] { --m: calc((10 + var(--glisse) + var(--balance)) * 1px); }
+  .plan[data-plan="devant"] img {
+    position: absolute; left: calc(var(--m) + (100% - 2 * var(--m)) * var(--pieds-x));
+    top: calc(var(--m) + (100% - 2 * var(--m)) * var(--pieds-y) + var(--taille) * var(--bas));
+    width: calc(var(--taille) * var(--largeur)); height: auto; object-fit: initial; translate: -50% -100%;
+    transform-origin: 50% 100%; animation: brise 8s ease-in-out infinite;
   }
-  /* Ombre de contact sous les pieds : ellipse floue vert brun, en fusion multiplicative, décalée vers le bas à droite. */
-  .ombre-perso {
-    position: absolute; left: 51%; top: 78.4%; transform: translate(-50%, -50%);
-    width: 24%; height: 3.6%; border-radius: 50%; filter: blur(2px); mix-blend-mode: multiply;
-    background: radial-gradient(closest-side, rgba(52, 58, 28, .75), rgba(52, 58, 28, 0));
-    animation: ombre-rebond 3s ease-in-out infinite;
-    translate: calc(var(--px, 0) * -4px) calc(var(--py, 0) * -4px); transition: translate .35s ease-out;
-  }
-  /* Personnage : environ 55 % de la hauteur de l'ouverture, pieds dans le tiers inférieur, herbe visible autour. */
+  @keyframes brise { 0%, 100% { rotate: -.6deg; } 50% { rotate: .6deg; } }
+  /* Le personnage : son plan a exactement la taille du monde. --pieds-x, --pieds-y : position de ses pieds, en fraction
+     du monde ; --taille : hauteur du cadre commun à toutes ses images (1080 × 960), dont il occupe environ 69 %,
+     calculée sur la largeur et la hauteur de l'arche. Pieds à 81,15 % de la hauteur du cadre et 49,6 % de sa largeur.
+     Pour le déplacer plus tard, il suffit de changer --pieds-x et --pieds-y. */
+  .plan[data-plan="personnage"] { inset: 0; }
+  .acteur { position: absolute; inset: 0; --x: calc(var(--pieds-x) * 100%); --y: calc(var(--pieds-y) * 100%); }
   .perso-cadre {
-    position: absolute; left: 50%; bottom: 21%; width: 55%; height: 55%; transform: translateX(-50%);
-    translate: calc(var(--px, 0) * -4px) calc(var(--py, 0) * -4px); transition: translate .35s ease-out;
+    position: absolute; left: var(--x); top: var(--y); width: calc(var(--taille) * 1.125); height: var(--taille);
+    margin: calc(var(--taille) * -.8115) 0 0 calc(var(--taille) * -.558);
+  }
+  /* Ombre de contact sous les pieds : la même pour toutes les poses, elle ne bouge pas quand l'image change. */
+  /* Douce tache de lumière chaude derrière lui (30 %). */
+  .halo-perso {
+    position: absolute; left: var(--x); top: calc(var(--y) - var(--taille) * .32); width: calc(var(--taille) * .9); height: calc(var(--taille) * .8);
+    translate: -50% -50%; border-radius: 50%; pointer-events: none;
+    background: radial-gradient(closest-side, rgba(255, 236, 196, .3), rgba(255, 236, 196, 0));
+  }
+  /* Ombre de contact juste sous les pieds, étirée légèrement vers le bas à droite (lumière en haut à gauche). */
+  .ombre-perso {
+    position: absolute; left: var(--x); top: var(--y); width: calc(var(--taille) * .38); height: calc(var(--taille) * .066);
+    margin: calc(var(--taille) * -.034) 0 0 calc(var(--taille) * -.165); rotate: 4deg;
+    border-radius: 50%; filter: blur(2px); mix-blend-mode: multiply;
+    background: radial-gradient(closest-side, rgba(52, 58, 28, .85), rgba(52, 58, 28, 0));
   }
   #perso {
-    position: relative; width: 100%; height: 100%; display: grid; place-items: center; color: var(--accent);
-    filter: drop-shadow(1px 2px 2px rgba(60, 50, 30, .22)); animation: rebond 3s ease-in-out infinite;
-    transition: transform var(--anim);
+    position: relative; width: 100%; height: 100%;
+    filter: drop-shadow(1px 3px 3px rgba(60, 50, 30, .22));
+    transform-origin: 49.6% 81.15%; animation: respire 4s ease-in-out infinite;
   }
-  #perso img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; filter: brightness(.96) saturate(.95); }
-  /* Très légère teinte verte en bas du personnage, comme un reflet de l'herbe (masquée par sa silhouette). */
-  #perso .reflet {
-    position: absolute; inset: 0; pointer-events: none;
-    background: linear-gradient(rgba(120, 165, 90, 0) 62%, rgba(120, 165, 90, .22));
-    -webkit-mask: var(--masque) center / contain no-repeat; mask: var(--masque) center / contain no-repeat;
+  /* Il respire en continu (échelle de 1 à 1,012), avec un très léger balancement. */
+  @keyframes respire { 0%, 100% { transform: scale(1) rotate(-.4deg); } 50% { transform: scale(1.012) rotate(.4deg); } }
+  /* Pollen : quelques points crème qui flottent lentement. */
+  /* Pollen : grains crème posés dans leur plan (loin, milieu, proche), taille, flou, opacité et vitesse selon la distance. */
+  .plan .grain {
+    position: absolute; left: var(--x); top: var(--y); width: var(--t); height: var(--t); border-radius: 50%;
+    background: #fff6e0; opacity: var(--o); filter: blur(var(--f, 0));
+    animation: flotte var(--d) ease-in-out infinite alternate;
   }
-  @keyframes rebond { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
-  @keyframes ombre-rebond { 0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; } 50% { transform: translate(-50%, -50%) scale(.9); opacity: .8; } }
-  .perso-cadre.saute { animation: saut-perso var(--anim) cubic-bezier(.3, 1.6, .5, 1); }
-  .perso-cadre.saute-double { animation: saut-double var(--anim) ease-out; }
-  @keyframes saut-perso { 0%, 100% { transform: translateX(-50%); } 40% { transform: translateX(-50%) translateY(-16px) rotate(-6deg); } 70% { transform: translateX(-50%) rotate(3deg); } }
-  @keyframes saut-double { 0%, 50%, 100% { transform: translateX(-50%); } 25% { transform: translateX(-50%) translateY(-16px) rotate(-6deg); } 75% { transform: translateX(-50%) translateY(-11px) rotate(6deg); } }
-  /* Mouvement de remplacement pendant une interaction, tant que la pose n'a pas sa propre image. */
-  .perso-cadre[data-pose="boire"] #perso, .perso-cadre[data-pose="manger"] #perso { transform: translateY(8px) rotate(10deg); }
-  .perso-cadre[data-pose="dormir"] #perso { transform: translateY(14px) scale(.9, .82); }
-  .perso-cadre[data-pose="saluer"] #perso { animation: salut var(--anim) ease-in-out 2; }
-  @keyframes salut { 0%, 100% { transform: rotate(0); } 33% { transform: rotate(-7deg); } 66% { transform: rotate(7deg); } }
+  @keyframes flotte { to { transform: translate(var(--dx), var(--dy)); } }
+  /* Journée parfaite : pétales roses et crème qui tombent doucement dans le jardin. */
+  .petale {
+    position: absolute; top: -6%; left: var(--x); z-index: 60; width: 9px; height: 6px; border-radius: 60% 0; background: var(--c);
+    pointer-events: none; animation: tombe var(--d) ease-in forwards;
+  }
+  @keyframes tombe {
+    0% { transform: translate(0, 0) rotate(0); opacity: 0; }
+    10% { opacity: .95; }
+    50% { transform: translate(var(--dx), calc(var(--chute) * .5)) rotate(200deg); }
+    100% { transform: translate(calc(var(--dx) * -.5), var(--chute)) rotate(420deg); opacity: 0; }
+  }
+  /* Pose de base et images d'action, superposées dans le même cadre ; fondu enchaîné de 250 ms.
+     --decalage : remonte une pose dont les pieds sont plus bas que ceux de la base (voir POSES). */
+  #perso img {
+    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; filter: brightness(.97) saturate(.95);
+    transform-origin: 49.6% 81.15%; translate: 0 var(--decalage, 0); transition: opacity .25s ease;
+  }
+  #perso .pose { opacity: 0; }
+  #perso .pose.visible { opacity: 1; }
+  #perso .base.cachee { opacity: 0; }
+  /* Lumière : un halo chaud venu d'en haut à gauche, et les bords du monde un peu dans l'ombre. */
+  .lumiere { position: absolute; inset: 0; z-index: 100; pointer-events: none; }
+  .lumiere::before, .lumiere::after { content: ''; position: absolute; inset: 0; }
+  .lumiere::before {
+    background: radial-gradient(ellipse 75% 60% at 26% 6%, rgba(255, 241, 205, .6), rgba(255, 241, 205, 0) 72%);
+    mix-blend-mode: soft-light;
+  }
+  .lumiere::after { background: radial-gradient(circle at 50% 45%, rgba(48, 36, 20, 0) 58%, rgba(48, 36, 20, .16) 100%); }
+  /* Le puits : ombre portée du cadre sur le jardin (large, puis serrée), vert gris un peu froid, qui assombrit le haut et la gauche,
+     et très fin reflet clair sur l'arête opposée, en bas à droite. */
+  .puits {
+    position: absolute; inset: 0; z-index: 105; border-radius: inherit; overflow: hidden; pointer-events: none;
+    box-shadow: inset 4px 18px 30px rgba(60, 74, 64, .3), inset 3px 4px 6px rgba(60, 74, 64, .3),
+                inset 0 -16px 14px -6px rgba(120, 90, 60, .3);   /* ombre de contact : le bas du jardin s'assombrit sur ~14 px, derrière le sol */
+  }
+  /* Phrase du personnage : en arc de cercle sous le haut de l'arche, concentrique avec elle, posée sur une bande claire
+     (le « calque ») qui la rend lisible sur le jardin. Géométrie posée par placerBulle(). Apparaît et disparaît en fondu
+     (simple apparition si l'appareil demande moins de mouvement). */
+  .bulle {
+    position: absolute; inset: 0; width: 100%; height: 100%; z-index: 110; pointer-events: none; overflow: visible;
+    opacity: 0; transition: opacity .4s ease;
+  }
+  .bulle.visible { opacity: 1; }
+  .bulle .bande { fill: none; stroke: rgba(255, 250, 243, .82); stroke-linecap: round; filter: drop-shadow(0 1px 2px rgba(120, 90, 60, .18)); }
+  .bulle text { font-family: 'DM Sans', system-ui, sans-serif; font-weight: 500; letter-spacing: .02em; fill: var(--texte); }
+  /* Toucher le personnage fait revenir la bulle. */
+  .perso-cadre { pointer-events: auto; cursor: pointer; -webkit-user-select: none; user-select: none; }
+  /* Petits mouvements pendant une pose (3 s), autour des pieds. */
+  #perso .pose[data-mouvement="course"] { animation: course .32s ease-in-out infinite; }
+  #perso .pose[data-mouvement="balai"] { animation: balai .8s ease-in-out infinite; }
+  #perso .pose[data-mouvement="contentement"] { animation: contentement .55s ease-out 2; }
+  #perso .pose[data-mouvement="sommeil"] { animation: sommeil 2.6s ease-in-out infinite; }
+  #perso .pose[data-mouvement="respiration"] { animation: respiration 2.4s ease-in-out infinite; }
+  @keyframes course { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-1.3%); } }
+  @keyframes balai { 0%, 100% { transform: rotate(-2.5deg); } 50% { transform: rotate(2.5deg); } }
+  @keyframes contentement { 0%, 100% { transform: translateY(0) scale(1); } 40% { transform: translateY(-1.6%) scale(1.01, .99); } }
+  @keyframes sommeil { 0%, 100% { transform: rotate(-1.2deg); } 50% { transform: rotate(1.2deg); } }
+  @keyframes respiration { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.01); } }
 
-  /* Boutons d'habitudes : posés sur le rail comme des perles ; l'étiquette est dans l'axe qui part du centre. */
+  /* Boutons d'habitudes : petites pièces en pâte mate de 48 px, lumière en haut à gauche.
+     --pastel : teinte du disque ; --soutenu : la même, un peu plus soutenue, une fois validé ; --encre : icône, nom, série et pastille.
+     Non validé : en relief, dégradé presque invisible, fin biseau. Validé : franchement enfoncé, pastille cochée en haut à droite. */
   .scene .tuile {
-    position: absolute; left: 50%; top: var(--cy); width: 54px; height: 54px; margin: -27px 0 0 -27px;
+    position: absolute; left: 0; top: 0; width: 48px; height: 48px; margin: -24px 0 0 -24px;
     transform: translate(var(--x, 0), var(--y, 0));
   }
-  .libelle {
-    position: absolute; left: 50%; top: 50%; width: 72px; height: 28px; transform: translate(-50%, -50%);
-    translate: var(--lx, 0) var(--ly, 0); display: grid; align-content: center; justify-items: center; gap: 2px; pointer-events: none;
-  }
-  .tuile[data-etiquette="gauche"] .libelle { justify-items: end; text-align: right; }
-  .tuile[data-etiquette="droite"] .libelle { justify-items: start; text-align: left; }
   .tuile {
     background: none; border: 0; padding: 0; display: block; color: var(--texte); touch-action: manipulation;
-    --teinte: #d3e5c6; --teinte-fonce: #3c6431;
+    -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
   }
-  .tuile[data-h="eau"] { --teinte: #cfe1ee; --teinte-fonce: #2c5873; }
-  .tuile[data-h="sport"] { --teinte: #eec3ad; --teinte-fonce: #843b1f; }
-  .tuile[data-h="lecture"] { --teinte: #f1cfd4; --teinte-fonce: #843a4b; }
-  .tuile[data-h="meditation"] { --teinte: #ddd4ef; --teinte-fonce: #55457f; }
-  .tuile[data-h="sommeil"] { --teinte: #d6dcef; --teinte-fonce: #3a4775; }
-  .tuile[data-h="petitDej"], .tuile[data-h="dejeuner"], .tuile[data-h="diner"] { --teinte: #f3dca6; --teinte-fonce: #6f5110; }
+  .tuile[data-h="eau"] { --pastel: #c9dbe6; --soutenu: #b3cde0; --encre: #3f5a6e; }
+  .tuile[data-h="sport"] { --pastel: #ecccbc; --soutenu: #e5b9a3; --encre: #7a4128; }
+  .tuile[data-h="lecture"] { --pastel: #ebcdd4; --soutenu: #e2b8c3; --encre: #6e3a52; }
+  .tuile[data-h="meditation"] { --pastel: #d8d3e6; --soutenu: #c8c1dc; --encre: #574d78; }
+  .tuile:is([data-h="petitDej"], [data-h="dejeuner"], [data-h="diner"]) { --pastel: #ecdcb4; --soutenu: #e3cd98; --encre: #6b5320; }
+  .tuile[data-h="sommeil"] { --pastel: #d2d8ec; --soutenu: #bfc8e4; --encre: #444f7e; }
+  .tuile[data-h="menage"] { --pastel: #d3e0c8; --soutenu: #c1d4b3; --encre: #3d5a35; }
+  /* Disque mat : à peine plus clair en haut à gauche (7 % environ), anneau clair de 1 px à l'intérieur du bord,
+     liseré un peu plus foncé en bas à droite, ombre douce en bas à droite et légère lumière en haut à gauche. */
   .icone-habitude {
-    position: relative; width: 54px; height: 54px; border-radius: 50%; display: grid; place-items: center;
-    --matiere: color-mix(in srgb, var(--teinte) 32%, var(--fond));
-    background: radial-gradient(circle at 32% 26%, rgba(255, 255, 255, .75), rgba(255, 255, 255, 0) 52%), var(--matiere);
-    box-shadow: 5px 6px 12px var(--ombre-foncee), -4px -4px 10px var(--ombre-claire),
-                inset 1.5px 1.5px 1px rgba(255, 255, 255, .8), inset -2px -2px 3px rgba(120, 85, 55, .18);
-    color: var(--teinte-fonce); transition: box-shadow .3s ease, background .3s ease, color .3s ease;
+    position: relative; width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; color: var(--encre);
+    background: linear-gradient(145deg, color-mix(in srgb, var(--pastel) 86%, #fff), color-mix(in srgb, var(--pastel) 95%, #5a3d28));
+    box-shadow: 3px 4px 9px var(--ombre-foncee), -3px -3px 8px var(--ombre-claire),
+                inset 0 0 0 1px rgba(255, 255, 255, .45), inset -1px -1.5px 0 rgba(95, 65, 42, .14);
+    transition: box-shadow .2s ease-out, background .2s ease-out;
   }
-  .icone-habitude .icone { width: 26px; height: 26px; }
-  .tuile:active .icone-habitude { transform: scale(.96); }
+  /* Icône Phosphor « regular », 22 px (46 % du disque), gravée par un seul liseré clair en bas à droite. */
+  .icone-habitude .icone { width: 22px; height: 22px; filter: drop-shadow(.8px .8px 0 rgba(255, 255, 255, .4)); }
   .tuile:focus-visible { outline: none; }
   .tuile:focus-visible .icone-habitude { outline: 2px solid rgba(79, 122, 66, .5); outline-offset: 3px; }
-  .tuile .nom { font-size: 11px; font-weight: 600; line-height: 1.1; transition: color .3s; }
-  .tuile .info { font-size: 9.5px; color: var(--texte-doux); display: flex; gap: 3px; align-items: center; min-height: 10px; line-height: 1; }
-  .tuile .info .serie { font-size: 9.5px; } .tuile .info .serie .icone { width: 9px; height: 9px; }
-  /* Cochée : remplie de sa teinte, légèrement enfoncée, même lumière en haut à gauche. */
+  /* Validé : franchement enfoncé, sans ombre extérieure ; ombre intérieure nette en haut à gauche, lumière douce
+     en bas à droite, disque plus sombre en haut à gauche. L'icône garde sa taille et sa couleur. */
   .tuile.fait .icone-habitude {
-    --matiere: var(--teinte);
-    box-shadow: 2px 3px 6px var(--ombre-foncee), -2px -2px 6px var(--ombre-claire),
-                inset 3px 4px 7px rgba(120, 85, 55, .22), inset -1.5px -1.5px 2px rgba(255, 255, 255, .55);
+    background: linear-gradient(145deg, color-mix(in srgb, var(--soutenu) 92%, #5a3d28), color-mix(in srgb, var(--soutenu) 90%, #fff));
+    box-shadow: inset 4px 4px 8px rgba(110, 72, 40, .3), inset -2px -2px 5px rgba(255, 250, 240, .55);
   }
-  .tuile.fait .nom { color: var(--teinte-fonce); }
+  /* Pastille : 18 px, pleine dans la teinte foncée, coche crème, à cheval sur le bord en haut à droite,
+     détachée par un liseré couleur de page, toute petite ombre. Elle fait partie du bouton (même clic). */
   .tuile.fait .icone-habitude::after {
-    content: '✓'; position: absolute; top: -3px; right: -3px; width: 18px; height: 18px; border-radius: 50%;
-    background: var(--teinte-fonce); color: #fff; font-size: 10px; font-weight: 700; display: grid; place-items: center;
+    content: ''; position: absolute; top: -2px; right: -2px; width: 18px; height: 18px; box-sizing: border-box; border-radius: 50%;
+    border: 1.5px solid var(--fond); box-shadow: 0 1px 2px rgba(80, 55, 30, .18);
+    background: var(--encre) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M2.2 5.3l1.9 1.9 3.8-4.2' fill='none' stroke='%23fffaf2' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 10px no-repeat;
   }
-  .tuile.exclue { opacity: .45; }
-  .tuile.exclue .icone-habitude { box-shadow: none; outline: 1.5px dashed var(--ombre-foncee); outline-offset: -2px; }
-  .tuile.rebond .icone-habitude { animation: rebond-bouton var(--anim) cubic-bezier(.3, 1.6, .5, 1); }
-  @keyframes rebond-bouton { 0% { transform: scale(1); } 35% { transform: scale(.86); } 70% { transform: scale(1.06); } 100% { transform: scale(1); } }
+  .tuile.exclue { opacity: .5; }
+  .tuile.exclue .icone-habitude { background: none; box-shadow: none; outline: 1.5px dashed var(--ombre-foncee); outline-offset: -1.5px; }
+  /* Passage en creux : 200 ms, très léger rebond (coupé si l'appareil demande moins de mouvement). */
+  .tuile.rebond .icone-habitude { animation: enfoncer .2s cubic-bezier(.3, 1.5, .5, 1); }
+  @keyframes enfoncer { 0% { transform: scale(1); } 55% { transform: scale(.95); } 100% { transform: scale(1); } }
   /* Étincelles et confettis : partent du bouton touché vers le personnage, retirés après l'animation. */
   .etincelle {
-    position: absolute; left: 50%; top: 27px; width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 50%;
+    position: absolute; left: 50%; top: 24px; width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 50%;
     background: var(--c); pointer-events: none; z-index: 2; animation: etincelle var(--anim) ease-out forwards;
   }
   .etincelle.confetti { width: 7px; height: 4px; border-radius: 2px; }
@@ -280,15 +378,35 @@
 
   /* --- Tâches --- */
   #compteur-taches { font-size: 12.5px; color: var(--texte-doux); margin: -8px 0 16px; }
-  #form-tache { display: flex; gap: 12px; }
+  #form-tache { display: flex; flex-wrap: wrap; gap: 12px; }
+  #form-tache .echeance { flex-basis: 100%; font-size: 13px; }
   #nouvelle-tache { flex: 1; min-width: 0; background: var(--creux-fond); border: 0; box-shadow: var(--creux); border-radius: 999px; padding: 12px 18px; font-size: 16px; }
   #nouvelle-tache:focus { outline: 2px solid rgba(79, 122, 66, .45); outline-offset: 2px; }
   #liste-taches { list-style: none; margin: 18px 0 0; padding: 0; display: grid; gap: 12px; }
-  #liste-taches button {
-    width: 100%; display: flex; align-items: center; gap: 12px; text-align: left; background: var(--fond);
+  /* Une tâche : la ligne à cocher, puis ses deux actions (modifier, supprimer). */
+  #liste-taches li { display: flex; align-items: center; gap: 8px; }
+  .tache-cocher {
+    flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; text-align: left; background: var(--fond);
     border: 0; border-radius: 16px; padding: 12px 16px; min-height: 50px; box-shadow: var(--relief-rond); transition: box-shadow .3s, background .3s;
   }
-  .tache-faite button { background: var(--creux-fond) !important; box-shadow: var(--creux-mini) !important; }
+  .tache-faite .tache-cocher { background: var(--creux-fond); box-shadow: var(--creux-mini); }
+  .tache-cocher .contenu { display: grid; gap: 3px; min-width: 0; }
+  .tache-cocher .texte { overflow-wrap: anywhere; }
+  .tache-cocher .date { font-size: 12px; color: var(--texte-doux); }
+  .tache-cocher .date.retard { color: #a4512c; font-weight: 600; }
+  .tache-action {
+    flex: none; width: 40px; height: 40px; border: 0; border-radius: 50%; display: grid; place-items: center;
+    background: var(--fond); box-shadow: var(--relief-mini); color: var(--texte-doux);
+  }
+  .tache-action .icone { width: 18px; height: 18px; }
+  .tache-action:active { box-shadow: var(--creux-mini); }
+  /* Suppression en deux touches : la première demande confirmation. */
+  .tache-action.confirmer { width: auto; padding: 0 12px; border-radius: 20px; color: #fff; background: #a4512c; box-shadow: none; font-size: 13px; font-weight: 600; }
+  /* Modification sur place : texte, échéance, Enregistrer et Annuler. */
+  .tache-edition { flex: 1; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px; border-radius: 16px; box-shadow: var(--creux-mini); background: var(--creux-fond); }
+  .tache-edition .texte-edite { flex: 1 1 100%; min-width: 0; background: var(--fond); border: 0; border-radius: 12px; padding: 10px 12px; font-size: 16px; box-shadow: var(--creux-mini); }
+  .tache-edition .champ { flex: 1; font-size: 13px; }
+  .tache-edition .bouton { padding: 8px 14px; font-size: 14px; }
   .rond { flex: none; width: 22px; height: 22px; border-radius: 50%; background: var(--creux-fond); box-shadow: var(--creux-mini); display: grid; place-items: center; font-size: 11px; color: #fff; }
   .tache-faite .rond { background: var(--accent); box-shadow: none; }
   .tache-faite .texte { text-decoration: line-through; color: var(--texte-doux); }
@@ -315,7 +433,7 @@
   }
   #menu-bouton {
     width: 50px; height: 50px; border: 0; border-radius: 50%; display: grid; place-items: center;
-    background: var(--fond); box-shadow: var(--relief-rond); color: var(--texte); transition: box-shadow .2s;
+    background: var(--fond); box-shadow: 4px 5px 10px var(--ombre-foncee), -4px -4px 9px var(--ombre-claire); color: var(--texte); transition: box-shadow .2s;
   }
   #menu-bouton .ferme, #menu.ouvert #menu-bouton .ouvre { display: none; }
   #menu.ouvert #menu-bouton .ferme { display: block; }
@@ -407,23 +525,25 @@
   .liste-defis .icone { width: 18px; height: 18px; color: var(--accent); }
 
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+  /* Onglet caché : la vie du jardin s'arrête. */
+  .onglet-cache .scene * { animation-play-state: paused !important; }
 </style>
 <script src="https://accounts.google.com/gsi/client" async></script>
 </head>
 <body>
 <!-- ===================== INTERFACE ===================== -->
-<!-- Icônes dessinées d'un même style (trait fin). Pour en changer une, modifier son <symbol>. -->
+<!-- Icônes dessinées d'un même style (trait fin). Pour en changer une, modifier son <symbol>.
+     Habitudes : Phosphor Icons, graisse « regular » (licence MIT, phosphoricons.com), pleines en currentColor. -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <symbol id="i-eau" viewBox="0 0 24 24"><path d="M12 3.5C9.2 7.8 6.5 10.6 6.5 14a5.5 5.5 0 0 0 11 0c0-3.4-2.7-6.2-5.5-10.5z"/><path d="M9.4 14.6a2.7 2.7 0 0 0 2.2 2.5"/></symbol>
-  <symbol id="i-sport" viewBox="0 0 24 24"><path d="M3 16.5c2.2 0 3.4-1.2 4.4-3.3l2.3 1.2c1.2.6 2.3.9 3.4.9h3c2.2 0 3.9 1.1 4.9 3.1v.9H3z"/><path d="M8.6 13.9l1.1-1.4M10.9 14.9l1.1-1.4M3 18.4h18"/></symbol>
-  <symbol id="i-lecture" viewBox="0 0 24 24"><path d="M12 6.8C9.6 5.3 6.6 5 3.5 5.6v12.2c3.1-.6 6.1-.3 8.5 1.2 2.4-1.5 5.4-1.8 8.5-1.2V5.6c-3.1-.6-6.1-.3-8.5 1.2z"/><path d="M12 6.8V19"/></symbol>
-  <symbol id="i-meditation" viewBox="0 0 24 24"><path d="M12 18.5c-3 0-6-1.4-8.2-4 3.1-.6 5.8.6 8.2 4zM12 18.5c3 0 6-1.4 8.2-4-3.1-.6-5.8.6-8.2 4zM12 18.5c-2.2-2.2-2.7-5.8 0-9.5 2.7 3.7 2.2 7.3 0 9.5z"/><path d="M8 20.5h8"/></symbol>
-  <symbol id="i-petitDej" viewBox="0 0 24 24"><path d="M5 10.5h11v3.8a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5z"/><path d="M16 11.8h1.4a2 2 0 0 1 0 4h-1.8M8.7 4.5c-.9 1 .9 2-.1 3.5M12 4.5c-.9 1 .9 2-.1 3.5"/></symbol>
-  <symbol id="i-dejeuner" viewBox="0 0 24 24"><path d="M3.5 12.5h17a8.5 6.5 0 0 1-17 0z"/><path d="M8 12.5c0-2.5 1.9-4.2 4.2-4.2M12.6 12.5c.4-2.1 2-3.4 4.1-3.4M9.5 20h5"/></symbol>
-  <symbol id="i-diner" viewBox="0 0 24 24"><path d="M4 13h16a8 6.2 0 0 1-16 0z"/><path d="M14.2 3.6L10.4 11M18.3 4.6l-5.1 6.7M9.5 20h5"/></symbol>
-  <symbol id="i-menage" viewBox="0 0 24 24"><path d="M16 3.2l-4.4 8.4"/><path d="M8 11l6.6 3.2-2.4 6.1c-2.3.2-5.4-1.2-7.4-3.4z"/><path d="M7.6 18.2l1.6-2.8M10 19.7l1.3-2.7"/></symbol>
-  <symbol id="i-sommeil" viewBox="0 0 24 24"><path d="M19.5 14.6A7.5 7.5 0 1 1 9.4 4.5a6.2 6.2 0 0 0 10.1 10.1z"/><path d="M16.2 3.5v2.4M15 4.7h2.4"/></symbol>
-  <symbol id="i-flamme" viewBox="0 0 24 24"><path d="M12 3c1.2 3.2 4.6 4.6 4.6 9a4.6 4.6 0 0 1-9.2 0c0-2.2 1.1-3.4 2.2-4.4 0 1.6.9 2.7 2.2 2.7 0-2.8-1-4.8.2-7.3z"/></symbol>
+  <symbol id="i-eau" viewBox="0 0 256 256"><g fill="currentColor" stroke="none"><path d="M174,47.75a254.19,254.19,0,0,0-41.45-38.3,8,8,0,0,0-9.18,0A254.19,254.19,0,0,0,82,47.75C54.51,79.32,40,112.6,40,144a88,88,0,0,0,176,0C216,112.6,201.49,79.32,174,47.75ZM128,216a72.08,72.08,0,0,1-72-72c0-57.23,55.47-105,72-118,16.53,13,72,60.75,72,118A72.08,72.08,0,0,1,128,216Zm55.89-62.66a57.6,57.6,0,0,1-46.56,46.55A8.75,8.75,0,0,1,136,200a8,8,0,0,1-1.32-15.89c16.57-2.79,30.63-16.85,33.44-33.45a8,8,0,0,1,15.78,2.68Z"/></g></symbol>
+  <symbol id="i-sport" viewBox="0 0 256 256"><g fill="currentColor" stroke="none"><path d="M152,88a32,32,0,1,0-32-32A32,32,0,0,0,152,88Zm0-48a16,16,0,1,1-16,16A16,16,0,0,1,152,40Zm67.31,100.68c-.61.28-7.49,3.28-19.67,3.28-13.85,0-34.55-3.88-60.69-20a169.31,169.31,0,0,1-15.41,32.34,104.29,104.29,0,0,1,31.31,15.81C173.92,186.65,184,207.35,184,232a8,8,0,0,1-16,0c0-41.7-34.69-56.71-54.14-61.85-.55.7-1.12,1.41-1.69,2.1-19.64,23.8-44.25,36.18-71.63,36.18A92.29,92.29,0,0,1,31.2,208,8,8,0,0,1,32.8,192c25.92,2.58,48.47-7.49,67-30,12.49-15.14,21-33.61,25.25-47C86.13,92.35,61.27,111.63,61,111.84A8,8,0,1,1,51,99.36c1.5-1.2,37.22-29,89.51,6.57,45.47,30.91,71.93,20.31,72.18,20.19a8,8,0,1,1,6.63,14.56Z"/></g></symbol>
+  <symbol id="i-lecture" viewBox="0 0 256 256"><g fill="currentColor" stroke="none"><path d="M232,48H160a40,40,0,0,0-32,16A40,40,0,0,0,96,48H24a8,8,0,0,0-8,8V200a8,8,0,0,0,8,8H96a24,24,0,0,1,24,24,8,8,0,0,0,16,0,24,24,0,0,1,24-24h72a8,8,0,0,0,8-8V56A8,8,0,0,0,232,48ZM96,192H32V64H96a24,24,0,0,1,24,24V200A39.81,39.81,0,0,0,96,192Zm128,0H160a39.81,39.81,0,0,0-24,8V88a24,24,0,0,1,24-24h64ZM160,88h40a8,8,0,0,1,0,16H160a8,8,0,0,1,0-16Zm48,40a8,8,0,0,1-8,8H160a8,8,0,0,1,0-16h40A8,8,0,0,1,208,128Zm0,32a8,8,0,0,1-8,8H160a8,8,0,0,1,0-16h40A8,8,0,0,1,208,160Z"/></g></symbol>
+  <symbol id="i-meditation" viewBox="0 0 256 256"><g fill="currentColor" stroke="none"><path d="M245.83,121.63a15.53,15.53,0,0,0-9.52-7.33,73.51,73.51,0,0,0-22.17-2.22c4-19.85,1-35.55-2.06-44.86a16.15,16.15,0,0,0-18.79-10.88,85.53,85.53,0,0,0-28.55,12.12,94.58,94.58,0,0,0-27.11-33.25,16.05,16.05,0,0,0-19.26,0A94.48,94.48,0,0,0,91.26,68.46,85.53,85.53,0,0,0,62.71,56.34,16.15,16.15,0,0,0,43.92,67.22c-3,9.31-6,25-2.06,44.86a73.51,73.51,0,0,0-22.17,2.22,15.53,15.53,0,0,0-9.52,7.33,16,16,0,0,0-1.6,12.27c3.39,12.57,13.8,36.48,45.33,55.32S113.13,208,128.05,208s42.67,0,74-18.78c31.53-18.84,41.94-42.75,45.33-55.32A16,16,0,0,0,245.83,121.63ZM59.14,72.14a.2.2,0,0,1,.23-.15A70.43,70.43,0,0,1,85.18,83.66,118.65,118.65,0,0,0,80,119.17c0,18.74,3.77,34,9.11,46.28A123.59,123.59,0,0,1,69.57,140C51.55,108.62,55.3,84,59.14,72.14Zm3,103.35C35.47,159.57,26.82,140.05,24,129.7a59.82,59.82,0,0,1,22.5-1.17,129.08,129.08,0,0,0,9.15,19.41,142.28,142.28,0,0,0,34,39.56A114.92,114.92,0,0,1,62.1,175.49ZM128,190.4c-9.33-6.94-32-28.23-32-71.23C96,76.7,118.38,55.24,128,48c9.62,7.26,32,28.72,32,71.19C160,162.17,137.33,183.46,128,190.4ZM170.82,83.66A70.43,70.43,0,0,1,196.63,72a.2.2,0,0,1,.23.15C200.7,84,204.45,108.62,186.43,140a123.32,123.32,0,0,1-19.54,25.48c5.34-12.26,9.11-27.54,9.11-46.28A118.65,118.65,0,0,0,170.82,83.66ZM232,129.72c-2.77,10.25-11.4,29.81-38.09,45.77a114.92,114.92,0,0,1-27.55,12,142.28,142.28,0,0,0,34-39.56,129.08,129.08,0,0,0,9.15-19.41A59.69,59.69,0,0,1,232,129.71Z"/></g></symbol>
+  <symbol id="i-petitDej" viewBox="0 0 256 256"><g fill="currentColor" stroke="none"><path d="M80,56V24a8,8,0,0,1,16,0V56a8,8,0,0,1-16,0Zm40,8a8,8,0,0,0,8-8V24a8,8,0,0,0-16,0V56A8,8,0,0,0,120,64Zm32,0a8,8,0,0,0,8-8V24a8,8,0,0,0-16,0V56A8,8,0,0,0,152,64Zm96,56v8a40,40,0,0,1-37.51,39.91,96.59,96.59,0,0,1-27,40.09H208a8,8,0,0,1,0,16H32a8,8,0,0,1,0-16H56.54A96.3,96.3,0,0,1,24,136V88a8,8,0,0,1,8-8H208A40,40,0,0,1,248,120ZM200,96H40v40a80.27,80.27,0,0,0,45.12,72h69.76A80.27,80.27,0,0,0,200,136Zm32,24a24,24,0,0,0-16-22.62V136a95.78,95.78,0,0,1-1.2,15A24,24,0,0,0,232,128Z"/></g></symbol>
+  <symbol id="i-dejeuner" viewBox="0 0 256 256"><g fill="currentColor" stroke="none"><path d="M72,88V40a8,8,0,0,1,16,0V88a8,8,0,0,1-16,0ZM216,40V224a8,8,0,0,1-16,0V176H152a8,8,0,0,1-8-8,268.75,268.75,0,0,1,7.22-56.88c9.78-40.49,28.32-67.63,53.63-78.47A8,8,0,0,1,216,40ZM200,53.9c-32.17,24.57-38.47,84.42-39.7,106.1H200ZM119.89,38.69a8,8,0,1,0-15.78,2.63L112,88.63a32,32,0,0,1-64,0l7.88-47.31a8,8,0,1,0-15.78-2.63l-8,48A8.17,8.17,0,0,0,32,88a48.07,48.07,0,0,0,40,47.32V224a8,8,0,0,0,16,0V135.32A48.07,48.07,0,0,0,128,88a8.17,8.17,0,0,0-.11-1.31Z"/></g></symbol>
+  <symbol id="i-diner" viewBox="0 0 256 256"><g fill="currentColor" stroke="none"><path d="M224,112H32a8,8,0,0,0-8,8,104.35,104.35,0,0,0,56,92.28V216a16,16,0,0,0,16,16h64a16,16,0,0,0,16-16v-3.72A104.35,104.35,0,0,0,232,120,8,8,0,0,0,224,112Zm-59.34,88a8,8,0,0,0-4.66,7.27V216H96v-8.71A8,8,0,0,0,91.34,200a88.29,88.29,0,0,1-51-72H215.63A88.29,88.29,0,0,1,164.66,200ZM81.77,55c5.35-6.66,6.67-11.16,6.12-13.14-.42-1.49-2.41-2.26-2.43-2.26A8,8,0,0,1,88,24a8.11,8.11,0,0,1,2.38.36c1,.31,9.91,3.33,12.79,12.76,2.46,8.07-.55,17.45-8.94,27.89-5.35,6.66-6.67,11.16-6.12,13.14.42,1.49,2.37,2.24,2.39,2.25A8,8,0,0,1,88,96a8.11,8.11,0,0,1-2.38-.36c-1-.31-9.91-3.33-12.79-12.76C70.37,74.81,73.38,65.43,81.77,55Zm40,0c5.35-6.66,6.67-11.16,6.12-13.14-.42-1.49-2.41-2.26-2.43-2.26A8,8,0,0,1,128,24a8.11,8.11,0,0,1,2.38.36c1,.31,9.91,3.33,12.79,12.76,2.46,8.07-.55,17.45-8.94,27.89-5.35,6.66-6.67,11.16-6.12,13.14.42,1.49,2.37,2.24,2.39,2.25A8,8,0,0,1,128,96a8.11,8.11,0,0,1-2.38-.36c-1-.31-9.91-3.33-12.79-12.76C110.37,74.81,113.38,65.43,121.77,55Zm40,0c5.35-6.66,6.67-11.16,6.12-13.14-.42-1.49-2.41-2.26-2.43-2.26A8,8,0,0,1,168,24a8.11,8.11,0,0,1,2.38.36c1,.31,9.91,3.33,12.79,12.76,2.46,8.07-.55,17.45-8.94,27.89-5.35,6.66-6.67,11.16-6.12,13.14.42,1.49,2.37,2.24,2.39,2.25A8,8,0,0,1,168,96a8.11,8.11,0,0,1-2.38-.36c-1-.31-9.91-3.33-12.79-12.76C150.37,74.81,153.38,65.43,161.77,55Z"/></g></symbol>
+  <symbol id="i-menage" viewBox="0 0 256 256"><g fill="currentColor" stroke="none"><path d="M235.5,216.81c-22.56-11-35.5-34.58-35.5-64.8V134.73a15.94,15.94,0,0,0-10.09-14.87L165,110a8,8,0,0,1-4.48-10.34l21.32-53a28,28,0,0,0-16.1-37,28.14,28.14,0,0,0-35.82,16,.61.61,0,0,0,0,.12L108.9,79a8,8,0,0,1-10.37,4.49L73.11,73.14A15.89,15.89,0,0,0,55.74,76.8C34.68,98.45,24,123.75,24,152a111.45,111.45,0,0,0,31.18,77.53A8,8,0,0,0,61,232H232a8,8,0,0,0,3.5-15.19ZM67.14,88l25.41,10.3a24,24,0,0,0,31.23-13.45l21-53c2.56-6.11,9.47-9.27,15.43-7a12,12,0,0,1,6.88,15.92L145.69,93.76a24,24,0,0,0,13.43,31.14L184,134.73V152c0,.33,0,.66,0,1L55.77,101.71A108.84,108.84,0,0,1,67.14,88Zm48,128a87.53,87.53,0,0,1-24.34-42,8,8,0,0,0-15.49,4,105.16,105.16,0,0,0,18.36,38H64.44A95.54,95.54,0,0,1,40,152a85.9,85.9,0,0,1,7.73-36.29l137.8,55.12c3,18,10.56,33.48,21.89,45.16Z"/></g></symbol>
+  <symbol id="i-sommeil" viewBox="0 0 256 256"><g fill="currentColor" stroke="none"><path d="M240,96a8,8,0,0,1-8,8H216v16a8,8,0,0,1-16,0V104H184a8,8,0,0,1,0-16h16V72a8,8,0,0,1,16,0V88h16A8,8,0,0,1,240,96ZM144,56h8v8a8,8,0,0,0,16,0V56h8a8,8,0,0,0,0-16h-8V32a8,8,0,0,0-16,0v8h-8a8,8,0,0,0,0,16Zm72.77,97a8,8,0,0,1,1.43,8A96,96,0,1,1,95.07,37.8a8,8,0,0,1,10.6,9.06A88.07,88.07,0,0,0,209.14,150.33,8,8,0,0,1,216.77,153Zm-19.39,14.88c-1.79.09-3.59.14-5.38.14A104.11,104.11,0,0,1,88,64c0-1.79,0-3.59.14-5.38A80,80,0,1,0,197.38,167.86Z"/></g></symbol>
   <symbol id="i-jour" viewBox="0 0 24 24"><path d="M5 19C5 10.5 10.5 5 19 5c0 8.5-5.5 14-14 14z"/><path d="M5 19l8.5-8.5"/></symbol>
   <symbol id="i-historique" viewBox="0 0 24 24"><rect x="4" y="5.5" width="16" height="14.5" rx="3.5"/><path d="M4 10h16M8.5 3.5v3.5M15.5 3.5v3.5"/><path d="M8 13.5h.01M12 13.5h.01M16 13.5h.01M8 16.8h.01M12 16.8h.01"/></symbol>
   <symbol id="i-reglages" viewBox="0 0 24 24"><path d="M18.70 10.33 L21.31 10.69 L21.31 13.31 L18.70 13.67 L17.91 15.55 L19.51 17.66 L17.66 19.51 L15.55 17.91 L13.67 18.70 L13.31 21.31 L10.69 21.31 L10.33 18.70 L8.45 17.91 L6.34 19.51 L4.49 17.66 L6.09 15.55 L5.30 13.67 L2.69 13.31 L2.69 10.69 L5.30 10.33 L6.09 8.45 L4.49 6.34 L6.34 4.49 L8.45 6.09 L10.33 5.30 L10.69 2.69 L13.31 2.69 L13.67 5.30 L15.55 6.09 L17.66 4.49 L19.51 6.34 L17.91 8.45Z"/><circle cx="12" cy="12" r="3"/></symbol>
@@ -432,6 +552,7 @@
   <symbol id="i-fermer" viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></symbol>
   <symbol id="i-defi" viewBox="0 0 24 24"><path d="M6 20.5V4"/><path d="M6 5c3.3-1.6 6.3 1.6 11 0v7.4c-4.7 1.6-7.7-1.6-11 0"/></symbol>
   <symbol id="i-crayon" viewBox="0 0 24 24"><path d="M4.5 19.5l1-4L15.8 5.2a2.1 2.1 0 0 1 3 3L8.5 18.5z"/><path d="M13.8 7.2l3 3"/></symbol>
+  <symbol id="i-poubelle" viewBox="0 0 24 24"><path d="M4.5 7h15M9.5 7V5a1.5 1.5 0 0 1 1.5-1.5h2A1.5 1.5 0 0 1 14.5 5v2"/><path d="M6.5 7l.9 11.6A2 2 0 0 0 9.4 20.5h5.2a2 2 0 0 0 2-1.9L17.5 7M10.2 11v5.5M13.8 11v5.5"/></symbol>
 </svg>
 
 <section id="ecran-connexion" hidden>
@@ -451,7 +572,7 @@
 
     <header class="bande">
       <div class="anneau">
-        <svg viewBox="0 0 64 64" aria-hidden="true"><circle class="anneau-fond" cx="32" cy="32" r="28.5"/><circle class="anneau-plein" id="anneau" cx="32" cy="32" r="28.5" pathLength="100"/></svg>
+        <svg viewBox="0 0 64 64" aria-hidden="true"><circle class="anneau-fond" cx="32" cy="32" r="27.5"/><circle class="anneau-plein" id="anneau" cx="32" cy="32" r="27.5" pathLength="100"/></svg>
         <div class="anneau-texte"><span id="score">0</span></div>
       </div>
       <div class="bande-titre">
@@ -461,18 +582,25 @@
     </header>
 
     <section class="scene" id="scene">
-      <div class="rail" aria-hidden="true"></div>
+      <!-- Les plans du monde sont ajoutés par construireMonde() autour du personnage, sous la lumière. -->
       <div class="hublot" aria-hidden="true">
-        <div class="ouverture">
-          <div class="jardin"></div>
-          <div class="ombre-perso"></div>
-          <div class="perso-cadre"><div id="perso"></div></div>
-          <div class="ombres"></div>
-          <div class="paroi"></div>
+        <div class="embrasure"></div>
+        <div class="monde" id="monde">
+          <div class="acteur" id="acteur">
+            <div class="halo-perso"></div>
+            <div class="ombre-perso"></div>
+            <div class="perso-cadre"><div id="perso"></div></div>
+          </div>
+          <div class="lumiere"></div>
+          <div class="puits"></div>
+          <svg class="bulle" id="bulle" aria-hidden="true">
+            <defs><path id="arc-bulle" fill="none"/></defs>
+            <use class="bande" href="#arc-bulle"/>
+            <text dominant-baseline="central"><textPath href="#arc-bulle" startOffset="50%" text-anchor="middle"></textPath></text>
+          </svg>
         </div>
-        <img class="avant-plan" src="images/avant-plan.png" alt="" onerror="this.remove()">
       </div>
-        <button class="tuile" id="menage-case" data-h="menage" aria-label="Ménage de la semaine"><span class="icone-habitude"><svg class="icone" aria-hidden="true"><use href="#i-menage"/></svg></span><span class="libelle"><span class="nom">Ménage</span><span class="info" id="menage-info"></span></span></button>
+      <button class="tuile" id="menage-case" data-h="menage" aria-label="Ménage de la semaine"><span class="icone-habitude"><svg class="icone" aria-hidden="true"><use href="#i-menage"/></svg></span></button>
     </section>
 
     <section class="carte carte-defi" id="carte-defi" hidden><div id="defi"></div></section>
@@ -504,6 +632,7 @@
       <form id="form-tache" autocomplete="off">
         <input id="nouvelle-tache" placeholder="Nouvelle tâche…" enterkeyhint="done" maxlength="200">
         <button class="bouton" aria-label="Ajouter">+</button>
+        <label class="champ echeance">Échéance <input type="date" id="echeance-tache"></label>
       </form>
       <ul id="liste-taches"></ul>
     </section>
@@ -790,7 +919,7 @@ function evaluerDefi(defi, { jours = {}, semaines = {}, aujourdhui }) {
 // ===================== DONNÉES =====================
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js';
 import { getAuth, GoogleAuthProvider, signInWithCredential, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js';
-import { getFirestore, collection, doc, onSnapshot, setDoc, addDoc, updateDoc, arrayUnion, serverTimestamp } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js';
+import { getFirestore, collection, doc, onSnapshot, setDoc, addDoc, updateDoc, deleteDoc, arrayUnion, serverTimestamp } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js';
 
 // Configuration publique (aucun secret) : seules les règles Firestore protègent les données.
 const app = initializeApp({
@@ -808,7 +937,7 @@ const GOOGLE_CLIENT_ID = '565047413369-2bi3f5bqfsao5hgdg271gv7g2prdhqrc.apps.goo
 
 // État en mémoire, alimenté en temps réel par Firestore (synchronise iPhone et ordinateur).
 const etat = { uid: null, aujourdhui: cleDuJour(new Date()), ecran: 'jour', jourAffiche: null,
-  ui: { exclMode: 'semaine', exclDate: null, defiType: 'sport-semaine', defiCible: 4, defiHabitude: 'meditation', abandon: false }, reglages: null, jours: {}, semaines: {}, taches: [], charge: new Set() };
+  ui: { exclMode: 'semaine', exclDate: null, defiType: 'sport-semaine', defiCible: 4, defiHabitude: 'meditation', abandon: false, tacheEditee: null, brouillon: null, suppression: null }, reglages: null, jours: {}, semaines: {}, taches: [], charge: new Set() };
 let desabonnements = [];
 
 const ref = (...chemin) => doc(db, 'users', etat.uid, ...chemin);
@@ -904,14 +1033,100 @@ const AVEC_ARTICLE = {
   sommeil: 'tes 7 h de sommeil', eau: 'tes 2 L d’eau', lecture: 'la lecture', meditation: 'la méditation',
   petitDej: 'le petit-déjeuner', dejeuner: 'le déjeuner', diner: 'le dîner',
 };
-// Personnage : un fichier par état et par interaction dans images/personnage/ (PNG à fond transparent).
-//   États : en-forme.png, content.png, neutre.png, fatigue.png
-//   Interactions : boire.png, manger.png, dormir.png, sauter.png, saluer.png
-// Tant qu'un fichier manque, l'image de base (base.png) s'affiche à sa place.
-const PERSONNAGE_PROVISOIRE = 'images/personnage/base.png';
-// Interaction déclenchée par chaque habitude cochée.
-const INTERACTION = { sommeil: 'dormir', eau: 'boire', petitDej: 'manger', dejeuner: 'manger', diner: 'manger', sport: 'sauter', lecture: 'saluer', meditation: 'saluer', menage: 'saluer' };
-const DUREE_POSE = 1500;
+// Personnage : toutes ses images dans images/personnage/, en PNG à fond transparent et dans le même cadre (1080 × 960).
+//   base.png : la pose affichée en permanence, y compris à l'ouverture de l'écran.
+//   Une image par action, jouée quand une habitude est cochée pendant que l'écran est ouvert : la base fait place
+//   à l'action (fondu de 250 ms), l'action reste DUREE_POSE ms avec son petit mouvement, puis la base revient.
+//   decalage : remonte l'image (en % de la hauteur du cadre) pour que ses pieds tombent sur ceux de la base.
+//   mouvement : nom de l'animation CSS jouée pendant la pose (voir #perso .pose[data-mouvement]).
+const POSES = {
+  boire: { decalage: -1.25, mouvement: 'contentement' },
+  manger: { decalage: -.73, mouvement: 'contentement' },
+  courir: { decalage: -2.6, mouvement: 'course' },
+  lire: { decalage: -1.56, mouvement: 'respiration' },
+  mediter: { decalage: -1.46, mouvement: 'respiration' },
+  balayer: { decalage: -3.02, mouvement: 'balai' },
+  dormir: { decalage: -2.92, mouvement: 'sommeil' },
+};
+// Pose jouée par chaque habitude cochée.
+const INTERACTION = { eau: 'boire', petitDej: 'manger', dejeuner: 'manger', diner: 'manger', sport: 'courir', lecture: 'lire', meditation: 'mediter', menage: 'balayer', sommeil: 'dormir' };
+const DUREE_POSE = 3000;
+// À augmenter quand tu remplaces une image du personnage, pour que les navigateurs ne gardent pas l'ancienne en cache.
+const VERSION_PERSONNAGE = 2;
+// De même pour les images du monde (images/monde/).
+const VERSION_MONDE = 2;
+// Le monde du personnage, vu par le hublot : des plans empilés, du plus lointain au plus proche.
+//   image : ton illustration, à déposer sous ce nom (PNG à fond transparent, sauf le fond) ;
+//           tant qu'elle manque, l'image provisoire s'affiche à sa place, ou le plan est simplement sauté.
+//   balance : balancement continu de la caméra, en px ; glisse : déplacement avec l'inclinaison du téléphone, en px.
+//   entree : agrandissement de départ du travelling d'entrée.
+//   flou (px), sombre (luminosité), opacite : profondeur de champ et premier plan hors de la mise au point.
+//   largeur, bas : pour devant.png (touffe recadrée), sa largeur et la descente de sa base sous les pieds, en fraction de --taille.
+//   grains : pollen de ce plan [x %, y %, dx px, dy px] ; taille, grainFlou, grainOpacite, grainDuree.
+// L'ordre de la liste est l'ordre d'empilement : pour qu'il passe derrière un élément de décor (un arbre),
+// ajoute un plan pour cet élément après le sien.
+const MONDE = [
+  { plan: 'fond', image: 'images/monde/fond.jpg', provisoire: 'images/jardin.jpg', balance: 6, glisse: 6, entree: 1.03, flou: 1.75 },
+  { plan: 'personnage', balance: 11, glisse: 14 },
+];
+// Place du personnage dans l'arche : ses pieds (x, y, en fraction du monde) et la hauteur du cadre de ses images
+// (il en occupe 69 %), au plus 150 % de la largeur de l'arche (sa silhouette est bien plus étroite que le cadre) et 65 % de sa hauteur.
+const PLACE_PERSONNAGE = { x: .5, y: .82, taille: 'min(150cqw, 65cqh)' };
+function construireMonde() {
+  const monde = $('monde'), lumiere = document.querySelector('.lumiere');
+  monde.style.setProperty('--pieds-x', PLACE_PERSONNAGE.x);
+  monde.style.setProperty('--pieds-y', PLACE_PERSONNAGE.y);
+  monde.style.setProperty('--taille', PLACE_PERSONNAGE.taille);
+  for (const p of MONDE) {
+    const plan = el('div', 'plan');
+    plan.dataset.plan = p.plan;
+    plan.style.setProperty('--glisse', p.glisse);
+    plan.style.setProperty('--balance', p.balance);
+    if (p.entree) plan.style.setProperty('--entree', p.entree);
+    if (p.flou) plan.style.setProperty('--flou', p.flou);
+    const filtres = [p.flou && `blur(${p.flou}px)`, p.sombre && `brightness(${p.sombre})`].filter(Boolean);
+    if (filtres.length) plan.style.filter = filtres.join(' ');
+    if (p.opacite) plan.style.opacity = p.opacite;
+    if (p.plan === 'personnage') plan.append($('acteur'));
+    else if (p.grains) {
+      for (const [x, y, dx, dy] of p.grains) {
+        const g = el('i', 'grain');
+        for (const [nom, v] of [['--x', `${x}%`], ['--y', `${y}%`], ['--dx', `${dx}px`], ['--dy', `${dy}px`], ['--t', `${p.taille}px`],
+                                ['--f', `${p.grainFlou ?? 0}px`], ['--o', p.grainOpacite], ['--d', `${p.grainDuree}s`]]) g.style.setProperty(nom, v);
+        plan.append(g);
+      }
+    } else {
+      const img = el('img');
+      img.alt = '';
+      if (p.largeur) { plan.style.setProperty('--largeur', p.largeur); plan.style.setProperty('--bas', p.bas); }
+      img.onerror = () => {
+        if (!p.provisoire || plan.classList.contains('provisoire')) return plan.remove();
+        plan.classList.add('provisoire');
+        img.src = p.provisoire;
+      };
+      img.src = `${p.image}?v=${VERSION_MONDE}`;
+      plan.append(img);
+    }
+    lumiere.before(plan);
+  }
+}
+construireMonde();
+// Pose de base et deux calques d'action (pour enchaîner deux actions en fondu). Les actions sont préchargées
+// et décodées dès le chargement ; une image manquante est simplement sautée.
+const imagesPoses = {};
+function construirePersonnage() {
+  const base = el('img', 'base');
+  base.src = `images/personnage/base.png?v=${VERSION_PERSONNAGE}`;
+  const calques = [el('img', 'pose'), el('img', 'pose')];
+  for (const img of [base, ...calques]) img.alt = '';
+  $('perso').replaceChildren(base, ...calques);
+  for (const nom of Object.keys(POSES)) {
+    const img = new Image();
+    img.src = `images/personnage/${nom}.png?v=${VERSION_PERSONNAGE}`;
+    imagesPoses[nom] = img.decode().then(() => img.src, () => null);
+  }
+}
+construirePersonnage();
 const SVGNS = 'http://www.w3.org/2000/svg';
 function icone(nom) {
   const svg = document.createElementNS(SVGNS, 'svg');
@@ -922,168 +1137,130 @@ function icone(nom) {
   svg.append(use);
   return svg;
 }
-// Scène calée sur l'écran. L'ouverture est la plus grande possible ; les boutons sont posés sur un rail
-// circulaire centré sur elle, à 24 px de son bord (pastille de validation comprise).
-//   Écran large : 4 boutons à gauche (eau, sport, lecture, méditation), 4 à droite (sommeil, petit-déj,
-//   déjeuner, dîner), de haut en bas, et le ménage seul au centre en bas ; étiquettes à côté (ménage : à droite).
-//   Écran étroit (pas la place d'étiquettes sur le côté) : les mêmes rangées en haut et en bas, le ménage
-//   au centre de la rangée du bas ; étiquettes au-dessus et au-dessous. Le rail n'y est dessiné que sous les
-//   deux rangées (le cercle complet sortirait de l'écran) ; il est complet sur écran large.
-// Chaque étiquette est alignée sur son bouton. Rien ne sort de l'écran.
-const RANG_1 = ['eau', 'sport', 'lecture', 'meditation'];
-const RANG_2 = ['sommeil', 'petitDej', 'dejeuner', 'diner'];
-const DEMI_BOUTON = 27;   // boutons ronds de 54 px (zone tactile au-dessus de 44 px)
-const PORTEE = 39;        // bouton + pastille de validation (en haut à droite) : jusqu'à 39 px du centre
-const ESPACE = 24;        // au moins 24 px entre le bord de l'ouverture et chaque bouton
-const ETIQUETTE = [72, 28];
-const MARGE = 6, MARGE_BAS = 34;   // marge du bas : celle de la page comprise
-const chevauche = (a, b) => !(a[2] <= b[0] || b[2] <= a[0] || a[3] <= b[1] || b[3] <= a[1]);
-// Rangées : [habitudes, angle central, sens de lecture, côté de l'étiquette]
-const RANGEES = {
-  'cotes': [[RANG_1, Math.PI, -1, 'gauche'], [RANG_2, 0, 1, 'droite'], [['menage'], Math.PI / 2, 1, 'droite']],
-  'haut-bas': [[RANG_1, -Math.PI / 2, 1, 'dessus'], [[RANG_2[0], RANG_2[1], 'menage', RANG_2[2], RANG_2[3]], Math.PI / 2, -1, 'dessous']],
-};
-function decalageEtiquette(cote) {
-  const v = DEMI_BOUTON + 5, [w, h] = ETIQUETTE;
-  return { gauche: [-(v + w / 2), 0], droite: [v + w / 2, 0], dessus: [0, -(v + h / 2)], dessous: [0, v + h / 2] }[cote];
-}
-function disposition(ouverture, largeur, pas, orientation) {
-  const rail = ouverture / 2 + ESPACE + PORTEE;
-  const places = [];
-  for (const [rang, centre, sens, cote] of RANGEES[orientation]) {
-    rang.forEach((h, i) => {
-      const a = centre + sens * (i - (rang.length - 1) / 2) * pas;
-      const x = rail * Math.cos(a), y = rail * Math.sin(a);
-      const [lx, ly] = decalageEtiquette(cote);
-      const rond = [x - DEMI_BOUTON, y - DEMI_BOUTON - 3, x + DEMI_BOUTON + 3, y + DEMI_BOUTON];   // pastille comprise
-      const nom = [x + lx - ETIQUETTE[0] / 2, y + ly - ETIQUETTE[1] / 2, x + lx + ETIQUETTE[0] / 2, y + ly + ETIQUETTE[1] / 2];
-      places.push({ h, x, y, lx, ly, cote, boites: [rond, nom] });
-    });
-  }
-  let libre = true;
-  for (let i = 0; i < places.length && libre; i++)
-    for (let j = i + 1; j < places.length && libre; j++)
-      for (const a of places[i].boites) for (const b of places[j].boites) if (chevauche(a, b)) libre = false;
-  const boites = places.flatMap(p => p.boites);
-  const tient = boites.every(b => b[0] >= -largeur / 2 + MARGE && b[2] <= largeur / 2 - MARGE);
-  // Hauteur occupée : boutons, étiquettes, l'ouverture elle-même et le rail complet.
-  const demi = Math.max(ouverture / 2 + 8, rail + 6);
-  return { rail, pas, orientation, places, libre, tient,
-           haut: Math.min(-demi, ...boites.map(b => b[1])), bas: Math.max(demi, ...boites.map(b => b[3])) };
-}
-let cacheCadran = {};
+// Scène calée sur l'écran : l'arche du jardin au centre, de sous la date jusqu'à MARGE_BAS du bas de l'écran (barre
+// d'accueil de l'iPhone en plus), ARCHE_MAX de large au plus. Son cadre est assez épais pour porter les boutons :
+// ils sont posés sur sa ligne médiane, à intervalles égaux sur tout le tour (arrondi du haut, côtés et bas),
+// dans l'ordre de TOUR, en partant du sommet et dans le sens des aiguilles d'une montre.
+const TOUR = ['eau', 'sport', 'lecture', 'meditation', 'diner', 'dejeuner', 'petitDej', 'sommeil', 'menage'];   // repas côte à côte, en bas
+const RAYON_BOUTON = 24;            // boutons ronds de 48 px
+const ARCHE_MAX = 640;
+const MARGE = 8;                    // entre l'arche et le bord de l'écran
+const MARGE_BAS = 24;               // sous l'arche
 function caleCadran() {
   const scene = $('scene');
   if (!scene || $('ecran-jour').hidden) return;
-  scene.style.removeProperty('height');
+  const r = RAYON_BOUTON;
   const largeur = scene.getBoundingClientRect().width;
-  const hauteurDispo = innerHeight - (scene.getBoundingClientRect().top + scrollY) - MARGE_BAS;
-  // Ouverture la plus grande possible ; pour chacune, l'écart le plus serré sans chevauchement qui tient dans l'écran.
-  // Le résultat est gardé tant que la place disponible ne change pas.
-  const cle = `${Math.round(largeur)}x${Math.round(hauteurDispo)}`;
-  let choix = cacheCadran.cle === cle ? cacheCadran.choix : null;
-  const dejaCalcule = !!choix;
-  for (const orientation of dejaCalcule ? [] : ['haut-bas', 'cotes']) {
-    let trouve = null;
-    for (let ouverture = Math.floor(Math.min(largeur, hauteurDispo)); ouverture >= 120 && !trouve; ouverture -= 2) {
-      for (let degres = 10; degres <= 60; degres++) {
-        const d = disposition(ouverture, largeur, degres * Math.PI / 180, orientation);
-        if (!d.libre) continue;
-        if (d.tient && d.bas - d.haut + 2 * MARGE <= hauteurDispo) trouve = { ...d, ouverture };
-        break;
-      }
-    }
-    if (trouve && (!choix || trouve.ouverture > choix.ouverture)) choix = trouve;
-  }
-  if (!choix) choix = { ...disposition(120, largeur, 40 * Math.PI / 180), ouverture: 120 };
-  if (!dejaCalcule) cacheCadran = { cle, choix };
-  scene.style.height = `${choix.bas - choix.haut + 2 * MARGE}px`;
-  for (const [nom, v] of [['--cy', -choix.haut + MARGE], ['--rail', choix.rail], ['--hublot', choix.ouverture]]) scene.style.setProperty(nom, `${v}px`);
-  // Rail : arcs un peu au-delà des perles extrêmes (écran étroit), cercle complet (écran large).
-  const arcs = choix.orientation === 'haut-bas', pasDeg = choix.pas * 180 / Math.PI;
-  document.querySelector('.rail').classList.toggle('arcs', arcs);
-  if (arcs) {
-    scene.style.setProperty('--a1', ((RANGEES['haut-bas'][0][0].length - 1) / 2 * pasDeg + 9).toFixed(1));
-    scene.style.setProperty('--a2', ((RANGEES['haut-bas'][1][0].length - 1) / 2 * pasDeg + 9).toFixed(1));
-  }
-  for (const p of choix.places) {
-    const b = p.h === 'menage' ? $('menage-case') : TUILES[p.h];
-    if (!b) continue;
-    for (const [nom, v] of [['--x', p.x], ['--y', p.y], ['--lx', p.lx], ['--ly', p.ly]]) b.style.setProperty(nom, `${v.toFixed(1)}px`);
-    b.dataset.etiquette = p.cote;
-  }
+  const hauteur = Math.max(320, innerHeight - (scene.getBoundingClientRect().top + scrollY));
+  const sonde = el('div');   // hauteur de la barre d'accueil de l'iPhone (0 ailleurs)
+  sonde.style.cssText = 'position: fixed; visibility: hidden; height: env(safe-area-inset-bottom)';
+  document.body.append(sonde);
+  const accueil = sonde.offsetHeight;
+  sonde.remove();
+  const cadre = 2 * r + (largeur < 600 ? 12 : 20);                 // le bouton et un peu d'air de chaque côté
+  const arche = Math.round(Math.min(ARCHE_MAX, largeur - 2 * MARGE, hauteur * .85));
+  const gauche = (largeur - arche) / 2, haut = 6;
+  scene.style.height = `${hauteur}px`;
+  const hauteurArche = hauteur - haut - MARGE_BAS - accueil;
+  for (const [nom, v] of [['--ax', gauche], ['--ay', haut], ['--hublot', arche], ['--ah', hauteurArche], ['--cadre-arche', cadre]]) scene.style.setProperty(nom, `${v}px`);
+  // Ligne médiane du cadre, parcourue depuis le sommet : quart de cercle droit, côté droit, bas, côté gauche, quart gauche.
+  const R = arche / 2, rho = R - cadre / 2, cx = gauche + R, cyArc = haut + R, yBas = haut + hauteurArche - cadre / 2;
+  const quart = rho * Math.PI / 2, cote = yBas - cyArc, tour = 2 * quart + 2 * cote + 2 * rho;
+  const point = s => {
+    if (s < quart) { const a = s / rho; return [cx + rho * Math.sin(a), cyArc - rho * Math.cos(a)]; }
+    if ((s -= quart) < cote) return [cx + rho, cyArc + s];
+    if ((s -= cote) < 2 * rho) return [cx + rho - s, yBas];
+    if ((s -= 2 * rho) < cote) return [cx - rho, yBas - s];
+    const a = (s - cote) / rho; return [cx - rho * Math.cos(a), cyArc - rho * Math.sin(a)];
+  };
+  TOUR.forEach((h, i) => {
+    const b = h === 'menage' ? $('menage-case') : TUILES[h];
+    if (!b) return;
+    const [x, y] = point(tour * i / TOUR.length);
+    b.style.setProperty('--x', `${x.toFixed(1)}px`);
+    b.style.setProperty('--y', `${y.toFixed(1)}px`);
+  });
 }
 addEventListener('resize', caleCadran);
-// Parallaxe légère : la souris (ordinateur) ou l'inclinaison du téléphone (si l'appareil la fournit)
-// déplace le jardin en sens inverse ; coupée si l'appareil demande moins de mouvement.
-function parallaxe(nx, ny) {
-  const o = document.querySelector('.ouverture');
-  if (!o) return;
-  const borne = v => Math.max(-1, Math.min(1, v));
-  o.style.setProperty('--px', borne(nx).toFixed(3));
-  o.style.setProperty('--py', borne(ny).toFixed(3));
+// Parallaxe : l'inclinaison du téléphone déplace le regard (la souris, elle, ne fait rien bouger) ; chaque plan du monde glisse
+// en sens inverse de son nombre de px (MONDE). Mouvement lissé image par image ;
+// coupé si l'appareil demande moins de mouvement.
+const regard = { x: 0, y: 0, vx: 0, vy: 0, image: 0 };
+const borne = v => Math.max(-1, Math.min(1, v));
+function viser(nx, ny) {
+  [regard.x, regard.y] = moinsDeMouvement() ? [0, 0] : [borne(nx), borne(ny)];
+  if (!regard.image) regard.image = requestAnimationFrame(glisser);
 }
-addEventListener('pointermove', e => {
-  if (e.pointerType !== 'mouse' || moinsDeMouvement()) return;
-  const r = document.querySelector('.hublot')?.getBoundingClientRect();
-  if (!r?.width) return;
-  parallaxe((e.clientX - r.left - r.width / 2) / (r.width / 2), (e.clientY - r.top - r.height / 2) / (r.height / 2));
-});
-document.addEventListener('pointerleave', () => parallaxe(0, 0));
+function glisser() {
+  regard.vx += (regard.x - regard.vx) * .08;
+  regard.vy += (regard.y - regard.vy) * .08;
+  const hublot = document.querySelector('.hublot');
+  hublot.style.setProperty('--px', regard.vx.toFixed(4));
+  hublot.style.setProperty('--py', regard.vy.toFixed(4));
+  regard.image = Math.abs(regard.x - regard.vx) + Math.abs(regard.y - regard.vy) > .001 ? requestAnimationFrame(glisser) : 0;
+}
+// Inclinaison : écart à la position de repos, qui suit lentement la main (le téléphone peut être tenu à tout angle).
+let repos = null;
 addEventListener('deviceorientation', e => {
-  if (moinsDeMouvement() || e.gamma === null || e.beta === null) return;
-  parallaxe(e.gamma / 30, (e.beta - 45) / 30);
+  if (e.beta === null || e.gamma === null) return;
+  const angle = screen.orientation?.angle ?? 0;
+  const [x, y] = angle === 90 ? [e.beta, -e.gamma] : angle === 270 ? [-e.beta, e.gamma] : [e.gamma, e.beta];
+  repos ??= { x, y };
+  repos.x += (x - repos.x) * .02;
+  repos.y += (y - repos.y) * .02;
+  viser((x - repos.x) / 15, (y - repos.y) / 15);
 });
-// Boutons autour du personnage (leurs angles sont dans le CSS) ; le ménage, écrit à la semaine, est dans le HTML.
-const ORDRE_SCENE = ['eau', 'sport', 'lecture', 'meditation', 'petitDej', 'dejeuner', 'diner', 'sommeil'];
-// Un mot sous chaque bouton rond de l'écran du jour.
-const MOT = { eau: 'Eau', sport: 'Sport', lecture: 'Lecture', meditation: 'Méditation', petitDej: 'Petit-déj', dejeuner: 'Déjeuner', diner: 'Dîner', sommeil: 'Sommeil' };
+// Sur iPhone, l'inclinaison n'arrive qu'après une autorisation, demandée une fois, au premier toucher sur l'écran du jour.
+if (typeof window.DeviceOrientationEvent?.requestPermission === 'function') {
+  const demander = () => {
+    if ($('app').hidden || $('ecran-jour').hidden) return;
+    removeEventListener('touchend', demander);
+    DeviceOrientationEvent.requestPermission().catch(() => {});
+  };
+  addEventListener('touchend', demander);
+}
 function iconeHabitude(h) {
   const span = el('span', 'icone-habitude');
   span.append(icone(h));
   return span;
 }
-// Série discrète : petite flamme et nombre, masquée tant qu'elle vaut 0.
-function serie(n, suffixe = '') {
-  if (!n) return '';
-  const span = el('span', 'serie');
-  span.append(icone('flamme'), `${n}${suffixe}`);
-  return span;
-}
-// Pose d'interaction affichée DUREE_POSE ms, puis retour à l'état lié au score.
-let etatPerso = 'neutre', pose = null, minuteurPose = 0;
-function majPersonnage() {
-  let img = $('perso').querySelector('img');
-  if (!img) {
-    img = el('img'); img.alt = '';
-    img.addEventListener('load', () => $('perso').style.setProperty('--masque', `url("${img.currentSrc || img.src}")`));
-    $('perso').replaceChildren(img, el('span', 'reflet'));
-  }
-  const cadre = document.querySelector('.perso-cadre');
-  if (pose) cadre.dataset.pose = pose; else delete cadre.dataset.pose;
-  // Sur ta vraie pose, pas de mouvement CSS de remplacement.
-  if (pose && imagesTrouvees.get(`images/personnage/${pose}.png`)) delete cadre.dataset.pose;
-  afficherPersonnage(img, pose ?? etatPerso);
-}
-function jouerPose(nom) {
-  if (moinsDeMouvement()) return;
-  pose = nom;
-  majPersonnage();
+// Une nouvelle action remplace celle en cours sans attendre et relance le délai ; seule la dernière demandée compte.
+// Si l'appareil demande moins de mouvement, le CSS coupe fondus et mouvements : simple changement d'image.
+let poseVisible = null, minuteurPose = 0, demandePose = 0;
+async function jouerPose(nom) {
+  const demande = ++demandePose;
+  const src = await imagesPoses[nom];
+  if (!src || demande !== demandePose) return;
+  const [a, b] = $('perso').querySelectorAll('.pose');
+  const calque = poseVisible === a ? b : a;
+  calque.src = src;
+  calque.style.setProperty('--decalage', `${POSES[nom].decalage}%`);
+  calque.dataset.mouvement = POSES[nom].mouvement;
+  calque.style.animation = 'none'; void calque.offsetWidth; calque.style.removeProperty('animation');   // mouvement relancé
+  calque.classList.add('visible');
+  poseVisible?.classList.remove('visible');
+  $('perso').querySelector('.base').classList.add('cachee');
+  poseVisible = calque;
   clearTimeout(minuteurPose);
-  minuteurPose = setTimeout(() => { pose = null; majPersonnage(); }, DUREE_POSE);
+  minuteurPose = setTimeout(() => {
+    poseVisible.classList.remove('visible');
+    poseVisible = null;
+    $('perso').querySelector('.base').classList.remove('cachee');
+  }, DUREE_POSE);
 }
 const moinsDeMouvement = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
-// Coche : le bouton rebondit, des étincelles de sa teinte partent et l'animal saute.
-// Série de 7 jours : confettis plus fournis et double saut. Rien de tout cela ne bloque la saisie.
+// Coche : le personnage joue l'action de l'habitude, le bouton rebondit et des étincelles de sa teinte partent.
+// Série de 7 jours : confettis plus fournis. Rien de tout cela ne bloque la saisie.
 function celebrer(bouton, sept, interaction) {
+  if (interaction) jouerPose(interaction);
   if (moinsDeMouvement()) return;
   // Direction du bouton vers le personnage, pour que les étincelles partent vers lui.
   const rb = bouton.getBoundingClientRect(), rp = document.querySelector('.perso-cadre').getBoundingClientRect();
-  const versX = rp.left + rp.width / 2 - (rb.left + rb.width / 2), versY = rp.top + rp.height / 2 - (rb.top + 27);
+  const versX = rp.left + rp.width / 2 - (rb.left + rb.width / 2), versY = rp.top + rp.height / 2 - (rb.top + 24);
   const versAngle = Math.atan2(versY, versX), versDistance = Math.hypot(versX, versY);
   bouton.classList.remove('rebond'); void bouton.offsetWidth; bouton.classList.add('rebond');
   bouton.addEventListener('animationend', () => bouton.classList.remove('rebond'), { once: true });
-  const teinte = getComputedStyle(bouton).getPropertyValue('--teinte-fonce');
+  const teinte = getComputedStyle(bouton).getPropertyValue('--encre');
   const couleurs = sept ? ['#c8641c', '#4f7a42', '#2c5873', '#843a4b', '#6f5110', '#55457f'] : [teinte];
   const n = sept ? 18 : 7;
   for (let i = 0; i < n; i++) {
@@ -1097,11 +1274,6 @@ function celebrer(bouton, sept, interaction) {
     bouton.append(e);
     setTimeout(() => e.remove(), 500);
   }
-  const cadre = document.querySelector('.perso-cadre');
-  if (interaction) jouerPose(interaction);
-  const classe = sept ? 'saute-double' : 'saute';
-  cadre.classList.remove('saute', 'saute-double'); void cadre.offsetWidth; cadre.classList.add(classe);
-  cadre.addEventListener('animationend', () => cadre.classList.remove(classe), { once: true });
 }
 // Le chiffre du score monte (ou descend) en comptant jusqu'à sa nouvelle valeur.
 let scoreAffiche = 0, compteur = 0;
@@ -1139,30 +1311,84 @@ function etapesDefi(defi, fait, total) {
 }
 // Tuiles d'habitudes créées une fois puis mises à jour, pour que le passage en creux reste une transition douce.
 const TUILES = {};
-// Image du personnage : d'abord images/personnage/<nom>.png, sinon l'image de base.
-const imagesTrouvees = new Map(); // chemin local → true (ton image) ou false (provisoire)
-function afficherPersonnage(img, nom) {
-  const local = `images/personnage/${nom}.png`;
-  if (img.dataset.src === local) return;
-  img.dataset.src = local;
-  img.classList.remove('provisoire');
-  const provisoire = () => {
-    img.onerror = null;
-    img.classList.add('provisoire');
-    img.src = PERSONNAGE_PROVISOIRE;
-  };
-  if (imagesTrouvees.get(local) === false) return provisoire();
-  img.onload = () => {
-    if (img.classList.contains('provisoire')) return;
-    imagesTrouvees.set(local, true);
-    img.closest('.perso-cadre')?.setAttribute('data-image', 'oui');
-  };
-  img.onerror = () => { imagesTrouvees.set(local, false); provisoire(); };
-  img.src = local;
-}
 const dateDe = cle => { const [a, m, j] = cle.split('-').map(Number); return new Date(a, m - 1, j, 12); };
 const formatDate = (cle, options) => new Intl.DateTimeFormat('fr-FR', options).format(dateDe(cle));
 const minutesEnTexte = m => `${Math.floor(m / 60)} h ${String(m % 60).padStart(2, '0')}`;
+
+// Bulle du personnage : une phrase courte selon le score du jour, à l'ouverture de l'écran du jour et quand on touche
+// le personnage (une autre phrase de la même tranche). Elle s'efface après DUREE_BULLE ms.
+const PHRASES_BULLE = [   // [score minimal, phrases]
+  [0, ['Prêt pour la journée\u202f?', 'Une nouvelle journée commence\u202f!', 'On commence quand tu veux.']],
+  [1, ['C’est parti, continue\u202f!', 'Bon début, on continue\u202f?', 'Chaque pas compte\u202f!']],
+  [50, ['Belle progression\u202f!', 'Tu es sur une belle lancée.', 'Déjà plus de la moitié, bravo\u202f!']],
+  [90, ['On frôle la perfection… tu vises le 100\u202f?', 'Presque parfait\u202f!', 'Le 100 est tout proche\u202f!']],
+  [100, ['Journée parfaite, bravo\u202f!', 'Cent sur cent, chapeau\u202f!', 'Tout est fait, savoure\u202f!']],
+];
+const DUREE_BULLE = 6000;
+// Travelling d'entrée : joué seulement à l'arrivée sur l'écran du jour (le CSS le coupe si moins de mouvement).
+function travelling() {
+  const monde = $('monde');
+  monde.classList.remove('entree');
+  void monde.offsetWidth;
+  monde.classList.add('entree');
+  setTimeout(() => monde.classList.remove('entree'), 1300);
+}
+let scoreDuJour = 0, minuteurBulle = 0, ecranAffiche = null;
+function montrerBulle() {
+  const liste = PHRASES_BULLE.findLast(([min]) => scoreDuJour >= min)[1];
+  const chemin = $('bulle').querySelector('textPath');
+  const autres = liste.filter(p => p !== chemin.textContent);
+  chemin.textContent = autres[Math.floor(Math.random() * autres.length)];
+  placerBulle();
+  $('bulle').classList.add('visible');
+  clearTimeout(minuteurBulle);
+  minuteurBulle = setTimeout(() => $('bulle').classList.remove('visible'), DUREE_BULLE);
+}
+document.querySelector('.perso-cadre').addEventListener('click', montrerBulle);
+// Arc de la phrase : concentrique avec le haut de l'arche, juste sous lui, sur 210° (il descend un peu le long des
+// côtés). La police se réduit si la phrase est plus longue que l'arc ; la bande claire couvre juste la phrase.
+function placerBulle() {
+  const svg = $('bulle'), texte = svg.querySelector('text'), arc = $('arc-bulle'), bande = svg.querySelector('.bande');
+  const W = $('monde').clientWidth, H = $('monde').clientHeight;
+  if (!W) return;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  let taille = Math.min(15, Math.max(11.5, W * .04));
+  const r = W / 2 - taille * 1.3 - 8, point = a => [W / 2 + r * Math.cos(a * Math.PI / 180), W / 2 + r * Math.sin(a * Math.PI / 180)];
+  arc.setAttribute('d', `M ${point(-195)} A ${r} ${r} 0 1 1 ${point(15)}`);
+  texte.style.fontSize = `${taille}px`;
+  const longueur = arc.getTotalLength();
+  let t = texte.getComputedTextLength();
+  if (t > longueur * .9) { taille = Math.max(9, taille * longueur * .9 / t); texte.style.fontSize = `${taille}px`; t = texte.getComputedTextLength(); }
+  const marge = taille * .9;
+  bande.style.strokeWidth = `${taille * 1.9}px`;
+  bande.style.strokeDasharray = `${t + 2 * marge} ${longueur}`;
+  bande.style.strokeDashoffset = `${-(longueur - t - 2 * marge) / 2}`;
+}
+addEventListener('resize', () => { if ($('bulle').classList.contains('visible')) placerBulle(); });
+// Journée parfaite : quelques pétales roses et crème tombent dans le jardin, une seule fois par jour
+// (mémorisé dans ce navigateur ; en mémoire seulement s'il refuse le stockage).
+let petalesDuJour = null;
+function journeeParfaite(cle) {
+  try { petalesDuJour = localStorage.getItem('respawn-petales'); } catch {}
+  if (petalesDuJour === cle) return;
+  petalesDuJour = cle;
+  try { localStorage.setItem('respawn-petales', cle); } catch {}
+  if (moinsDeMouvement() || document.hidden) return;
+  const monde = $('monde'), chute = `${Math.round(monde.clientHeight * 1.1)}px`;
+  for (let i = 0; i < 14; i++) {
+    const p = el('span', 'petale');
+    p.style.setProperty('--x', `${6 + Math.random() * 88}%`);
+    p.style.setProperty('--dx', `${Math.round((Math.random() - .5) * 60)}px`);
+    p.style.setProperty('--d', `${(2.6 + Math.random() * 1.2).toFixed(2)}s`);
+    p.style.setProperty('--c', i % 3 ? '#efc3cc' : '#fff4e0');
+    p.style.setProperty('--chute', chute);
+    p.style.animationDelay = `${(Math.random() * .4).toFixed(2)}s`;
+    monde.append(p);
+    setTimeout(() => p.remove(), 4400);
+  }
+}
+// Onglet caché : la vie du jardin (respiration, brise, pollen) se met en pause.
+document.addEventListener('visibilitychange', () => document.documentElement.classList.toggle('onglet-cache', document.hidden));
 
 function rendre() {
   $('ecran-connexion').hidden = true;
@@ -1176,6 +1402,8 @@ function rendre() {
   }
   rendreJour();
   caleCadran();
+  if (etat.ecran === 'jour' && ecranAffiche !== 'jour') { montrerBulle(); travelling(); }
+  ecranAffiche = etat.ecran;
   rendreHistorique();
   rendreTaches();
   rendreReglages();
@@ -1203,13 +1431,12 @@ function rendreJour() {
 
   // Score du jour : habitudes quotidiennes seulement (même calcul que la couleur du calendrier).
   const sj = scoreJour(jour, semaine, poidsSemaine(lundi)).score;
+  scoreDuJour = sj === null ? 0 : Math.round(sj);
+  if (!passe && scoreDuJour === 100) journeeParfaite(aujourdhui);
   $('score-jour').textContent = sj === null ? '—' : Math.round(sj);
   $('libelle-jour').textContent = passe ? formatDate(cle, { weekday: 'long' }) : 'aujourd’hui';
   $('anneau').style.strokeDashoffset = 100 - (r.score ?? 0);
 
-  // Personnage : son état suit le score de la semaine affichée (ou une pose d'interaction en cours).
-  etatPerso = etatPersonnage(r.score);
-  majPersonnage();
   $('libelle-semaine').textContent = semaineEnCours ? 'cette semaine' : `semaine du ${formatDate(lundi, { day: 'numeric', month: 'short' })}`;
   const lundiPrecedent = ajouterJours(lundi, -7);
   const precedente = semaines[lundiPrecedent];
@@ -1235,12 +1462,10 @@ function rendreJour() {
     if (!b) {
       b = el('button', 'tuile');
       b.dataset.h = h;
-      const libelle = el('span', 'libelle');
-      libelle.append(el('span', 'nom', MOT[h]), el('span', 'info'));
-      b.append(iconeHabitude(h), libelle);
+      b.append(iconeHabitude(h));
       b.setAttribute('aria-label', h === 'sommeil' ? 'Nuit de 7 heures ou plus' : AFFICHAGE[h]);
       TUILES[h] = b;
-      conteneur.insertBefore(b, $('menage-case'));
+      conteneur.append(b);
     }
     const exclue = estExclue(h, jour, semaine);
     const fait = !exclue && !!valeurHabitude(h, jour);
@@ -1248,13 +1473,8 @@ function rendreJour() {
     b.classList.toggle('exclue', exclue);
     b.setAttribute('aria-pressed', fait);
     b.disabled = exclue;
-    const info = b.querySelector('.info');
-    if (exclue) info.replaceChildren('exclue');
-    else if (h === 'sport') {
-      const semaines = serieSemainesSport({ ...contexte, poids: poids(), objectifSport: objectifSport() });
-      info.replaceChildren(`${r.sport?.seances ?? 0}/${objectifSport()}`, serie(semaines, ' sem.'));
-    } else info.replaceChildren(serie(serieJours(h, contexte)));
-    b.onclick = () => {
+    b.onclick = e => {
+      if (e.detail) b.blur();   // clic ou toucher (pas le clavier) : aucun contour ne reste
       if (!fait) {
         // Série de 7 jours atteinte par cette coche : petite célébration.
         const apres = { ...jours, [cle]: { ...jour, habitudes: { ...jour?.habitudes, [h]: true } } };
@@ -1264,7 +1484,11 @@ function rendreJour() {
       ecrireJour({ habitudes: { [h]: !fait } });
     };
   };
-  for (const h of ORDRE_SCENE) tuile(h, $('scene'));
+  // Dans l'ordre de lecture : l'arc du haut, puis celui du bas (le ménage, écrit à la semaine, est dans le HTML).
+  for (const h of TOUR) {
+    if (h !== 'menage') tuile(h, $('scene'));
+    else if (!TUILES.menage) { TUILES.menage = $('menage-case'); $('scene').append(TUILES.menage); }
+  }
 
   // Ménage
   const menageExclu = !!semaine?.exclusions?.includes('menage');
@@ -1273,28 +1497,89 @@ function rendreJour() {
   $('menage-case').classList.toggle('exclue', menageExclu);
   $('menage-case').setAttribute('aria-pressed', menageFait);
   $('menage-case').disabled = menageExclu;
-  $('menage-info').textContent = menageExclu ? 'exclu' : 'hebdo';
-  $('menage-case').onclick = () => {
+  $('menage-case').onclick = e => {
+    if (e.detail) $('menage-case').blur();
     if (!menageFait) celebrer($('menage-case'), false, INTERACTION.menage);
     ecrireSemaine({ menage: !menageFait });
   };
 }
 
 // Tâches (écran dédié, hors score) : les tâches cochées restent barrées jusqu'à la fin de leur semaine.
+// Chacune peut être modifiée (texte et échéance) et supprimée (deux touches). Les tâches à faire sont triées par
+// échéance (la plus proche d'abord, sans échéance ensuite), puis par date de création.
+const echeanceEnTexte = (cle, aujourdhui) => cle === aujourdhui ? 'aujourd’hui' : cle === ajouterJours(aujourdhui, 1) ? 'demain'
+  : cle === ajouterJours(aujourdhui, -1) ? 'hier' : formatDate(cle, { weekday: 'short', day: 'numeric', month: 'short' });
+let minuteurSuppression = 0;
 function rendreTaches() {
-  const { aujourdhui } = etat;
+  const { aujourdhui, ui } = etat;
   const dansLaSemaine = t => t.fait && t.faitLe && lundiDe(t.faitLe) === lundiDe(aujourdhui);
+  const cree = t => t.creeLe?.toMillis?.() ?? 0;
   const visibles = etat.taches.filter(t => !t.fait || dansLaSemaine(t))
-    .sort((x, y) => (x.fait - y.fait) || ((x.creeLe?.toMillis?.() ?? 0) - (y.creeLe?.toMillis?.() ?? 0)));
+    .sort((x, y) => (x.fait - y.fait) || (!x.fait && ((x.echeance ? 0 : 1) - (y.echeance ? 0 : 1) || (x.echeance ?? '').localeCompare(y.echeance ?? ''))) || cree(x) - cree(y));
   const faites = etat.taches.filter(dansLaSemaine).length;
   $('compteur-taches').textContent = `${faites} tâche${faites > 1 ? 's' : ''} faite${faites > 1 ? 's' : ''} cette semaine`;
   $('liste-taches').replaceChildren(...visibles.map(t => {
     const li = el('li', t.fait ? 'tache-faite' : '');
-    const b = el('button');
+    if (ui.tacheEditee === t.id) {
+      // Modification sur place ; le brouillon survit aux mises à jour venues de Firestore.
+      const form = el('form', 'tache-edition');
+      const texte = el('input', 'texte-edite');
+      Object.assign(texte, { value: ui.brouillon?.texte ?? t.texte, maxLength: 200, enterKeyHint: 'done' });
+      texte.setAttribute('aria-label', 'Texte de la tâche');
+      const date = el('input');
+      Object.assign(date, { type: 'date', value: ui.brouillon?.echeance ?? t.echeance ?? '' });
+      const champ = el('label', 'champ', 'Échéance ');
+      champ.append(date);
+      const garder = () => { ui.brouillon = { texte: texte.value, echeance: date.value }; };
+      texte.oninput = garder; date.oninput = garder;
+      const enregistrer = el('button', 'bouton', 'Enregistrer');
+      const annuler = el('button', 'bouton secondaire', 'Annuler');
+      annuler.type = 'button';
+      const fermer = () => { ui.tacheEditee = null; ui.brouillon = null; rendre(); };
+      annuler.onclick = fermer;
+      form.onsubmit = e => {
+        e.preventDefault();
+        const nouveau = texte.value.trim();
+        if (!nouveau) return texte.focus();
+        updateDoc(ref('tasks', t.id), { texte: nouveau, echeance: date.value || null }).catch(erreur);
+        fermer();
+      };
+      form.append(texte, champ, enregistrer, annuler);
+      li.append(form);
+      if (ui.focusEdition) { ui.focusEdition = false; requestAnimationFrame(() => texte.focus()); }
+      return li;
+    }
+    const b = el('button', 'tache-cocher');
     b.setAttribute('aria-pressed', !!t.fait);
-    b.append(el('span', 'rond', t.fait ? '✓' : ''), el('span', 'texte', t.texte));
+    const contenu = el('span', 'contenu');
+    contenu.append(el('span', 'texte', t.texte));
+    if (t.echeance) {
+      const retard = !t.fait && t.echeance < aujourdhui;
+      contenu.append(el('span', `date${retard ? ' retard' : ''}`, `${retard ? 'En retard · ' : 'Échéance : '}${echeanceEnTexte(t.echeance, aujourdhui)}`));
+    }
+    b.append(el('span', 'rond', t.fait ? '✓' : ''), contenu);
     b.onclick = () => setDoc(ref('tasks', t.id), { fait: !t.fait, faitLe: t.fait ? null : aujourdhui }, { merge: true }).catch(erreur);
-    li.append(b);
+    const modifier = el('button', 'tache-action');
+    modifier.append(icone('crayon'));
+    modifier.setAttribute('aria-label', `Modifier « ${t.texte} »`);
+    modifier.onclick = () => { ui.tacheEditee = t.id; ui.brouillon = null; ui.focusEdition = true; ui.suppression = null; rendre(); };
+    const supprimer = el('button', 'tache-action');
+    if (ui.suppression === t.id) {
+      supprimer.classList.add('confirmer');
+      supprimer.textContent = 'Supprimer ?';
+      supprimer.setAttribute('aria-label', `Confirmer la suppression de « ${t.texte} »`);
+      supprimer.onclick = () => { clearTimeout(minuteurSuppression); ui.suppression = null; deleteDoc(ref('tasks', t.id)).catch(erreur); rendre(); };
+    } else {
+      supprimer.append(icone('poubelle'));
+      supprimer.setAttribute('aria-label', `Supprimer « ${t.texte} »`);
+      supprimer.onclick = () => {
+        ui.suppression = t.id;
+        clearTimeout(minuteurSuppression);
+        minuteurSuppression = setTimeout(() => { ui.suppression = null; rendre(); }, 3000);
+        rendre();
+      };
+    }
+    li.append(b, modifier, supprimer);
     return li;
   }));
 }
@@ -1503,8 +1788,10 @@ $('form-tache').onsubmit = e => {
   e.preventDefault();
   const texte = $('nouvelle-tache').value.trim();
   if (!texte) return;
+  const echeance = $('echeance-tache').value || null;
   $('nouvelle-tache').value = '';
-  addDoc(col('tasks'), { texte, fait: false, faitLe: null, creeLe: serverTimestamp() }).catch(erreur);
+  $('echeance-tache').value = '';
+  addDoc(col('tasks'), { texte, echeance, fait: false, faitLe: null, creeLe: serverTimestamp() }).catch(erreur);
 };
 
 let minuteurToast;
