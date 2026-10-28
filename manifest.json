@@ -1,0 +1,14 @@
+{
+  "name": "Respawn",
+  "short_name": "Respawn",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f7ebdf",
+  "theme_color": "#f7ebdf",
+  "icons": [
+    { "src": "images/icone-ecran-accueil.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "images/logo.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
