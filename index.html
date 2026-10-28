@@ -516,9 +516,9 @@
   #navigation button[aria-current="page"] .inactif { opacity: 0; }
   .courbe-menu { display: none; }
   /* Mobile : barre collée en bas de l'écran, sur toute la largeur, coins du haut arrondis. Ses icônes descendent près du
-     bas : elles n'empiètent que d'une vingtaine de pixels sur la zone de la barre d'accueil de l'iPhone (--sous-barre).
+     bas : 14 px sous elles (--sous-barre), juste au-dessus du trait d'accueil de l'iPhone.
      Le contenu garde de la place pour ne pas passer dessous. */
-  :root { --sous-barre: max(6px, calc(env(safe-area-inset-bottom) - 22px)); }
+  :root { --sous-barre: 14px; }   /* fixe : ne dépend pas de la marge de sécurité annoncée par l'iPhone */
   @media (max-width: 768px) {
     #navigation {
       left: 0; right: 0; bottom: 0; height: calc(var(--barre) + var(--sous-barre)); border-radius: 24px 24px 0 0;
@@ -835,6 +835,7 @@
     <section class="carte">
       <h2 class="titre-carte">Compte</h2>
       <p id="reglage-compte"></p>
+      <p class="note" id="version-site"></p>
       <button id="deconnexion">Se déconnecter</button>
     </section>
  </div>
@@ -1947,6 +1948,8 @@ function rendreReglages() {
   $('defi-zone').replaceChildren(liste);
 
   $('reglage-compte').textContent = `Connecté : ${auth.currentUser?.email ?? ''}`;
+  // Date de la version chargée (date de publication de la page) : pour vérifier qu'une mise à jour est bien arrivée.
+  $('version-site').textContent = `Version du ${new Date(document.lastModified).toLocaleString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}`;
 }
 
 $('poids-defaut').onclick = () => ecrireReglages(Object.fromEntries(Object.entries(POIDS_DEFAUT).map(([h, v]) => [`poids.${h}`, v])));
