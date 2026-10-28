@@ -20,7 +20,7 @@
      ont du relief ; tout le reste est plat : surfaces claires bordées d'un filet fin, aplats teintés pour les choix actifs.
      Chaque habitude a sa teinte ; le vert est réservé au score et au calendrier. */
   :root {
-    --bouton: 48px;   /* diamètre des boutons d'habitudes (42 px sur iPhone) */
+    --diametre: 48px;   /* diamètre des boutons d'habitudes (42 px sur iPhone) */
     --fond: #f7ebdf; --creux-fond: #efdfd0;
     --ombre-claire: #fff9f3; --ombre-foncee: #dbc4ae;
     --accent: #4f7a42; --accent-texte: #426635;
@@ -32,7 +32,7 @@
     --anim: .45s;
     /* Anciens noms, encore utilisés par l'historique et les réglages (convertis aux étapes suivantes). */
     --creme: var(--fond); --beige: var(--fond); --sable: #ddd4c6; --sable-fonce: var(--ombre-foncee);
-    --feuille-clair: #dfe6d3; --feuille: #8ab372; --feuille-fonce: var(--accent); --bouton: var(--accent);
+    --feuille-clair: #dfe6d3; --feuille: #8ab372; --feuille-fonce: var(--accent);
     --brun: var(--texte); --brun-doux: var(--texte-doux); --soleil: #e9dcc2; --ocre: #b08a4f; --corail: #d9a99b;
     --grain: none;
     --rond: 16px;
@@ -300,27 +300,27 @@
      --pastel : teinte du disque ; --encre : icône.
      Toujours à plat, dans sa teinte ; validé, il porte la pastille cochée. */
   .scene .tuile {
-    position: absolute; left: 0; top: 0; width: var(--bouton); height: var(--bouton); margin: calc(var(--bouton) / -2) 0 0 calc(var(--bouton) / -2);
+    position: absolute; left: 0; top: 0; width: var(--diametre); height: var(--diametre); margin: calc(var(--diametre) / -2) 0 0 calc(var(--diametre) / -2);
     transform: translate(var(--x, 0), var(--y, 0));
   }
   .tuile {
     background: none; border: 0; padding: 0; display: block; color: var(--texte); touch-action: manipulation;
     -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
   }
-  .tuile[data-h="eau"] { --pastel: #c9dbe6; --encre: #3f5a6e; }
-  .tuile[data-h="sport"] { --pastel: #ecccbc; --encre: #7a4128; }
-  .tuile[data-h="lecture"] { --pastel: #ebcdd4; --encre: #6e3a52; }
-  .tuile[data-h="meditation"] { --pastel: #d8d3e6; --encre: #574d78; }
-  .tuile:is([data-h="petitDej"], [data-h="dejeuner"], [data-h="diner"]) { --pastel: #ecdcb4; --encre: #6b5320; }
-  .tuile[data-h="sommeil"] { --pastel: #d2d8ec; --encre: #444f7e; }
-  .tuile[data-h="menage"] { --pastel: #e3d4c6; --encre: #6a4e3a; }   /* argile */
+  [data-h="eau"] { --pastel: #c9dbe6; --encre: #3f5a6e; }
+  [data-h="sport"] { --pastel: #ecccbc; --encre: #7a4128; }
+  [data-h="lecture"] { --pastel: #ebcdd4; --encre: #6e3a52; }
+  [data-h="meditation"] { --pastel: #d8d3e6; --encre: #574d78; }
+  :is([data-h="petitDej"], [data-h="dejeuner"], [data-h="diner"]) { --pastel: #ecdcb4; --encre: #6b5320; }
+  [data-h="sommeil"] { --pastel: #d2d8ec; --encre: #444f7e; }
+  [data-h="menage"] { --pastel: #e3d4c6; --encre: #6a4e3a; }   /* argile */
   /* Disque plat dans la teinte pastel de l'habitude. */
   .icone-habitude {
-    position: relative; width: var(--bouton); height: var(--bouton); border-radius: 50%; display: grid; place-items: center; color: var(--encre);
+    position: relative; width: var(--diametre); height: var(--diametre); border-radius: 50%; display: grid; place-items: center; color: var(--encre);
     background: var(--pastel);
   }
   /* Icône Phosphor « regular », 22 px (46 % du disque). */
-  .icone-habitude .icone { width: calc(var(--bouton) * .46); height: calc(var(--bouton) * .46); }
+  .icone-habitude .icone { width: calc(var(--diametre) * .46); height: calc(var(--diametre) * .46); }
   .tuile:focus-visible { outline: none; }
   .tuile:focus-visible .icone-habitude { outline: 2px solid rgba(79, 122, 66, .5); outline-offset: 3px; }
   /* Validation : 200 ms, très léger rebond (coupé si l'appareil demande moins de mouvement). */
@@ -337,7 +337,7 @@
   .tuile.exclue .icone-habitude { background: none; outline: 1.5px dashed var(--ombre-foncee); outline-offset: -1.5px; }
   /* Étincelles et confettis : partent du bouton touché vers le personnage, retirés après l'animation. */
   .etincelle {
-    position: absolute; left: 50%; top: calc(var(--bouton) / 2); width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 50%;
+    position: absolute; left: 50%; top: calc(var(--diametre) / 2); width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 50%;
     background: var(--c); pointer-events: none; z-index: 2; animation: etincelle var(--anim) ease-out forwards;
   }
   .etincelle.confetti { width: 7px; height: 4px; border-radius: 2px; }
@@ -474,13 +474,13 @@
   #ajouter-sous-tache .icone { width: 16px; height: 16px; }
   .actions-fenetre { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 8px; margin-top: 2px; }
   .actions-fenetre .bouton { padding: 10px 16px; font-size: 14px; }
-  #supprimer-tache { margin-right: auto; }
+  #supprimer-tache, #supprimer-habitude { margin-right: auto; }
   #fermer-tache { width: 36px; height: 36px; }
   #fermer-tache .icone { width: 16px; height: 16px; }
 
   /* --- Divers --- */
   .pied { text-align: center; }
-  #deconnexion { background: none; border: 0; color: var(--texte-doux); font-size: 14px; text-decoration: underline; padding: 8px; }
+  #deconnexion { background: none; border: 0; color: var(--texte-doux); font-size: 14px; text-decoration: underline; padding: 8px 0; text-align: left; }   /* aligné sur le titre et l'adresse */
   #chargement { text-align: center; margin: 48px auto; color: var(--texte-doux); font-size: 18px; }
   #toast {
     position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom)); transform: translateX(-50%);
@@ -585,7 +585,7 @@
   .segment button { flex: 1; border: 0; background: none; border-radius: 7px; padding: 8px 6px; font-weight: 600; color: var(--texte-doux); min-height: 40px; transition: background .3s; }
   .segment button[aria-pressed="true"] { background: var(--plat-fond); color: var(--texte); box-shadow: var(--filet); }
   .champ { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--texte-doux); }
-  .champ input, .poids input {
+  .champ input {
     background: #fff; border: 1px solid var(--plat-filet); border-radius: 10px; padding: 6px 10px; font-weight: 600; min-height: 42px;
   }
   .puces { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
@@ -606,15 +606,51 @@
   .defi-actif .icone { width: 20px; height: 20px; color: var(--accent); }
   .bouton.secondaire { background: var(--plat-fond); color: var(--texte); box-shadow: var(--filet); border: 0; }
   .bouton.secondaire:active { background: var(--plat-filet-doux); }
-  .poids { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-  .poids label { display: grid; gap: 6px; font-size: 12.5px; color: var(--texte-doux); }
-  .poids input { width: 100%; text-align: center; font-size: 17px; }
+  /* Habitudes suivies : une ligne chacune (pastille, nom et fréquence, pondération, retrait en deux touches). */
+  .liste-habitudes { list-style: none; margin: 0; padding: 0; border: 1px solid var(--plat-filet); border-radius: 12px; background: var(--plat-fond); overflow: hidden; }
+  .liste-habitudes li { display: flex; align-items: center; gap: 12px; padding: 8px 10px 8px 12px; min-height: 56px; }
+  .liste-habitudes li + li { border-top: 1px solid var(--plat-filet-doux); }
+  .pastille-habitude { flex: none; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--pastel); color: var(--encre); }
+  .pastille-habitude .icone { width: 18px; height: 18px; }
+  .liste-habitudes .nom { flex: 1; min-width: 0; display: grid; gap: 1px; }
+  .liste-habitudes .nom b { font-weight: 600; font-size: 14.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .liste-habitudes .nom small { font-size: 12px; color: var(--texte-doux); }
+  .liste-habitudes .poids { width: 62px; text-align: center; font-size: 16px; background: #fff; border: 1px solid var(--plat-filet); border-radius: 10px; padding: 6px; font-weight: 600; min-height: 40px; }
+  .liste-habitudes .retirer { width: 34px; height: 34px; }
+  .liste-habitudes .retirer .icone { width: 14px; height: 14px; }
+  /* Toucher le nom ou la pastille d'une habitude ouvre sa modification. Masquée : estompée, avec l'œil pour la réafficher. */
+  .liste-habitudes .modifier { flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; border: 0; background: none; padding: 0; text-align: left; color: inherit; }
+  .liste-habitudes li.masquee .modifier, .liste-habitudes li.masquee .poids { opacity: .5; }
+  .liste-habitudes li.masquee .nom small::before { content: 'Masquée · '; font-weight: 600; }
+  .liste-habitudes li.en-edition { background: var(--feuille-clair); }
+  .titre-form { margin: 0; font-family: var(--titres); font-weight: 600; font-size: 17px; }
+  /* Défis, dans la même liste que les habitudes : compteur de séances, choix de l'habitude, bouton « Lancer ». */
+  .liste-defis-reglage li { flex-wrap: wrap; }
+  .compteur-defi { display: inline-flex; align-items: center; gap: 8px; margin-top: 4px; }
+  .compteur-defi .tache-action { width: 30px; height: 30px; font-size: 18px; font-weight: 600; color: var(--texte); }
+  .compteur-defi b { min-width: 18px; text-align: center; font-family: var(--titres); font-size: 18px; }
+  .choix-defi { margin-top: 4px; justify-self: start; max-width: 100%; font: inherit; font-size: 14px; color: var(--texte); background: #fff; border: 1px solid var(--plat-filet); border-radius: 8px; padding: 4px 8px; }
+  .bouton.lancer { padding: 8px 14px; font-size: 14px; }
+  .ajout-habitude { display: inline-flex; align-items: center; gap: 6px; border: 0; background: none; padding: 8px 2px; margin-top: 8px; color: var(--accent-texte); font-weight: 600; font-size: 14.5px; }
+  .ajout-habitude .icone { width: 16px; height: 16px; }
+  /* Création d'une habitude : nom, fréquence, icône, couleur, pondération. */
+  .form-habitude { display: grid; gap: 12px; margin-top: 8px; padding: 14px; border: 1px solid var(--plat-filet); border-radius: 12px; background: var(--plat-fond); }
+  .form-habitude .segment { margin: 0; }
+  .form-habitude .intitule { font-size: 13px; color: var(--texte-doux); margin: 0 0 -4px; }
+  .champ-bloc { display: grid; gap: 6px; font-size: 13px; color: var(--texte-doux); }
+  .champ-bloc input { background: #fff; border: 1px solid var(--plat-filet); border-radius: 10px; padding: 10px 12px; font-size: 16px; color: var(--texte); }
+  .choix-icones, .choix-teintes { display: flex; flex-wrap: wrap; gap: 6px; }
+  .choix-icones button { width: 40px; height: 40px; border: 1px solid var(--plat-filet); border-radius: 10px; background: #fff; display: grid; place-items: center; color: var(--texte-doux); }
+  .choix-icones button .icone { width: 20px; height: 20px; }
+  .choix-icones button[aria-pressed="true"] { border-color: var(--accent); background: var(--feuille-clair); color: var(--accent-texte); }
+  .choix-teintes button { width: 32px; height: 32px; border: 0; border-radius: 50%; background: var(--pastel); box-shadow: inset 0 0 0 1px rgba(61, 49, 41, .08); }
+  .choix-teintes button[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--fond), 0 0 0 4px var(--encre); }
   #reglage-compte { font-size: 14px; color: var(--texte-doux); margin: 0 0 6px; }
   .liste-defis { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; font-size: 14px; }
   .liste-defis li { display: flex; align-items: center; gap: 10px; background: var(--plat-fond); border-radius: 12px; padding: 12px 14px; box-shadow: var(--filet); }
   .liste-defis .icone { width: 18px; height: 18px; color: var(--accent); }
 
-  @media (max-width: 599px) { :root { --bouton: 42px; } }
+  @media (max-width: 599px) { :root { --diametre: 42px; } }
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
   /* Onglet caché : la vie du jardin s'arrête. */
   .onglet-cache .scene * { animation-play-state: paused !important; }
@@ -626,6 +662,29 @@
 <!-- Icônes dessinées d'un même style (trait fin). Pour en changer une, modifier son <symbol>.
      Habitudes : Phosphor Icons, graisse « regular » (licence MIT, phosphoricons.com), pleines en currentColor. -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-afficher" viewBox="0 0 256 256"><g fill="currentColor" stroke="none"><path d="M247.31,124.76c-.35-.79-8.82-19.58-27.65-38.41C194.57,61.26,162.88,48,128,48S61.43,61.26,36.34,86.35C17.51,105.18,9,124,8.69,124.76a8,8,0,0,0,0,6.5c.35.79,8.82,19.57,27.65,38.4C61.43,194.74,93.12,208,128,208s66.57-13.26,91.66-38.34c18.83-18.83,27.3-37.61,27.65-38.4A8,8,0,0,0,247.31,124.76ZM128,192c-30.78,0-57.67-11.19-79.93-33.25A133.47,133.47,0,0,1,25,128,133.33,133.33,0,0,1,48.07,97.25C70.33,75.19,97.22,64,128,64s57.67,11.19,79.93,33.25A133.46,133.46,0,0,1,231.05,128C223.84,141.46,192.43,192,128,192Zm0-112a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160Z"/></g></symbol>
+  <symbol id="i-masquer" viewBox="0 0 256 256"><g fill="currentColor" stroke="none"><path d="M53.92,34.62A8,8,0,1,0,42.08,45.38L61.32,66.55C25,88.84,9.38,123.2,8.69,124.76a8,8,0,0,0,0,6.5c.35.79,8.82,19.57,27.65,38.4C61.43,194.74,93.12,208,128,208a127.11,127.11,0,0,0,52.07-10.83l22,24.21a8,8,0,1,0,11.84-10.76Zm47.33,75.84,41.67,45.85a32,32,0,0,1-41.67-45.85ZM128,192c-30.78,0-57.67-11.19-79.93-33.25A133.16,133.16,0,0,1,25,128c4.69-8.79,19.66-33.39,47.35-49.38l18,19.75a48,48,0,0,0,63.66,70l14.73,16.2A112,112,0,0,1,128,192Zm6-95.43a8,8,0,0,1,3-15.72,48.16,48.16,0,0,1,38.77,42.64,8,8,0,0,1-7.22,8.71,6.39,6.39,0,0,1-.75,0,8,8,0,0,1-8-7.26A32.09,32.09,0,0,0,134,96.57Zm113.28,34.69c-.42.94-10.55,23.37-33.36,43.8a8,8,0,1,1-10.67-11.92A132.77,132.77,0,0,0,231.05,128a133.15,133.15,0,0,0-23.12-30.77C185.67,75.19,158.78,64,128,64a118.37,118.37,0,0,0-19.36,1.57A8,8,0,1,1,106,49.79,134,134,0,0,1,128,48c34.88,0,66.57,13.26,91.66,38.35,18.83,18.83,27.3,37.62,27.65,38.41A8,8,0,0,1,247.31,131.26Z"/></g></symbol>
+  <!-- Icônes proposées pour les habitudes créées (Phosphor « regular »), nommées i-p-… -->
+  <symbol id="i-p-heart" viewBox="0 0 256 256"><g fill="currentColor" stroke="none"><path d="M178,40c-20.65,0-38.73,8.88-50,23.89C116.73,48.88,98.65,40,78,40a62.07,62.07,0,0,0-62,62c0,70,103.79,126.66,108.21,129a8,8,0,0,0,7.58,0C136.21,228.66,240,172,240,102A62.07,62.07,0,0,0,178,40ZM128,214.8C109.74,204.16,32,155.69,32,102A46.06,46.06,0,0,1,78,56c19.45,0,35.78,10.36,42.6,27a8,8,0,0,0,14.8,0c6.82-16.67,23.15-27,42.6-27a46.06,46.06,0,0,1,46,46C224,155.61,146.24,204.15,128,214.8Z"/></g></symbol>
+  <symbol id="i-p-star" viewBox="0 0 256 256"><g fill="currentColor" stroke="none"><path d="M239.18,97.26A16.38,16.38,0,0,0,224.92,86l-59-4.76L143.14,26.15a16.36,16.36,0,0,0-30.27,0L90.11,81.23,31.08,86a16.46,16.46,0,0,0-9.37,28.86l45,38.83L53,211.75a16.38,16.38,0,0,0,24.5,17.82L128,198.49l50.53,31.08A16.4,16.4,0,0,0,203,211.75l-13.76-58.07,45-38.83A16.43,16.43,0,0,0,239.18,97.26Zm-15.34,5.47-48.7,42a8,8,0,0,0-2.56,7.91l14.88,62.8a.37.37,0,0,1-.17.48c-.18.14-.23.11-.38,0l-54.72-33.65a8,8,0,0,0-8.38,0L69.09,215.94c-.15.09-.19.12-.38,0a.37.37,0,0,1-.17-.48l14.88-62.8a8,8,0,0,0-2.56-7.91l-48.7-42c-.12-.1-.23-.19-.13-.5s.18-.27.33-.29l63.92-5.16A8,8,0,0,0,103,91.86l24.62-59.61c.08-.17.11-.25.35-.25s.27.08.35.25L153,91.86a8,8,0,0,0,6.75,4.92l63.92,5.16c.15,0,.24,0,.33.29S224,102.63,223.84,102.73Z"/></g></symbol>
+  <symbol id="i-p-leaf" viewBox="0 0 256 256"><g fill="currentColor" stroke="none"><path d="M223.45,40.07a8,8,0,0,0-7.52-7.52C139.8,28.08,78.82,51,52.82,94a87.09,87.09,0,0,0-12.76,49c.57,15.92,5.21,32,13.79,47.85l-19.51,19.5a8,8,0,0,0,11.32,11.32l19.5-19.51C81,210.73,97.09,215.37,113,215.94q1.67.06,3.33.06A86.93,86.93,0,0,0,162,203.18C205,177.18,227.93,116.21,223.45,40.07ZM153.75,189.5c-22.75,13.78-49.68,14-76.71.77l88.63-88.62a8,8,0,0,0-11.32-11.32L65.73,179c-13.19-27-13-54,.77-76.71,22.09-36.47,74.6-56.44,141.31-54.06C210.2,114.89,190.22,167.41,153.75,189.5Z"/></g></symbol>
+  <symbol id="i-p-plant" viewBox="0 0 256 256"><g fill="currentColor" stroke="none"><path d="M247.63,47.89a8,8,0,0,0-7.52-7.52c-51.76-3-93.32,12.74-111.18,42.22-11.8,19.49-11.78,43.16-.16,65.74a71.34,71.34,0,0,0-14.17,27L98.33,159c7.82-16.33,7.52-33.35-1-47.49-13.2-21.79-43.67-33.47-81.5-31.25a8,8,0,0,0-7.52,7.52c-2.23,37.83,9.46,68.3,31.25,81.5A45.82,45.82,0,0,0,63.44,176,54.58,54.58,0,0,0,87,170.33l25,25V224a8,8,0,0,0,16,0V194.51a55.61,55.61,0,0,1,12.27-35,73.91,73.91,0,0,0,33.31,8.4,60.9,60.9,0,0,0,31.83-8.86C234.89,141.21,250.67,99.65,247.63,47.89ZM47.81,155.6C32.47,146.31,23.79,124.32,24,96c28.32-.24,50.31,8.47,59.6,23.81,4.85,8,5.64,17.33,2.46,26.94L61.65,122.34a8,8,0,0,0-11.31,11.31l24.41,24.41C65.14,161.24,55.82,160.45,47.81,155.6Zm149.31-10.22c-13.4,8.11-29.15,8.73-45.15,2l53.69-53.7a8,8,0,0,0-11.31-11.31L140.65,136c-6.76-16-6.15-31.76,2-45.15,13.94-23,47-35.82,89.33-34.83C232.94,98.34,220.14,131.44,197.12,145.38Z"/></g></symbol>
+  <symbol id="i-p-sun" viewBox="0 0 256 256"><g fill="currentColor" stroke="none"><path d="M120,40V16a8,8,0,0,1,16,0V40a8,8,0,0,1-16,0Zm72,88a64,64,0,1,1-64-64A64.07,64.07,0,0,1,192,128Zm-16,0a48,48,0,1,0-48,48A48.05,48.05,0,0,0,176,128ZM58.34,69.66A8,8,0,0,0,69.66,58.34l-16-16A8,8,0,0,0,42.34,53.66Zm0,116.68-16,16a8,8,0,0,0,11.32,11.32l16-16a8,8,0,0,0-11.32-11.32ZM192,72a8,8,0,0,0,5.66-2.34l16-16a8,8,0,0,0-11.32-11.32l-16,16A8,8,0,0,0,192,72Zm5.66,114.34a8,8,0,0,0-11.32,11.32l16,16a8,8,0,0,0,11.32-11.32ZM48,128a8,8,0,0,0-8-8H16a8,8,0,0,0,0,16H40A8,8,0,0,0,48,128Zm80,80a8,8,0,0,0-8,8v24a8,8,0,0,0,16,0V216A8,8,0,0,0,128,208Zm112-88H216a8,8,0,0,0,0,16h24a8,8,0,0,0,0-16Z"/></g></symbol>
+  <symbol id="i-p-music-notes" viewBox="0 0 256 256"><g fill="currentColor" stroke="none"><path d="M212.92,17.69a8,8,0,0,0-6.86-1.45l-128,32A8,8,0,0,0,72,56V166.08A36,36,0,1,0,88,196V110.25l112-28v51.83A36,36,0,1,0,216,164V24A8,8,0,0,0,212.92,17.69ZM52,216a20,20,0,1,1,20-20A20,20,0,0,1,52,216ZM88,93.75V62.25l112-28v31.5ZM180,184a20,20,0,1,1,20-20A20,20,0,0,1,180,184Z"/></g></symbol>
+  <symbol id="i-p-pencil-simple" viewBox="0 0 256 256"><g fill="currentColor" stroke="none"><path d="M227.31,73.37,182.63,28.68a16,16,0,0,0-22.63,0L36.69,152A15.86,15.86,0,0,0,32,163.31V208a16,16,0,0,0,16,16H92.69A15.86,15.86,0,0,0,104,219.31L227.31,96a16,16,0,0,0,0-22.63ZM92.69,208H48V163.31l88-88L180.69,120ZM192,108.68,147.31,64l24-24L216,84.68Z"/></g></symbol>
+  <symbol id="i-p-paint-brush" viewBox="0 0 256 256"><g fill="currentColor" stroke="none"><path d="M232,32a8,8,0,0,0-8-8c-44.08,0-89.31,49.71-114.43,82.63A60,60,0,0,0,32,164c0,30.88-19.54,44.73-20.47,45.37A8,8,0,0,0,16,224H92a60,60,0,0,0,57.37-77.57C182.3,121.31,232,76.08,232,32ZM92,208H34.63C41.38,198.41,48,183.92,48,164a44,44,0,1,1,44,44Zm32.42-94.45q5.14-6.66,10.09-12.55A76.23,76.23,0,0,1,155,121.49q-5.9,4.94-12.55,10.09A60.54,60.54,0,0,0,124.42,113.55Zm42.7-2.68a92.57,92.57,0,0,0-22-22c31.78-34.53,55.75-45,69.9-47.91C212.17,55.12,201.65,79.09,167.12,110.87Z"/></g></symbol>
+  <symbol id="i-p-guitar" viewBox="0 0 256 256"><g fill="currentColor" stroke="none"><path d="M249.66,46.34l-40-40a8,8,0,0,0-11.31,11.32L200.69,20,140.52,80.16C117.73,68.3,92.21,69.29,76.75,84.74a42.27,42.27,0,0,0-9.39,14.37A8.24,8.24,0,0,1,59.81,104c-14.59.49-27.26,5.72-36.65,15.11C11.08,131.22,6,148.6,8.74,168.07,11.4,186.7,21.07,205.15,36,220s33.34,24.56,52,27.22A71.13,71.13,0,0,0,98.1,248c15.32,0,28.83-5.23,38.76-15.16,9.39-9.39,14.62-22.06,15.11-36.65a8.24,8.24,0,0,1,4.92-7.55,42.12,42.12,0,0,0,14.37-9.39c15.45-15.46,16.44-41,4.58-63.77L236,55.31l2.34,2.34a8,8,0,1,0,11.32-11.31ZM160,167.93a26.12,26.12,0,0,1-8.95,5.83,24.24,24.24,0,0,0-15,21.89c-.36,10.46-4,19.41-10.43,25.88-8.44,8.43-21,11.95-35.36,9.89C75,229.25,59.73,221.19,47.27,208.73S26.75,181,24.58,165.81c-2-14.37,1.46-26.92,9.89-35.36C40.94,124,49.89,120.37,60.35,120h0a24.22,24.22,0,0,0,21.89-15,26.12,26.12,0,0,1,5.83-9c5.49-5.49,13-8.13,21.38-8.13a49.38,49.38,0,0,1,19.13,4.19L108.5,112.19a32,32,0,1,0,35.31,35.31l20.08-20.08C170.41,142.71,169.47,158.41,160,167.93Zm-10.4-61.48a72.9,72.9,0,0,1,5.93,6.75l-15.42,15.42a32.22,32.22,0,0,0-12.68-12.68l15.42-15.43A73,73,0,0,1,149.55,106.45ZM112,128a16,16,0,0,1,16,16h0a16,16,0,1,1-16-16Zm48.85-32.85a86.94,86.94,0,0,0-6.68-6L176,67.31,188.69,80l-21.83,21.82A86.94,86.94,0,0,0,160.86,95.14ZM200,68.68,187.32,56,212,31.31,224.69,44ZM93.66,194.33a8,8,0,0,1-11.31,11.32l-32-32a8,8,0,0,1,11.32-11.31Z"/></g></symbol>
+  <symbol id="i-p-bicycle" viewBox="0 0 256 256"><g fill="currentColor" stroke="none"><path d="M208,112a47.81,47.81,0,0,0-16.93,3.09L165.93,72H192a8,8,0,0,1,8,8,8,8,0,0,0,16,0,24,24,0,0,0-24-24H152a8,8,0,0,0-6.91,12l11.65,20H99.26L82.91,60A8,8,0,0,0,76,56H48a8,8,0,0,0,0,16H71.41L85.12,95.51,69.41,117.06a48.13,48.13,0,1,0,12.92,9.44l11.59-15.9L125.09,164A8,8,0,1,0,138.91,156l-30.32-52h57.48l11.19,19.17A48,48,0,1,0,208,112ZM80,160a32,32,0,1,1-20.21-29.74l-18.25,25a8,8,0,1,0,12.92,9.42l18.25-25A31.88,31.88,0,0,1,80,160Zm128,32a32,32,0,0,1-22.51-54.72L201.09,164A8,8,0,1,0,214.91,156L199.3,129.21A32,32,0,1,1,208,192Z"/></g></symbol>
+  <symbol id="i-p-barbell" viewBox="0 0 256 256"><g fill="currentColor" stroke="none"><path d="M248,120h-8V88a16,16,0,0,0-16-16H208V64a16,16,0,0,0-16-16H168a16,16,0,0,0-16,16v56H104V64A16,16,0,0,0,88,48H64A16,16,0,0,0,48,64v8H32A16,16,0,0,0,16,88v32H8a8,8,0,0,0,0,16h8v32a16,16,0,0,0,16,16H48v8a16,16,0,0,0,16,16H88a16,16,0,0,0,16-16V136h48v56a16,16,0,0,0,16,16h24a16,16,0,0,0,16-16v-8h16a16,16,0,0,0,16-16V136h8a8,8,0,0,0,0-16ZM32,168V88H48v80Zm56,24H64V64H88V192Zm104,0H168V64h24V175.82c0,.06,0,.12,0,.18s0,.12,0,.18V192Zm32-24H208V88h16Z"/></g></symbol>
+  <symbol id="i-p-person-simple-walk" viewBox="0 0 256 256"><g fill="currentColor" stroke="none"><path d="M152,80a32,32,0,1,0-32-32A32,32,0,0,0,152,80Zm0-48a16,16,0,1,1-16,16A16,16,0,0,1,152,32Zm64,112a8,8,0,0,1-8,8c-35.31,0-52.95-17.81-67.12-32.12-2.74-2.77-5.36-5.4-8-7.84l-13.43,30.88,37.2,26.57A8,8,0,0,1,160,176v56a8,8,0,0,1-16,0V180.12l-31.07-22.2L79.34,235.19A8,8,0,0,1,72,240a7.84,7.84,0,0,1-3.19-.67,8,8,0,0,1-4.15-10.52l54.08-124.37c-9.31-1.65-20.92,1.2-34.7,8.58a163.88,163.88,0,0,0-30.57,21.77,8,8,0,0,1-10.95-11.66c2.5-2.35,61.69-57.23,98.72-25.08,3.83,3.32,7.48,7,11,10.57C166.19,122.7,179.36,136,208,136A8,8,0,0,1,216,144Z"/></g></symbol>
+  <symbol id="i-p-carrot" viewBox="0 0 256 256"><g fill="currentColor" stroke="none"><path d="M232,64H203.31l26.35-26.34a8,8,0,0,0-11.32-11.32L192,52.69V24a8,8,0,0,0-16,0V56.57a64,64,0,0,0-77.2,10.12l0,0,0,0,0,0c-40.1,39.39-70.25,133.08-73.19,142.45a16,16,0,0,0,21.26,21.26c9.37-2.94,103.18-33.13,142.47-73.21A64,64,0,0,0,199.43,80H232a8,8,0,0,0,0-16Zm-54.12,82c-8.94,9.12-21.25,17.8-34.85,25.73l-25.38-25.39a8,8,0,0,0-11.32,11.32l22.09,22.09c-40.87,21.19-86.32,35.42-87,35.63A7.93,7.93,0,0,0,40,216a7.93,7.93,0,0,0,.59-1.41c.29-.93,28-89.58,64-130.67l33.77,33.77a8,8,0,0,0,11.32-11.32L116.18,72.88A48,48,0,0,1,177.88,146Z"/></g></symbol>
+  <symbol id="i-p-pill" viewBox="0 0 256 256"><g fill="currentColor" stroke="none"><path d="M216.42,39.6a53.26,53.26,0,0,0-75.32,0L39.6,141.09a53.26,53.26,0,0,0,75.32,75.31h0L216.43,114.91A53.31,53.31,0,0,0,216.42,39.6ZM103.61,205.09h0a37.26,37.26,0,0,1-52.7-52.69L96,107.31,148.7,160ZM205.11,103.6,160,148.69,107.32,96l45.1-45.09a37.26,37.26,0,0,1,52.69,52.69ZM189.68,82.34a8,8,0,0,1,0,11.32l-24,24a8,8,0,1,1-11.31-11.32l24-24A8,8,0,0,1,189.68,82.34Z"/></g></symbol>
+  <symbol id="i-p-tooth" viewBox="0 0 256 256"><g fill="currentColor" stroke="none"><path d="M171,71.42,149.54,80,171,88.57A8,8,0,1,1,165,103.42L128,88.61,91,103.42A8,8,0,1,1,85,88.57L106.46,80,85,71.42A8,8,0,1,1,91,56.57l37,14.81,37-14.81A8,8,0,1,1,171,71.42Zm53,8.33c0,42.72-8,75.4-14.69,95.28-8.73,25.8-20.63,45.49-32.65,54a15.69,15.69,0,0,1-15.95,1.41,16.09,16.09,0,0,1-9.18-13.36C150.68,205.58,146.48,168,128,168s-22.68,37.59-23.53,49.11a16.09,16.09,0,0,1-16,14.9,15.67,15.67,0,0,1-9.13-2.95c-12-8.53-23.92-28.22-32.65-54C40,155.15,32,122.47,32,79.75A56,56,0,0,1,88,24h80A56,56,0,0,1,224,79.75Zm-16,0A40,40,0,0,0,168,40H88A40,40,0,0,0,48,79.76c0,40.55,7.51,71.4,13.85,90.14,11.05,32.66,23,43.37,26.61,46C91.57,174.67,105.59,152,128,152s36.45,22.71,39.49,63.94h0c3.6-2.59,15.57-13.26,26.66-46C200.49,151.16,208,120.31,208,79.76Z"/></g></symbol>
+  <symbol id="i-p-dog" viewBox="0 0 256 256"><g fill="currentColor" stroke="none"><path d="M239.71,125l-16.42-88a16,16,0,0,0-19.61-12.58l-.31.09L150.85,40h-45.7L52.63,24.56l-.31-.09A16,16,0,0,0,32.71,37.05L16.29,125a15.77,15.77,0,0,0,9.12,17.52A16.26,16.26,0,0,0,32.12,144,15.48,15.48,0,0,0,40,141.84V184a40,40,0,0,0,40,40h96a40,40,0,0,0,40-40V141.85a15.5,15.5,0,0,0,7.87,2.16,16.31,16.31,0,0,0,6.72-1.47A15.77,15.77,0,0,0,239.71,125ZM32,128h0L48.43,40,90.5,52.37Zm144,80H136V195.31l13.66-13.65a8,8,0,0,0-11.32-11.32L128,180.69l-10.34-10.35a8,8,0,0,0-11.32,11.32L120,195.31V208H80a24,24,0,0,1-24-24V123.11L107.92,56h40.15L200,123.11V184A24,24,0,0,1,176,208Zm48-80L165.5,52.37,207.57,40,224,128ZM104,140a12,12,0,1,1-12-12A12,12,0,0,1,104,140Zm72,0a12,12,0,1,1-12-12A12,12,0,0,1,176,140Z"/></g></symbol>
+  <symbol id="i-p-graduation-cap" viewBox="0 0 256 256"><g fill="currentColor" stroke="none"><path d="M251.76,88.94l-120-64a8,8,0,0,0-7.52,0l-120,64a8,8,0,0,0,0,14.12L32,117.87v48.42a15.91,15.91,0,0,0,4.06,10.65C49.16,191.53,78.51,216,128,216a130,130,0,0,0,48-8.76V240a8,8,0,0,0,16,0V199.51a115.63,115.63,0,0,0,27.94-22.57A15.91,15.91,0,0,0,224,166.29V117.87l27.76-14.81a8,8,0,0,0,0-14.12ZM128,200c-43.27,0-68.72-21.14-80-33.71V126.4l76.24,40.66a8,8,0,0,0,7.52,0L176,143.47v46.34C163.4,195.69,147.52,200,128,200Zm80-33.75a97.83,97.83,0,0,1-16,14.25V134.93l16-8.53ZM188,118.94l-.22-.13-56-29.87a8,8,0,0,0-7.52,14.12L171,128l-43,22.93L25,96,128,41.07,231,96Z"/></g></symbol>
+  <symbol id="i-p-translate" viewBox="0 0 256 256"><g fill="currentColor" stroke="none"><path d="M247.15,212.42l-56-112a8,8,0,0,0-14.31,0l-21.71,43.43A88,88,0,0,1,108,126.93,103.65,103.65,0,0,0,135.69,64H160a8,8,0,0,0,0-16H104V32a8,8,0,0,0-16,0V48H32a8,8,0,0,0,0,16h87.63A87.76,87.76,0,0,1,96,116.35a87.74,87.74,0,0,1-19-31,8,8,0,1,0-15.08,5.34A103.63,103.63,0,0,0,84,127a87.55,87.55,0,0,1-52,17,8,8,0,0,0,0,16,103.46,103.46,0,0,0,64-22.08,104.18,104.18,0,0,0,51.44,21.31l-26.6,53.19a8,8,0,0,0,14.31,7.16L148.94,192h70.11l13.79,27.58A8,8,0,0,0,240,224a8,8,0,0,0,7.15-11.58ZM156.94,176,184,121.89,211.05,176Z"/></g></symbol>
+  <symbol id="i-p-device-mobile-slash" viewBox="0 0 256 256"><g fill="currentColor" stroke="none"><path d="M213.92,210.62l-160-176A8,8,0,1,0,42.08,45.38L56,60.69V216a24,24,0,0,0,24,24h96a24,24,0,0,0,23.82-21.11l2.26,2.49a8,8,0,1,0,11.84-10.76ZM184,216a8,8,0,0,1-8,8H80a8,8,0,0,1-8-8V78.29l112,123.2ZM68.7,24a8,8,0,0,1,8-8H176a24,24,0,0,1,24,24V150.83a8,8,0,1,1-16,0V40a8,8,0,0,0-8-8H76.7A8,8,0,0,1,68.7,24Z"/></g></symbol>
+  <symbol id="i-p-shower" viewBox="0 0 256 256"><g fill="currentColor" stroke="none"><path d="M64,236a12,12,0,1,1-12-12A12,12,0,0,1,64,236Zm20-44a12,12,0,1,0,12,12A12,12,0,0,0,84,192Zm-64,0a12,12,0,1,0,12,12A12,12,0,0,0,20,192Zm32-32a12,12,0,1,0,12,12A12,12,0,0,0,52,160ZM256,40a8,8,0,0,1-8,8H219.31L191.46,75.86,169.8,202.65a16,16,0,0,1-27.09,8.66l-98-98a16,16,0,0,1,8.69-27.1L180.14,64.54l30.2-30.2A8,8,0,0,1,216,32h32A8,8,0,0,1,256,40ZM174.21,81.79,56,102l98,98Z"/></g></symbol>
   <symbol id="i-eau" viewBox="0 0 256 256"><g fill="currentColor" stroke="none"><path d="M174,47.75a254.19,254.19,0,0,0-41.45-38.3,8,8,0,0,0-9.18,0A254.19,254.19,0,0,0,82,47.75C54.51,79.32,40,112.6,40,144a88,88,0,0,0,176,0C216,112.6,201.49,79.32,174,47.75ZM128,216a72.08,72.08,0,0,1-72-72c0-57.23,55.47-105,72-118,16.53,13,72,60.75,72,118A72.08,72.08,0,0,1,128,216Zm55.89-62.66a57.6,57.6,0,0,1-46.56,46.55A8.75,8.75,0,0,1,136,200a8,8,0,0,1-1.32-15.89c16.57-2.79,30.63-16.85,33.44-33.45a8,8,0,0,1,15.78,2.68Z"/></g></symbol>
   <symbol id="i-sport" viewBox="0 0 256 256"><g fill="currentColor" stroke="none"><path d="M152,88a32,32,0,1,0-32-32A32,32,0,0,0,152,88Zm0-48a16,16,0,1,1-16,16A16,16,0,0,1,152,40Zm67.31,100.68c-.61.28-7.49,3.28-19.67,3.28-13.85,0-34.55-3.88-60.69-20a169.31,169.31,0,0,1-15.41,32.34,104.29,104.29,0,0,1,31.31,15.81C173.92,186.65,184,207.35,184,232a8,8,0,0,1-16,0c0-41.7-34.69-56.71-54.14-61.85-.55.7-1.12,1.41-1.69,2.1-19.64,23.8-44.25,36.18-71.63,36.18A92.29,92.29,0,0,1,31.2,208,8,8,0,0,1,32.8,192c25.92,2.58,48.47-7.49,67-30,12.49-15.14,21-33.61,25.25-47C86.13,92.35,61.27,111.63,61,111.84A8,8,0,1,1,51,99.36c1.5-1.2,37.22-29,89.51,6.57,45.47,30.91,71.93,20.31,72.18,20.19a8,8,0,1,1,6.63,14.56Z"/></g></symbol>
   <symbol id="i-lecture" viewBox="0 0 256 256"><g fill="currentColor" stroke="none"><path d="M232,48H160a40,40,0,0,0-32,16A40,40,0,0,0,96,48H24a8,8,0,0,0-8,8V200a8,8,0,0,0,8,8H96a24,24,0,0,1,24,24,8,8,0,0,0,16,0,24,24,0,0,1,24-24h72a8,8,0,0,0,8-8V56A8,8,0,0,0,232,48ZM96,192H32V64H96a24,24,0,0,1,24,24V200A39.81,39.81,0,0,0,96,192Zm128,0H160a39.81,39.81,0,0,0-24,8V88a24,24,0,0,1,24-24h64ZM160,88h40a8,8,0,0,1,0,16H160a8,8,0,0,1,0-16Zm48,40a8,8,0,0,1-8,8H160a8,8,0,0,1,0-16h40A8,8,0,0,1,208,128Zm0,32a8,8,0,0,1-8,8H160a8,8,0,0,1,0-16h40A8,8,0,0,1,208,160Z"/></g></symbol>
@@ -698,7 +757,6 @@
           </svg>
         </div>
       </div>
-      <button class="tuile" id="menage-case" data-h="menage" aria-label="Ménage de la semaine"><span class="icone-habitude"><svg class="icone" aria-hidden="true"><use href="#i-menage"/></svg></span></button>
     </section>
 
     <section class="carte carte-defi" id="carte-defi" hidden><div id="defi"></div></section>
@@ -741,27 +799,35 @@
 
  <div id="ecran-reglages" hidden>
     <section class="carte">
-      <h2 class="titre-carte">Exclusions</h2>
-      <div class="segment" id="excl-mode">
-        <button data-mode="semaine">Toute la semaine</button>
-        <button data-mode="jour">Un jour</button>
-      </div>
-      <label class="champ">Date <input type="date" id="excl-date"></label>
-      <p class="note" id="excl-periode"></p>
-      <div class="puces" id="excl-puces"></div>
-      <p class="note">Une habitude exclue sort du score (100 reste atteignable) et sa série est mise en pause.</p>
+      <h2 class="titre-carte">Habitudes</h2>
+      <ul class="liste-habitudes" id="liste-habitudes"></ul>
+      <p class="note" id="poids-total"></p>
+      <button type="button" class="ajout-habitude" id="nouvelle-habitude"><svg class="icone" aria-hidden="true"><use href="#i-plus"/></svg>Nouvelle habitude</button>
+      <form class="form-habitude" id="form-habitude" autocomplete="off" hidden>
+        <p class="titre-form" id="titre-form-habitude">Nouvelle habitude</p>
+        <label class="champ-bloc">Nom <input id="nom-habitude" maxlength="40" placeholder="Ex. : Étirements" enterkeyhint="done"></label>
+        <div class="segment" id="type-habitude" role="group" aria-label="Fréquence">
+          <button type="button" data-type="jour">Chaque jour</button>
+          <button type="button" data-type="semaine">Chaque semaine</button>
+        </div>
+        <p class="intitule">Icône</p>
+        <div class="choix-icones" id="choix-icones" role="group" aria-label="Icône"></div>
+        <p class="intitule">Couleur</p>
+        <div class="choix-teintes" id="choix-teintes" role="group" aria-label="Couleur"></div>
+        <label class="champ" id="champ-poids-habitude">Pondération <input type="number" id="poids-habitude" min="0" max="100" step="1" inputmode="numeric" value="8"></label>
+        <p class="note" id="note-suppression" hidden></p>
+        <div class="actions-fenetre">
+          <button type="button" class="tache-action" id="supprimer-habitude" aria-label="Supprimer l’habitude" hidden><svg class="icone" aria-hidden="true"><use href="#i-poubelle"/></svg></button>
+          <button type="button" class="bouton secondaire" id="annuler-habitude">Annuler</button>
+          <button class="bouton" id="valider-habitude">Ajouter</button>
+        </div>
+      </form>
+      <p><button class="bouton secondaire" id="poids-defaut">Revenir aux pondérations d’origine</button></p>
     </section>
 
     <section class="carte">
       <h2 class="titre-carte">Défi</h2>
       <div id="defi-zone"></div>
-    </section>
-
-    <section class="carte">
-      <h2 class="titre-carte">Pondérations</h2>
-      <div class="poids" id="poids"></div>
-      <p class="note" id="poids-total"></p>
-      <p><button class="bouton secondaire" id="poids-defaut">Revenir aux valeurs d’origine</button></p>
     </section>
 
     <section class="carte">
@@ -822,6 +888,10 @@ const POIDS_DEFAUT = {
   menage: 4,
 };
 const HABITUDES_JOUR = ['sommeil', 'eau', 'petitDej', 'dejeuner', 'diner', 'lecture', 'meditation'];
+// Habitudes cochées à la semaine (une case par semaine) : le ménage, et les habitudes créées « chaque semaine ».
+const HABITUDES_SEMAINE = ['menage'];
+// Valeur d'une habitude à la semaine : le ménage garde son champ d'origine, les autres sont rangées dans « cases ».
+const valeurSemaine = (habitude, semaine) => (habitude === 'menage' ? semaine?.menage : semaine?.cases?.[habitude]) ? 1 : 0;
 const OBJECTIF_SPORT = 3;           // séances par semaine
 const SOMMEIL_MIN_MINUTES = 7 * 60; // sommeil validé à partir de 7 h
 
@@ -869,22 +939,26 @@ function estExclue(habitude, jour, semaine) {
 }
 
 // --- Score d'une journée (sert aussi à la couleur du calendrier en pixels) ---
+// quotidiennes : les habitudes cochées chaque jour qui comptent (par défaut, celles d'origine).
 // Retourne { score: 0..100 ou null si tout est exclu, poids: total des poids comptés }.
-function scoreJour(jour, semaine, poids = POIDS_DEFAUT) {
+function scoreJour(jour, semaine, poids = POIDS_DEFAUT, quotidiennes = HABITUDES_JOUR) {
   let num = 0, den = 0;
-  for (const h of HABITUDES_JOUR) {
+  for (const h of quotidiennes) {
     if (estExclue(h, jour, semaine)) continue;
-    num += poids[h] * valeurHabitude(h, jour);
-    den += poids[h];
+    num += (poids[h] ?? 0) * valeurHabitude(h, jour);
+    den += poids[h] ?? 0;
   }
   return { score: den ? (100 * num) / den : null, poids: den };
 }
 
 // --- Score de la semaine ---
-// jours : { 'AAAA-MM-JJ': jour }, semaine : { menage, exclusions }.
+// jours : { 'AAAA-MM-JJ': jour }, semaine : { menage, cases, exclusions }.
 // Jours comptés : ceux de la semaine compris entre dateDebut et aujourdhui inclus.
+// Habitudes qui comptent : quotidiennes (cochées chaque jour), hebdomadaires (une case par semaine) et le sport
+// (avecSport) ; par défaut, les neuf d'origine. Une habitude retirée n'est simplement pas dans ces listes.
 function calculerScoreSemaine({ lundi, jours = {}, semaine = {}, poids = POIDS_DEFAUT,
-                                objectifSport = OBJECTIF_SPORT, dateDebut, aujourdhui }) {
+                                objectifSport = OBJECTIF_SPORT, dateDebut, aujourdhui,
+                                quotidiennes = HABITUDES_JOUR, hebdomadaires = HABITUDES_SEMAINE, avecSport = true }) {
   const comptes = joursDeLaSemaine(lundi)
     .filter(c => (!dateDebut || c >= dateDebut) && (!aujourdhui || c <= aujourdhui));
 
@@ -893,7 +967,7 @@ function calculerScoreSemaine({ lundi, jours = {}, semaine = {}, poids = POIDS_D
   let numJours = 0, denJours = 0, nbJours = 0;
   const scoresJours = {};
   for (const c of comptes) {
-    const { score, poids: p } = scoreJour(jours[c], semaine, poids);
+    const { score, poids: p } = scoreJour(jours[c], semaine, poids, quotidiennes);
     scoresJours[c] = score;
     if (p === 0) continue;
     numJours += (score / 100) * p;
@@ -907,7 +981,7 @@ function calculerScoreSemaine({ lundi, jours = {}, semaine = {}, poids = POIDS_D
   const joursSport = comptes.filter(c => !estExclue('sport', jours[c], semaine));
   const seances = comptes.filter(c => jours[c]?.habitudes?.sport).length;
   let sport = null;
-  if (joursSport.length) {
+  if (avecSport && joursSport.length) {
     const objectif = Math.max(1, Math.round(objectifSport * joursSport.length / 7));
     const taux = Math.min(seances, objectif) / objectif;
     sport = { seances, objectif, taux };
@@ -915,17 +989,20 @@ function calculerScoreSemaine({ lundi, jours = {}, semaine = {}, poids = POIDS_D
     den += poids.sport;
   }
 
-  // Ménage : case hebdomadaire.
-  let menage = null;
-  if (comptes.length && !semaine.exclusions?.includes('menage')) {
-    menage = semaine.menage ? 1 : 0;
-    num += poids.menage * menage;
-    den += poids.menage;
+  // Cases hebdomadaires (le ménage, et les habitudes « chaque semaine »).
+  const hebdo = {};
+  for (const h of hebdomadaires) {
+    if (!comptes.length || semaine.exclusions?.includes(h)) continue;
+    hebdo[h] = valeurSemaine(h, semaine);
+    num += (poids[h] ?? 0) * hebdo[h];
+    den += poids[h] ?? 0;
   }
+  const menage = hebdo.menage ?? null;
 
   return {
     score: den ? Math.round((100 * num) / den) : null,
     jours: comptes.length, scoresJours, sport, menage,
+    ...(hebdomadaires.some(h => h !== 'menage') && { hebdo }),
   };
 }
 
@@ -1061,7 +1138,7 @@ const GOOGLE_CLIENT_ID = '565047413369-2bi3f5bqfsao5hgdg271gv7g2prdhqrc.apps.goo
 
 // État en mémoire, alimenté en temps réel par Firestore (synchronise iPhone et ordinateur).
 const etat = { uid: null, aujourdhui: cleDuJour(new Date()), ecran: 'jour', jourAffiche: null,
-  ui: { exclMode: 'semaine', exclDate: null, defiType: 'sport-semaine', defiCible: 4, defiHabitude: 'meditation', abandon: false }, reglages: null, jours: {}, semaines: {}, taches: [], charge: new Set() };
+  ui: { defiCible: 4, defiHabitude: 'meditation', abandon: false }, reglages: null, jours: {}, semaines: {}, taches: [], charge: new Set() };
 let desabonnements = [];
 
 const ref = (...chemin) => doc(db, 'users', etat.uid, ...chemin);
@@ -1072,6 +1149,24 @@ const poids = () => ({ ...POIDS_DEFAUT, ...etat.reglages?.poids });
 const poidsSemaine = lundi => lundi < lundiDe(etat.aujourdhui) && etat.semaines[lundi]?.poids
   ? { ...POIDS_DEFAUT, ...etat.semaines[lundi].poids } : poids();
 const objectifSport = () => etat.reglages?.objectifSport ?? OBJECTIF_SPORT;
+
+// Habitudes : les neuf d'origine et celles créées dans les réglages (habitudesPerso : { id: { nom, type, icone, teinte } },
+// type « jour » ou « semaine »). La liste « habitudes » des réglages donne celles qui sont suivies, dans l'ordre du tour
+// de l'arche ; une habitude retirée garde son historique et peut être remise.
+const HABITUDES_ORIGINE = ['eau', 'petitDej', 'dejeuner', 'diner', 'sport', 'menage', 'sommeil', 'meditation', 'lecture'];
+const habitudesPerso = () => etat.reglages?.habitudesPerso ?? {};
+const habitudesActives = () => (etat.reglages?.habitudes ?? HABITUDES_ORIGINE).filter(h => HABITUDES_ORIGINE.includes(h) || habitudesPerso()[h]);
+const typeHabitude = h => h === 'sport' ? 'sport' : h === 'menage' ? 'semaine' : HABITUDES_ORIGINE.includes(h) ? 'jour' : habitudesPerso()[h]?.type ?? 'jour';
+const configHabitudes = liste => ({
+  quotidiennes: liste.filter(h => typeHabitude(h) === 'jour'),
+  hebdomadaires: liste.filter(h => typeHabitude(h) === 'semaine'),
+  avecSport: liste.includes('sport'),
+});
+// Une semaine terminée garde la liste d'habitudes avec laquelle elle a été figée (les neuf d'origine si elle a été
+// figée avant qu'on puisse en changer) ; la semaine en cours suit la liste actuelle.
+const habitudesSemaine = lundi => lundi < lundiDe(etat.aujourdhui) && etat.semaines[lundi]?.fige
+  ? etat.semaines[lundi].habitudes ?? HABITUDES_ORIGINE : habitudesActives();
+const configSemaine = lundi => configHabitudes(habitudesSemaine(lundi));
 
 function ecouter(uid) {
   etat.uid = uid;
@@ -1117,11 +1212,13 @@ function figerSemainesPassees() {
   for (let lundi = lundiDe(dateDebut); lundi < lundiCourant; lundi = ajouterJours(lundi, 7)) {
     const deja = etat.semaines[lundi];
     const p = deja?.poids ?? poids();
-    const r = calculerScoreSemaine({ lundi, jours: etat.jours, semaine: deja, poids: p,
+    const liste = deja?.fige ? deja.habitudes ?? HABITUDES_ORIGINE : habitudesActives();
+    const r = calculerScoreSemaine({ lundi, jours: etat.jours, semaine: deja, poids: p, ...configHabitudes(liste),
                                      objectifSport: objectifSport(), dateDebut, aujourdhui: etat.aujourdhui });
-    const detail = { sport: r.sport, menage: r.menage, scoresJours: r.scoresJours };
-    if (deja?.fige && deja.score === r.score && stable(deja.detail) === stable(detail) && stable(deja.poids) === stable(p)) continue;
-    setDoc(ref('weeks', lundi), { score: r.score, detail, poids: p, fige: true, calculeLe: serverTimestamp() }, { merge: true }).catch(erreur);
+    const detail = { sport: r.sport, menage: r.menage, scoresJours: r.scoresJours, ...(r.hebdo && { hebdo: r.hebdo }) };
+    if (deja?.fige && deja.score === r.score && stable(deja.detail) === stable(detail) && stable(deja.poids) === stable(p)
+        && stable(deja.habitudes) === stable(liste)) continue;
+    setDoc(ref('weeks', lundi), { score: r.score, detail, poids: p, habitudes: liste, fige: true, calculeLe: serverTimestamp() }, { merge: true }).catch(erreur);
   }
 }
 
@@ -1157,6 +1254,24 @@ const AVEC_ARTICLE = {
   sommeil: 'tes 7 h de sommeil', eau: 'tes 2 L d’eau', lecture: 'la lecture', meditation: 'la méditation',
   petitDej: 'le petit-déjeuner', dejeuner: 'le déjeuner', diner: 'le dîner',
 };
+// Habitudes créées : icône et teinte choisies dans ces listes (teinte : disque pastel et encre de l'icône).
+const ICONES_PERSO = ['heart', 'star', 'leaf', 'plant', 'sun', 'music-notes', 'pencil-simple', 'paint-brush', 'guitar', 'bicycle', 'barbell', 'person-simple-walk', 'carrot', 'pill', 'tooth', 'dog', 'graduation-cap', 'translate', 'device-mobile-slash', 'shower'];
+const TEINTES_PERSO = {
+  bleu: ['#c9dbe6', '#3f5a6e'], peche: ['#ecccbc', '#7a4128'], rose: ['#ebcdd4', '#6e3a52'], lavande: ['#d8d3e6', '#574d78'],
+  miel: ['#ecdcb4', '#6b5320'], pervenche: ['#d2d8ec', '#444f7e'], argile: ['#e3d4c6', '#6a4e3a'], sauge: ['#d3e0c8', '#3d5a35'],
+  corail: ['#f0c9c0', '#7c3b2e'], menthe: ['#cfe4dc', '#2f5a4c'],
+};
+// Teinte d'origine des neuf habitudes de base (les mêmes que dans le CSS).
+const TEINTES_ORIGINE = { eau: 'bleu', sport: 'peche', lecture: 'rose', meditation: 'lavande', petitDej: 'miel', dejeuner: 'miel', diner: 'miel', sommeil: 'pervenche', menage: 'argile' };
+// Bibliothèque d'icônes : celles des neuf habitudes de base, puis celles proposées pour les nouvelles.
+const BIBLIOTHEQUE_ICONES = [...HABITUDES_ORIGINE, ...ICONES_PERSO];
+const symboleIcone = cle => HABITUDES_ORIGINE.includes(cle) ? cle : `p-${cle}`;
+// Apparence d'une habitude (nom, icône, teinte) : celle d'origine, modifiable dans les réglages (apparences),
+// ou celle choisie à la création (habitudesPerso).
+const apparence = h => HABITUDES_ORIGINE.includes(h)
+  ? { nom: AFFICHAGE[h], icone: h, teinte: TEINTES_ORIGINE[h], ...etat.reglages?.apparences?.[h] }
+  : { nom: h, icone: ICONES_PERSO[0], teinte: 'bleu', ...habitudesPerso()[h] };
+const nomHabitude = h => apparence(h).nom;
 // Personnage : toutes ses images dans images/personnage/, en PNG à fond transparent et dans le même cadre (1080 × 960).
 //   base.png : la pose affichée en permanence, y compris à l'ouverture de l'écran.
 //   Une image par action, jouée quand une habitude est cochée pendant que l'écran est ouvert : la base fait place
@@ -1267,9 +1382,9 @@ function icone(nom) {
 // Scène calée sur l'écran : l'arche du jardin au centre, de sous la date jusqu'à MARGE_BAS du bas de l'écran (barre
 // d'accueil de l'iPhone en plus ; sur iPhone, raccourcie à HAUTEUR_ARCHE_MOBILE), ARCHE_MAX de large au plus. Son cadre est assez épais pour porter les boutons :
 // ils sont posés sur sa ligne médiane, à intervalles égaux sur tout le tour (arrondi du haut, côtés et bas),
-// dans l'ordre de TOUR, en partant du sommet et dans le sens des aiguilles d'une montre.
-const TOUR = ['eau', 'petitDej', 'dejeuner', 'diner', 'sport', 'menage', 'sommeil', 'meditation', 'lecture'];   // les trois repas ensemble, à droite, dans l'ordre de la journée
-const RAYON_BOUTON = 24;            // boutons ronds de 48 px (21 sur iPhone : --bouton à 42 px)
+// dans l'ordre des habitudes suivies (habitudesActives : par défaut les trois repas ensemble, à droite, dans l'ordre
+// de la journée), en partant du sommet et dans le sens des aiguilles d'une montre.
+const RAYON_BOUTON = 24;            // boutons ronds de 48 px (21 sur iPhone : --diametre à 42 px)
 const ARCHE_MAX = 640;
 const MARGE = 18;                   // entre l’arche et le bord de l’écran (sur iPhone, où l’arche prend toute la largeur)
 const MARGE_BAS = 24;               // sous l'arche
@@ -1309,10 +1424,11 @@ function caleCadran() {
     if ((s -= 2 * rho) < cote) return [cx - rho, yBas - s];
     const a = (s - cote) / rho; return [cx - rho * Math.cos(a), cyArc - rho * Math.sin(a)];
   };
-  TOUR.forEach((h, i) => {
-    const b = h === 'menage' ? $('menage-case') : TUILES[h];
+  const ordre = habitudesActives();
+  ordre.forEach((h, i) => {
+    const b = TUILES[h];
     if (!b) return;
-    const [x, y] = point(tour * i / TOUR.length);
+    const [x, y] = point(tour * i / ordre.length);
     b.style.setProperty('--x', `${x.toFixed(1)}px`);
     b.style.setProperty('--y', `${y.toFixed(1)}px`);
   });
@@ -1340,10 +1456,18 @@ function placerMenu() {
   nav.querySelector('.courbe-menu path').setAttribute('d', `M${x1.toFixed(1)},${y1.toFixed(1)} A${rho.toFixed(1)},${rho.toFixed(1)} 0 0 0 ${x2.toFixed(1)},${y2.toFixed(1)}`);
 }
 addEventListener('resize', placerMenu);
+const iconeDe = h => icone(symboleIcone(apparence(h).icone));
 function iconeHabitude(h) {
   const span = el('span', 'icone-habitude');
-  span.append(icone(h));
+  span.append(iconeDe(h));
   return span;
+}
+// Teinte d'une habitude (pastel du disque, encre de l'icône), posée sur son élément.
+function teinter(element, h) {
+  const t = TEINTES_PERSO[apparence(h).teinte];
+  if (!t) return;
+  element.style.setProperty('--pastel', t[0]);
+  element.style.setProperty('--encre', t[1]);
 }
 // Une nouvelle action remplace celle en cours sans attendre et relance le délai ; seule la dernière demandée compte.
 // Si l'appareil demande moins de mouvement, le CSS coupe fondus et mouvements : simple changement d'image.
@@ -1548,11 +1672,12 @@ function rendreJour() {
   if (passe) $('bandeau-texte').textContent = `Tu modifies ${formatDate(cle, { weekday: 'long', day: 'numeric', month: 'long' })}`;
 
   // Score de la semaine du jour affiché
-  const r = calculerScoreSemaine({ lundi, jours, semaine, poids: poidsSemaine(lundi), objectifSport: objectifSport(), dateDebut, aujourdhui });
+  const config = configSemaine(lundi);
+  const r = calculerScoreSemaine({ lundi, jours, semaine, poids: poidsSemaine(lundi), ...config, objectifSport: objectifSport(), dateDebut, aujourdhui });
   compterScore(r.score);
 
   // Score du jour : habitudes quotidiennes seulement (même calcul que la couleur du calendrier).
-  const sj = scoreJour(jour, semaine, poidsSemaine(lundi)).score;
+  const sj = scoreJour(jour, semaine, poidsSemaine(lundi), config.quotidiennes).score;
   scoreDuJour = sj === null ? 0 : Math.round(sj);
   if (!passe && scoreDuJour === 100) journeeParfaite(aujourdhui);
   $('score-jour').textContent = sj === null ? '—' : Math.round(sj);
@@ -1578,19 +1703,25 @@ function rendreJour() {
       etapesDefi(defi, fait, total));
   }
 
-  // Habitudes
-  const tuile = (h, conteneur) => {
+  // Habitudes suivies, une tuile chacune autour de l'arche (créée une fois, retirée si l'habitude n'est plus suivie).
+  // Quotidienne : cochée pour le jour affiché ; à la semaine (ménage, habitudes « chaque semaine ») : pour sa semaine.
+  const actives = habitudesActives();
+  for (const h of Object.keys(TUILES)) if (!actives.includes(h)) { TUILES[h].remove(); delete TUILES[h]; }
+  for (const h of actives) {
     let b = TUILES[h];
     if (!b) {
       b = el('button', 'tuile');
       b.dataset.h = h;
-      b.append(iconeHabitude(h));
-      b.setAttribute('aria-label', h === 'sommeil' ? 'Nuit de 7 heures ou plus' : AFFICHAGE[h]);
+      b.append(el('span', 'icone-habitude'));
       TUILES[h] = b;
-      conteneur.append(b);
+      $('scene').append(b);
     }
-    const exclue = estExclue(h, jour, semaine);
-    const fait = !exclue && !!valeurHabitude(h, jour);
+    teinter(b, h);   // apparence modifiable dans les réglages : remise à jour à chaque rendu
+    if (b.dataset.icone !== apparence(h).icone) { b.dataset.icone = apparence(h).icone; b.firstChild.replaceChildren(iconeDe(h)); }
+    const aLaSemaine = typeHabitude(h) === 'semaine';
+    b.setAttribute('aria-label', h === 'sommeil' ? 'Nuit de 7 heures ou plus' : `${nomHabitude(h)}${aLaSemaine ? ' (cette semaine)' : ''}`);
+    const exclue = aLaSemaine ? !!semaine?.exclusions?.includes(h) : estExclue(h, jour, semaine);
+    const fait = !exclue && !!(aLaSemaine ? valeurSemaine(h, semaine) : valeurHabitude(h, jour));
     b.classList.toggle('fait', fait);
     b.classList.toggle('exclue', exclue);
     b.setAttribute('aria-pressed', fait);
@@ -1600,30 +1731,14 @@ function rendreJour() {
       if (!fait) {
         // Série de 7 jours atteinte par cette coche : petite célébration.
         const apres = { ...jours, [cle]: { ...jour, habitudes: { ...jour?.habitudes, [h]: true } } };
-        const sept = !passe && h !== 'sport' && serieJours(h, { ...contexte, jours: apres }) === 7;
+        const sept = !passe && !aLaSemaine && h !== 'sport' && serieJours(h, { ...contexte, jours: apres }) === 7;
         celebrer(b, sept, INTERACTION[h]);
       }
-      ecrireJour({ habitudes: { [h]: !fait } });
+      if (h === 'menage') ecrireSemaine({ menage: !fait });
+      else if (aLaSemaine) ecrireSemaine({ cases: { [h]: !fait } });
+      else ecrireJour({ habitudes: { [h]: !fait } });
     };
-  };
-  // Dans l'ordre de lecture : l'arc du haut, puis celui du bas (le ménage, écrit à la semaine, est dans le HTML).
-  for (const h of TOUR) {
-    if (h !== 'menage') tuile(h, $('scene'));
-    else if (!TUILES.menage) { TUILES.menage = $('menage-case'); $('scene').append(TUILES.menage); }
   }
-
-  // Ménage
-  const menageExclu = !!semaine?.exclusions?.includes('menage');
-  const menageFait = !menageExclu && !!semaine?.menage;
-  $('menage-case').classList.toggle('fait', menageFait);
-  $('menage-case').classList.toggle('exclue', menageExclu);
-  $('menage-case').setAttribute('aria-pressed', menageFait);
-  $('menage-case').disabled = menageExclu;
-  $('menage-case').onclick = e => {
-    if (e.detail) $('menage-case').blur();
-    if (!menageFait) celebrer($('menage-case'), false, INTERACTION.menage);
-    ecrireSemaine({ menage: !menageFait });
-  };
 }
 
 // Tâches (écran dédié, hors score), en tableau : nom, statut, priorité (1 à 3 étoiles), échéance, description. Trois statuts : à faire, en cours, terminé
@@ -1703,7 +1818,7 @@ function rendreHistorique() {
     ligne.append(el('span', 'cal-semaine', formatDate(lundi, { day: 'numeric', month: 'short' })));
     for (const c of joursDeLaSemaine(lundi)) {
       if (c < dateDebut || c > aujourdhui) { ligne.append(el('span', 'cal-case vide')); continue; }
-      const { score } = scoreJour(jours[c], semaines[lundi], poidsSemaine(lundi));
+      const { score } = scoreJour(jours[c], semaines[lundi], poidsSemaine(lundi), configSemaine(lundi).quotidiennes);
       const b = el('button', `cal-case${score === null ? ' exclue' : ` n${niveau(score)}`}${c === aujourdhui ? ' aujourdhui' : ''}`);
       b.setAttribute('aria-label', `${formatDate(c, { weekday: 'long', day: 'numeric', month: 'long' })} : ${score === null ? 'exclu' : `${Math.round(score)} %`}`);
       b.title = b.getAttribute('aria-label');
@@ -1711,7 +1826,7 @@ function rendreHistorique() {
       ligne.append(b);
     }
     const scoreSemaine = lundi === lundiCourant
-      ? calculerScoreSemaine({ lundi, jours, semaine: semaines[lundi], poids: poids(), objectifSport: objectifSport(), dateDebut, aujourdhui }).score
+      ? calculerScoreSemaine({ lundi, jours, semaine: semaines[lundi], poids: poids(), ...configSemaine(lundi), objectifSport: objectifSport(), dateDebut, aujourdhui }).score
       : semaines[lundi]?.score;
     const cellule = el('span', 'cal-score', scoreSemaine ?? '—');
     if (lundi === lundiCourant) cellule.append(el('small', '', 'en cours'));
@@ -1758,117 +1873,228 @@ function rendreReglages() {
   const { aujourdhui, reglages, jours, semaines, ui } = etat;
   rendreDefisReussis();
 
-  // Exclusions : pour la semaine d'une date, ou pour un jour précis.
-  const date = ui.exclDate ?? aujourdhui;
-  if (document.activeElement !== $('excl-date')) $('excl-date').value = date;
-  for (const b of $('excl-mode').children) b.setAttribute('aria-pressed', b.dataset.mode === ui.exclMode);
-  const lundi = lundiDe(date);
-  const exclSemaine = semaines[lundi]?.exclusions ?? [];
-  const exclJour = jours[date]?.exclusions ?? [];
-  const parSemaine = ui.exclMode === 'semaine';
-  $('excl-periode').textContent = parSemaine
-    ? `Semaine du ${formatDate(lundi, { day: 'numeric', month: 'long' })} au ${formatDate(ajouterJours(lundi, 6), { day: 'numeric', month: 'long' })}`
-    : formatDate(date, { weekday: 'long', day: 'numeric', month: 'long' });
-  const liste = parSemaine ? exclSemaine : exclJour;
-  const habitudes = ['sommeil', 'eau', 'sport', 'lecture', 'meditation', 'petitDej', 'dejeuner', 'diner', ...(parSemaine ? ['menage'] : [])];
-  $('excl-puces').replaceChildren(...habitudes.map(h => {
-    const viaSemaine = !parSemaine && exclSemaine.includes(h);
-    const actif = liste.includes(h) || viaSemaine;
-    const b = el('button', 'puce');
-    b.append(icone(h), `${AFFICHAGE[h]}${viaSemaine ? ' (toute la semaine)' : ''}`);
-    b.setAttribute('aria-pressed', actif);
-    b.disabled = viaSemaine;
-    b.onclick = () => {
-      const nouvelle = actif ? liste.filter(x => x !== h) : [...liste, h];
-      if (parSemaine) setDoc(ref('weeks', lundi), { exclusions: nouvelle }, { merge: true }).catch(erreur);
-      else setDoc(ref('days', date), { exclusions: nouvelle, majLe: serverTimestamp() }, { merge: true }).catch(erreur);
-    };
-    return b;
-  }));
+  rendreHabitudes();
 
-  // Défi : un seul à la fois.
+  // Défi : un seul à la fois, présenté comme la liste des habitudes. En cours : une ligne (avancement, dates, abandon
+  // en deux touches). Sinon : une ligne par défi possible, réglable sur place, avec son bouton « Lancer ».
   const defi = reglages.defiEnCours;
   const court = c => formatDate(c, { day: 'numeric', month: 'short' });
+  const ligne = (h, titre, detail) => {
+    const li = el('li');
+    if (h) li.dataset.h = h;
+    teinter(li, h);
+    const pastille = el('span', 'pastille-habitude');
+    pastille.append(h ? iconeDe(h) : icone('defi'));
+    const nom = el('span', 'nom');
+    nom.append(el('b', '', titre), el('small', '', detail));
+    li.append(pastille, nom);
+    return li;
+  };
+  const liste = el('ul', 'liste-habitudes liste-defis-reglage');
   if (defi) {
     const { fait, total, statut } = evaluerDefi(defi, { jours, semaines, aujourdhui });
-    const bloc = el('div', 'defi-actif');
-    const titre = el('div', 'titre-defi');
-    titre.append(icone('defi'), defi.libelle);
-    bloc.append(titre,
-      el('p', 'note', `Du ${court(defi.debut)} au ${court(defi.fin)} · ${fait}/${total}${statut === 'reussi' ? ' · réussi ✓' : statut === 'rate' ? ' · raté cette fois' : ''}`));
-    const abandon = el('button', 'bouton secondaire', ui.abandon ? 'Touche encore pour confirmer' : 'Abandonner le défi');
+    const li = ligne(defi.type === 'sport-semaine' ? 'sport' : defi.habitude, defi.libelle,
+      `Du ${court(defi.debut)} au ${court(defi.fin)} · ${fait}/${total}${statut === 'reussi' ? ' · réussi ✓' : statut === 'rate' ? ' · raté cette fois' : ''}`);
+    const abandon = el('button', `tache-action retirer${ui.abandon ? ' confirmer' : ''}`);
+    abandon.type = 'button';
+    if (ui.abandon) abandon.textContent = 'Abandonner ?';
+    else abandon.append(icone('fermer'));
+    abandon.setAttribute('aria-label', ui.abandon ? 'Confirmer : abandonner le défi' : 'Abandonner le défi');
     abandon.onclick = () => {
-      if (!ui.abandon) { ui.abandon = true; rendre(); setTimeout(() => { ui.abandon = false; rendre(); }, 4000); return; }
+      if (!ui.abandon) { ui.abandon = true; rendre(); setTimeout(() => { ui.abandon = false; rendre(); }, 3000); return; }
       ui.abandon = false;
       ecrireReglages({ defiEnCours: null });
     };
-    const p = el('p'); p.append(abandon);
-    bloc.append(p);
-    $('defi-zone').replaceChildren(bloc);
+    li.append(abandon);
+    liste.append(li);
   } else {
-    const segment = el('div', 'segment');
-    for (const [type, nom] of [['sport-semaine', 'Sport cette semaine'], ['sans-manquer', 'Un mois sans manquer']]) {
-      const b = el('button', '', nom);
-      b.setAttribute('aria-pressed', ui.defiType === type);
-      b.onclick = () => { ui.defiType = type; rendre(); };
-      segment.append(b);
-    }
-    const options = el('div');
-    if (ui.defiType === 'sport-semaine') {
-      const compteur = el('div', 'compteur');
-      const moins = el('button', '', '−'), plus = el('button', '', '+');
-      moins.setAttribute('aria-label', 'Une séance de moins'); plus.setAttribute('aria-label', 'Une séance de plus');
-      moins.onclick = () => { ui.defiCible = Math.max(1, ui.defiCible - 1); rendre(); };
-      plus.onclick = () => { ui.defiCible = Math.min(7, ui.defiCible + 1); rendre(); };
-      compteur.append(moins, el('b', '', ui.defiCible), plus, el('span', 'note', `séance${ui.defiCible > 1 ? 's' : ''} du ${court(lundiDe(aujourdhui))} au ${court(ajouterJours(lundiDe(aujourdhui), 6))}`));
-      options.append(compteur);
-    } else {
-      const puces = el('div', 'puces');
-      for (const h of Object.keys(AVEC_ARTICLE)) {
-        const b = el('button', 'puce choisie');
-        b.append(icone(h), AFFICHAGE[h]);
-        b.setAttribute('aria-pressed', ui.defiHabitude === h);
-        b.onclick = () => { ui.defiHabitude = h; rendre(); };
-        puces.append(b);
-      }
-      options.append(puces, el('p', 'note', `Du ${court(aujourdhui)} au ${court(finDefiMensuel(aujourdhui))}`));
-    }
-    const lancer = el('button', 'bouton', 'Lancer le défi');
-    lancer.onclick = () => {
-      const debut = ui.defiType === 'sport-semaine' ? lundiDe(aujourdhui) : aujourdhui;
-      ecrireReglages({ defiEnCours: ui.defiType === 'sport-semaine'
-        ? { type: 'sport-semaine', cible: ui.defiCible, debut, fin: ajouterJours(debut, 6), libelle: `${ui.defiCible} séances de sport cette semaine` }
-        : { type: 'sans-manquer', habitude: ui.defiHabitude, debut, fin: finDefiMensuel(debut), libelle: `Un mois sans manquer ${AVEC_ARTICLE[ui.defiHabitude]}` } });
+    const lancer = defiNouveau => {
+      const b = el('button', 'bouton lancer', 'Lancer');
+      b.type = 'button';
+      b.onclick = () => ecrireReglages({ defiEnCours: defiNouveau() });
+      return b;
     };
-    const p = el('p'); p.append(lancer);
-    $('defi-zone').replaceChildren(segment, options, p);
+    // Sport : un nombre de séances pour la semaine en cours.
+    const lundi = lundiDe(aujourdhui);
+    const sport = ligne('sport', 'Sport cette semaine', `Du ${court(lundi)} au ${court(ajouterJours(lundi, 6))}`);
+    const compteur = el('span', 'compteur-defi');
+    const moins = el('button', 'tache-action', '−'), plus = el('button', 'tache-action', '+');
+    moins.setAttribute('aria-label', 'Une séance de moins'); plus.setAttribute('aria-label', 'Une séance de plus');
+    moins.onclick = () => { ui.defiCible = Math.max(1, ui.defiCible - 1); rendre(); };
+    plus.onclick = () => { ui.defiCible = Math.min(7, ui.defiCible + 1); rendre(); };
+    compteur.append(moins, el('b', '', ui.defiCible), plus);
+    sport.querySelector('.nom').append(compteur);
+    sport.append(lancer(() => ({ type: 'sport-semaine', cible: ui.defiCible, debut: lundi, fin: ajouterJours(lundi, 6),
+      libelle: `${ui.defiCible} séances de sport cette semaine` })));
+    if (habitudesActives().includes('sport')) liste.append(sport);
+    // Un mois sans manquer une habitude quotidienne suivie.
+    const possibles = configHabitudes(habitudesActives()).quotidiennes;
+    if (possibles.length) {
+      if (!possibles.includes(ui.defiHabitude)) ui.defiHabitude = possibles[0];
+      const mois = ligne(ui.defiHabitude, 'Un mois sans manquer', `Du ${court(aujourdhui)} au ${court(finDefiMensuel(aujourdhui))}`);
+      const choix = el('select', 'choix-defi');
+      choix.setAttribute('aria-label', 'Habitude du défi');
+      for (const h of possibles) choix.append(Object.assign(el('option', '', nomHabitude(h)), { value: h, selected: h === ui.defiHabitude }));
+      choix.onchange = () => { ui.defiHabitude = choix.value; rendre(); };
+      mois.querySelector('.nom').append(choix);
+      mois.append(lancer(() => ({ type: 'sans-manquer', habitude: ui.defiHabitude, debut: aujourdhui, fin: finDefiMensuel(aujourdhui),
+        libelle: `Un mois sans manquer ${etat.reglages?.apparences?.[ui.defiHabitude]?.nom ? `« ${nomHabitude(ui.defiHabitude)} »` : AVEC_ARTICLE[ui.defiHabitude] ?? `« ${nomHabitude(ui.defiHabitude)} »`}` })));
+      liste.append(mois);
+    }
   }
-
-  // Pondérations
-  const pd = poids();
-  const ordre = ['sport', 'sommeil', 'eau', 'petitDej', 'dejeuner', 'diner', 'lecture', 'meditation', 'menage'];
-  if (!$('poids').contains(document.activeElement)) {
-    $('poids').replaceChildren(...ordre.map(k => {
-      const label = el('label', '', AFFICHAGE[k]);
-      const input = el('input');
-      Object.assign(input, { type: 'number', min: 0, max: 100, step: 1, inputMode: 'numeric', value: pd[k] });
-      input.onchange = () => {
-        const v = Math.max(0, Math.min(100, Math.round(Number(input.value) || 0)));
-        ecrireReglages({ [`poids.${k}`]: v });
-      };
-      label.append(input);
-      return label;
-    }));
-  }
-  const total = ordre.reduce((t, k) => t + pd[k], 0);
-  $('poids-total').textContent = `Total : ${total}. Le score reste sur 100 quel que soit le total. Un changement s’applique à partir de la semaine en cours ; les semaines passées gardent leurs poids.`;
+  $('defi-zone').replaceChildren(liste);
 
   $('reglage-compte').textContent = `Connecté : ${auth.currentUser?.email ?? ''}`;
 }
 
-for (const b of $('excl-mode').children) b.onclick = () => { etat.ui.exclMode = b.dataset.mode; rendre(); };
-$('excl-date').onchange = () => { if ($('excl-date').value) { etat.ui.exclDate = $('excl-date').value; rendre(); } };
-$('poids-defaut').onclick = () => ecrireReglages({ poids: POIDS_DEFAUT });
+$('poids-defaut').onclick = () => ecrireReglages(Object.fromEntries(Object.entries(POIDS_DEFAUT).map(([h, v]) => [`poids.${h}`, v])));
+
+// Habitudes (réglages) : une ligne par habitude, les suivies d'abord (dans l'ordre du tour de l'arche), puis les
+// masquées, estompées. Chaque ligne : pastille et nom (à toucher pour modifier nom, icône et couleur), pondération,
+// et l'œil pour masquer ou réafficher l'habitude. Masquer la retire de l'arche et du score sans rien effacer.
+// Un changement s'applique à partir de la semaine en cours ; les semaines passées gardent leurs habitudes et leurs poids.
+function rendreHabitudes() {
+  const pd = poids(), actives = habitudesActives();
+  const masquees = [...HABITUDES_ORIGINE, ...Object.keys(habitudesPerso())].filter(h => !actives.includes(h));
+  const typeEnTexte = h => ({ jour: 'Chaque jour', semaine: 'Chaque semaine', sport: `${objectifSport()} séances par semaine` })[typeHabitude(h)];
+  if (!$('liste-habitudes').contains(document.activeElement)) {
+    $('liste-habitudes').replaceChildren(...[...actives, ...masquees].map(h => {
+      const masquee = !actives.includes(h);
+      const li = el('li', `${masquee ? 'masquee' : ''}${brouillon.edition === h ? ' en-edition' : ''}`);
+      teinter(li, h);
+      li.dataset.h = h;
+      const modifier = el('button', 'modifier');
+      modifier.type = 'button';
+      modifier.setAttribute('aria-label', `Modifier ${nomHabitude(h)}`);
+      const pastille = el('span', 'pastille-habitude');
+      pastille.append(iconeDe(h));
+      const nom = el('span', 'nom');
+      nom.append(el('b', '', nomHabitude(h)), el('small', '', typeEnTexte(h)));
+      modifier.append(pastille, nom);
+      modifier.onclick = () => ouvrirFormHabitude(h);
+      const champ = el('input', 'poids');
+      Object.assign(champ, { type: 'number', min: 0, max: 100, step: 1, inputMode: 'numeric', value: pd[h] ?? 0 });
+      champ.setAttribute('aria-label', `Pondération de ${nomHabitude(h)}`);
+      champ.onchange = () => ecrireReglages({ [`poids.${h}`]: Math.max(0, Math.min(100, Math.round(Number(champ.value) || 0))) });
+      const oeil = el('button', 'tache-action retirer');
+      oeil.type = 'button';
+      oeil.append(icone(masquee ? 'afficher' : 'masquer'));
+      oeil.setAttribute('aria-label', `${masquee ? 'Afficher' : 'Masquer'} ${nomHabitude(h)}`);
+      oeil.title = masquee ? 'Afficher' : 'Masquer';
+      oeil.onclick = () => ecrireReglages({ habitudes: masquee ? [...actives, h] : actives.filter(x => x !== h) });
+      li.append(modifier, champ, oeil);
+      return li;
+    }));
+  }
+  const total = actives.reduce((t, h) => t + (pd[h] ?? 0), 0);
+  $('poids-total').textContent = `Total des pondérations (habitudes affichées) : ${total}. Le score reste sur 100 quel que soit le total. Un changement s’applique à partir de la semaine en cours ; les semaines passées gardent leurs habitudes et leurs poids.`;
+}
+
+// Formulaire d'habitude, pour en créer une (nom, fréquence, icône, couleur, pondération) ou en modifier une
+// (nom, icône, couleur ; la fréquence ne change pas). Les neuf de base gardent leur apparence modifiée dans
+// « apparences », les autres dans « habitudesPerso ».
+const brouillon = { edition: null, type: 'jour', icone: ICONES_PERSO[0], teinte: 'bleu' };
+function rendreFormHabitude() {
+  for (const b of $('type-habitude').children) b.setAttribute('aria-pressed', b.dataset.type === brouillon.type);
+  for (const b of $('choix-icones').children) b.setAttribute('aria-pressed', b.dataset.icone === brouillon.icone);
+  for (const b of $('choix-teintes').children) b.setAttribute('aria-pressed', b.dataset.teinte === brouillon.teinte);
+  $('choix-icones').style.setProperty('--encre', TEINTES_PERSO[brouillon.teinte][1]);
+}
+$('choix-icones').replaceChildren(...BIBLIOTHEQUE_ICONES.map(n => {
+  const b = el('button');
+  b.type = 'button';
+  b.dataset.icone = n;
+  b.setAttribute('aria-label', `Icône ${AFFICHAGE[n] ?? n}`);
+  b.append(icone(symboleIcone(n)));
+  b.onclick = () => { brouillon.icone = n; rendreFormHabitude(); };
+  return b;
+}));
+$('choix-teintes').replaceChildren(...Object.entries(TEINTES_PERSO).map(([n, [pastel, encre]]) => {
+  const b = el('button');
+  b.type = 'button';
+  b.dataset.teinte = n;
+  b.setAttribute('aria-label', `Couleur ${n}`);
+  b.style.setProperty('--pastel', pastel);
+  b.style.setProperty('--encre', encre);
+  b.onclick = () => { brouillon.teinte = n; rendreFormHabitude(); };
+  return b;
+}));
+for (const b of $('type-habitude').children) b.onclick = () => { brouillon.type = b.dataset.type; rendreFormHabitude(); };
+// Une habitude créée peut être supprimée tant qu'elle n'a jamais servi : cochée nulle part aujourd'hui (une coche
+// retirée ne compte pas), absente des semaines figées et des défis. Sinon, on peut seulement la masquer
+// (son historique reste juste).
+function habitudeUtilisee(h) {
+  const { jours, semaines, reglages } = etat;
+  return Object.values(jours).some(j => j?.habitudes?.[h] === true)
+    || Object.values(semaines).some(se => se?.cases?.[h] === true || se?.habitudes?.includes(h))
+    || reglages?.defiEnCours?.habitude === h || (reglages?.defisPasses ?? []).some(d => d.habitude === h);
+}
+function armerSuppressionHabitude(armee) {
+  clearTimeout(minuteurSuppressionHabitude);
+  const b = $('supprimer-habitude');
+  b.classList.toggle('confirmer', armee);
+  b.replaceChildren(armee ? 'Supprimer ?' : icone('poubelle'));
+  b.setAttribute('aria-label', armee ? 'Confirmer la suppression' : 'Supprimer l’habitude');
+  if (armee) minuteurSuppressionHabitude = setTimeout(() => armerSuppressionHabitude(false), 3000);
+}
+let minuteurSuppressionHabitude = 0;
+$('supprimer-habitude').onclick = () => {
+  if (!$('supprimer-habitude').classList.contains('confirmer')) return armerSuppressionHabitude(true);
+  const h = brouillon.edition;
+  const { [h]: _, ...perso } = habitudesPerso();
+  const { [h]: __, ...poidsRestants } = etat.reglages?.poids ?? {};
+  ecrireReglages({ habitudesPerso: perso, poids: poidsRestants, habitudes: habitudesActives().filter(x => x !== h) });
+  fermerFormHabitude();
+};
+function ouvrirFormHabitude(h = null) {
+  const creee = h && !HABITUDES_ORIGINE.includes(h), utilisee = creee && habitudeUtilisee(h);
+  armerSuppressionHabitude(false);
+  $('supprimer-habitude').hidden = !creee || utilisee;
+  $('note-suppression').hidden = !utilisee;
+  $('note-suppression').textContent = 'Cette habitude a déjà servi : elle ne peut plus être supprimée, seulement masquée.';
+  const a = h ? apparence(h) : null;
+  Object.assign(brouillon, { edition: h, type: h ? typeHabitude(h) : 'jour', icone: a?.icone ?? ICONES_PERSO[0], teinte: a?.teinte ?? 'bleu' });
+  $('titre-form-habitude').textContent = h ? `Modifier « ${a.nom} »` : 'Nouvelle habitude';
+  $('valider-habitude').textContent = h ? 'Enregistrer' : 'Ajouter';
+  $('type-habitude').hidden = !!h;
+  $('champ-poids-habitude').hidden = !!h;
+  $('nom-habitude').value = a?.nom ?? '';
+  $('form-habitude').hidden = false;
+  $('nouvelle-habitude').hidden = true;
+  rendreFormHabitude();
+  rendre();
+  $('form-habitude').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  $('nom-habitude').focus({ preventScroll: true });
+}
+$('nouvelle-habitude').onclick = () => ouvrirFormHabitude();
+const fermerFormHabitude = () => {
+  brouillon.edition = null;
+  $('form-habitude').hidden = true;
+  $('nouvelle-habitude').hidden = false;
+  $('nom-habitude').value = '';
+  $('poids-habitude').value = 8;
+  rendre();
+};
+$('annuler-habitude').onclick = fermerFormHabitude;
+$('form-habitude').onsubmit = e => {
+  e.preventDefault();
+  const nom = $('nom-habitude').value.trim();
+  if (!nom) return $('nom-habitude').focus();
+  const h = brouillon.edition;
+  if (h) {
+    const champ = HABITUDES_ORIGINE.includes(h) ? `apparences.${h}` : `habitudesPerso.${h}`;
+    ecrireReglages({ [`${champ}.nom`]: nom, [`${champ}.icone`]: brouillon.icone, [`${champ}.teinte`]: brouillon.teinte });
+    return fermerFormHabitude();
+  }
+  const id = `h${Date.now().toString(36)}`;
+  const poidsNouvelle = Math.max(0, Math.min(100, Math.round(Number($('poids-habitude').value) || 0)));
+  ecrireReglages({
+    [`habitudesPerso.${id}`]: { nom, type: brouillon.type, icone: brouillon.icone, teinte: brouillon.teinte },
+    [`poids.${id}`]: poidsNouvelle,
+    habitudes: [...habitudesActives(), id],
+  });
+  fermerFormHabitude();
+};
 
 // Navigation : barre du bas (mobile) ou rail de gauche (ordinateur), toujours visible.
 for (const b of $('navigation').querySelectorAll('button')) b.onclick = () => {

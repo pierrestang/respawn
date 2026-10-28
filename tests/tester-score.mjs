@@ -178,5 +178,31 @@ verifier('Méditation : aujourd\'hui pas encore faite → toujours en cours',
 verifier('Correction : cocher le jeudi oublié → plus raté',
   L.evaluerDefi(defiMedit, { jours: { ...medit, '2026-10-22': jour() }, aujourdhui: '2026-10-24' }), { fait: 5, total: 5, statut: 'en-cours' });
 
+// --- Habitudes choisies : ajoutées (chaque jour, chaque semaine) ou retirées ---
+const semaineParfaite = semaineDe(i => jour(avecSport(TOUT, i)));
+const D = { lundi: LUNDI, dateDebut: LUNDI, aujourdhui: J[6] };
+const QUOTIDIENNES = ['sommeil', 'eau', 'petitDej', 'dejeuner', 'diner', 'lecture', 'meditation'];
+verifier('Liste par défaut = les neuf d\'origine',
+  L.calculerScoreSemaine({ ...D, jours: semaineParfaite, semaine: { menage: true } }).score, 100);
+verifier('Quotidienne ajoutée (poids 10), jamais cochée → 91',
+  L.calculerScoreSemaine({ ...D, jours: semaineParfaite, semaine: { menage: true }, poids: { ...L.POIDS_DEFAUT, etirements: 10 },
+    quotidiennes: [...QUOTIDIENNES, 'etirements'] }).score, 91);
+verifier('Quotidienne ajoutée, cochée tous les jours → 100',
+  L.calculerScoreSemaine({ ...D, jours: semaineDe(i => jour(avecSport({ ...TOUT, etirements: true }, i))), semaine: { menage: true },
+    poids: { ...L.POIDS_DEFAUT, etirements: 10 }, quotidiennes: [...QUOTIDIENNES, 'etirements'] }).score, 100);
+verifier('Hebdomadaire ajoutée (poids 10), non cochée → 91',
+  L.calculerScoreSemaine({ ...D, jours: semaineParfaite, semaine: { menage: true }, poids: { ...L.POIDS_DEFAUT, appel: 10 },
+    hebdomadaires: ['menage', 'appel'] }).score, 91);
+verifier('Hebdomadaire ajoutée, cochée (rangée dans « cases ») → 100',
+  L.calculerScoreSemaine({ ...D, jours: semaineParfaite, semaine: { menage: true, cases: { appel: true } }, poids: { ...L.POIDS_DEFAUT, appel: 10 },
+    hebdomadaires: ['menage', 'appel'] }).score, 100);
+verifier('Sport retiré : une semaine sans sport redevient parfaite',
+  L.calculerScoreSemaine({ ...D, jours: semaineDe(() => jour(TOUT)), semaine: { menage: true }, avecSport: false }).score, 100);
+verifier('Ménage retiré : ménage non fait sans effet',
+  L.calculerScoreSemaine({ ...D, jours: semaineParfaite, semaine: { menage: false }, hebdomadaires: [] }).score, 100);
+verifier('Lecture retirée : jamais lue sans effet',
+  L.calculerScoreSemaine({ ...D, jours: semaineDe(i => jour(avecSport({ ...TOUT, lecture: false }, i))), semaine: { menage: true },
+    quotidiennes: QUOTIDIENNES.filter(h => h !== 'lecture') }).score, 100);
+
 console.log(echecs ? `\n✗ ${echecs} échec(s)` : '\n✓ Tout est juste');
 process.exit(echecs ? 1 : 0);
