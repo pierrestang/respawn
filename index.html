@@ -16,28 +16,25 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,500..600,0..100&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
 <!-- ===================== STYLES ===================== -->
 <style>
-  /* Direction artistique : néomorphisme (soft UI) chaleureux. Tout est sculpté dans le même crème pêche ;
-     seules les ombres (claire en haut à gauche, brun clair en bas à droite) donnent le relief.
-     Les zones en creux sont un peu plus foncées pour que le relief se lise nettement.
+  /* Direction artistique : plat et chaleureux, sur un fond crème pêche. Seuls l'arche et le jardin qu'elle contient
+     ont du relief ; tout le reste est plat : surfaces claires bordées d'un filet fin, aplats teintés pour les choix actifs.
      Chaque habitude a sa teinte ; le vert est réservé au score et au calendrier. */
   :root {
     --fond: #f7ebdf; --creux-fond: #efdfd0;
     --ombre-claire: #fff9f3; --ombre-foncee: #dbc4ae;
     --accent: #4f7a42; --accent-texte: #426635;
     --texte: #3d3129; --texte-doux: #64554a;
-    --relief: 9px 9px 20px var(--ombre-foncee), -9px -9px 20px var(--ombre-claire);
-    --relief-rond: 6px 6px 14px var(--ombre-foncee), -6px -6px 14px var(--ombre-claire);
-    --relief-mini: 3px 3px 7px var(--ombre-foncee), -3px -3px 7px var(--ombre-claire);
-    --creux: inset 6px 6px 12px var(--ombre-foncee), inset -6px -6px 12px var(--ombre-claire);
-    --creux-mini: inset 3px 3px 6px var(--ombre-foncee), inset -3px -3px 6px var(--ombre-claire);
+    /* Surfaces plates : fond clair, filet fin, filet plus doux entre deux lignes. */
+    --plat-fond: #fffaf4; --plat-filet: #eadbcc; --plat-filet-doux: #f2e6da;
+    --filet: inset 0 0 0 1px var(--plat-filet);
     --titres: 'Fraunces', Georgia, serif;
     --anim: .45s;
     /* Anciens noms, encore utilisés par l'historique et les réglages (convertis aux étapes suivantes). */
     --creme: var(--fond); --beige: var(--fond); --sable: #ddd4c6; --sable-fonce: var(--ombre-foncee);
     --feuille-clair: #dfe6d3; --feuille: #8ab372; --feuille-fonce: var(--accent); --bouton: var(--accent);
     --brun: var(--texte); --brun-doux: var(--texte-doux); --soleil: #e9dcc2; --ocre: #b08a4f; --corail: #d9a99b;
-    --ombre: var(--relief); --ombre-legere: var(--relief-rond); --grain: none;
-    --rond: 28px;
+    --grain: none;
+    --rond: 16px;
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   [hidden] { display: none !important; }
@@ -49,18 +46,18 @@
     -webkit-font-smoothing: antialiased;
     padding: calc(12px + env(safe-area-inset-top)) 16px calc(28px + env(safe-area-inset-bottom));
   }
-  button, input { font: inherit; color: inherit; }
+  button, input, textarea { font: inherit; color: inherit; }
   button { cursor: pointer; }
   .logo, .titre-carte, #score, .score-sous, #duree { font-variation-settings: 'SOFT' 100; }
   /* Contour de focus uniquement pour la navigation au clavier, discret et accordé au style. */
-  button:focus, input:focus { outline: none; }
-  button:focus-visible, input:focus-visible { outline: 2px solid rgba(79, 122, 66, .5); outline-offset: 3px; }
+  button:focus, input:focus, textarea:focus { outline: none; }
+  button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid rgba(79, 122, 66, .5); outline-offset: 3px; }
 
   /* --- Connexion --- */
   #ecran-connexion { min-height: 90vh; display: grid; place-content: center; }
   #ecran-connexion .carte { text-align: center; display: grid; gap: 18px; justify-items: center; padding: 32px 28px; }
   .logo { font-family: var(--titres); font-size: 38px; font-weight: 600; color: var(--texte); margin: -8px 0 0; }
-  .logo-image { width: 148px; height: 148px; border-radius: 34px; box-shadow: var(--relief); }
+  .logo-image { width: 148px; height: 148px; border-radius: 34px; }
   #message { color: #9a4a36; max-width: 320px; margin: 0 auto; }
 
   /* --- Mise en page --- */
@@ -72,7 +69,7 @@
     #app { padding-top: 20px; }
     #ecran-historique, #ecran-taches, #ecran-reglages { max-width: 640px; margin: 0 auto; }
   }
-  .carte { background: var(--fond); border-radius: var(--rond); box-shadow: var(--relief); padding: 16px 18px; position: relative; }
+  .carte { background: var(--plat-fond); border: 1px solid var(--plat-filet); border-radius: var(--rond); padding: 16px 18px; position: relative; }
   .titre-carte { font-family: var(--titres); font-size: 21px; font-weight: 600; margin: 0 0 16px; }
   .etiquette {
     display: inline-block; background: var(--feuille-clair); color: var(--accent-texte); font-weight: 700; font-size: 15px;
@@ -86,25 +83,19 @@
   /* --- Bande du haut, à plat et compacte : un groupe centré (anneau du score, puis date et infos) --- */
   .bande { display: flex; justify-content: center; align-items: center; gap: 14px; min-height: 80px; padding: 4px 0; }
   .bande-titre { min-width: 0; }
-  #date { font-family: var(--titres); font-variation-settings: 'SOFT' 100; font-size: 20px; font-weight: 600; color: var(--texte); margin: 0; line-height: 1.15; }
+  #date, #titre-taches { font-family: var(--titres); font-variation-settings: 'SOFT' 100; font-size: 20px; font-weight: 600; color: var(--texte); margin: 0; line-height: 1.15; }
   #date::first-letter { text-transform: uppercase; }
   .bande-infos { font-size: 11.5px; color: var(--texte-doux); margin: 3px 0 0; }
   .bande-infos b { color: var(--texte); font-weight: 700; }
   .pour-lecteur { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   /* Anneau de progression autour du score de la semaine */
-  /* Anneau : disque en relief ; la piste est une rainure en creux, l'arc vert y est posé en léger relief. */
-  .anneau {
-    position: relative; width: 64px; height: 64px; border-radius: 50%; flex: none; display: grid; place-items: center;
-    background: var(--creux-fond);
-    box-shadow: 4px 5px 10px var(--ombre-foncee), -4px -4px 9px var(--ombre-claire),
-                inset 2px 2px 4px var(--ombre-foncee), inset -2px -2px 4px var(--ombre-claire);
-  }
-  .anneau::before { content: ''; position: absolute; inset: 9px; border-radius: 50%; background: var(--fond); box-shadow: var(--relief-mini); }
+  /* Anneau plat : une piste claire, l'arc vert par-dessus. */
+  .anneau { position: relative; width: 64px; height: 64px; border-radius: 50%; flex: none; display: grid; place-items: center; }
   .anneau svg { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); overflow: visible; }
-  .anneau-fond { fill: none; stroke: none; }
+  .anneau-fond { fill: none; stroke: var(--plat-filet); stroke-width: 7.5; }
   .anneau-plein {
     fill: none; stroke: var(--accent); stroke-width: 7.5; stroke-linecap: round;
-    filter: drop-shadow(-.6px .8px .8px rgba(40, 60, 30, .4)); stroke-dasharray: 100; stroke-dashoffset: 100; transition: stroke-dashoffset var(--anim) cubic-bezier(.22, 1, .36, 1); }
+    stroke-dasharray: 100; stroke-dashoffset: 100; transition: stroke-dashoffset var(--anim) cubic-bezier(.22, 1, .36, 1); }
   .anneau-texte { position: relative; display: grid; justify-items: center; line-height: 1; }
   #score { font-family: var(--titres); font-size: 21px; font-weight: 600; color: var(--texte); font-variant-numeric: tabular-nums lining-nums; }
 
@@ -121,8 +112,10 @@
   }
   /* L'arche se cale elle-même sur le bas de l'écran (caleCadran) : pas de marge de page sous l'écran du jour. */
   body:has(#ecran-jour:not([hidden])) { padding-bottom: 0; }
+  /* L'écran du jour est figé : il tient dans l'écran et ne défile pas (ni rebond sur iPhone). */
+  html:has(#ecran-jour:not([hidden])), body:has(#ecran-jour:not([hidden])) { overflow: hidden; overscroll-behavior: none; }
   @media (min-width: 600px) {
-    .scene { width: min(900px, 100vw - 40px); left: calc((100% - min(900px, 100vw - 40px)) / 2); margin-top: 4px; max-width: none; }
+    .scene { --large: min(900px, 100vw - 40px); width: var(--large); left: calc((100% - var(--large)) / 2); margin-top: 4px; max-width: none; }
   }
   /* Cadre en pâte épais et bombé (18 à 22 px), un peu plus clair que la page, posé sur elle :
      profil de petit tube (clair au milieu, plus foncé vers les deux bords), plus clair en haut à gauche,
@@ -205,11 +198,12 @@
   }
   @keyframes brise { 0%, 100% { rotate: -.6deg; } 50% { rotate: .6deg; } }
   /* Le personnage : son plan a exactement la taille du monde. --pieds-x, --pieds-y : position de ses pieds, en fraction
-     du monde ; --taille : hauteur du cadre commun à toutes ses images (1080 × 960), dont il occupe environ 69 %,
-     calculée sur la largeur et la hauteur de l'arche. Pieds à 81,15 % de la hauteur du cadre et 49,6 % de sa largeur.
-     Pour le déplacer plus tard, il suffit de changer --pieds-x et --pieds-y. */
+     du monde, plus --sous-pieds (en fraction de --taille) pour les descendre sous le bas du monde ; --taille : hauteur
+     du cadre commun à toutes ses images (1080 × 960), calculée sur la largeur et la hauteur de l'arche. Dans ce cadre :
+     haut de la tête à 12,5 %, haut du nombril vers 61,5 %, pieds à 81,15 % de la hauteur, 49,6 % de la largeur.
+     Pour le déplacer plus tard, il suffit de changer PLACE_PERSONNAGE dans le script. */
   .plan[data-plan="personnage"] { inset: 0; }
-  .acteur { position: absolute; inset: 0; --x: calc(var(--pieds-x) * 100%); --y: calc(var(--pieds-y) * 100%); }
+  .acteur { position: absolute; inset: 0; --x: calc(var(--pieds-x) * 100%); --y: calc(var(--pieds-y) * 100% + var(--taille) * var(--sous-pieds, 0)); }
   .perso-cadre {
     position: absolute; left: var(--x); top: var(--y); width: calc(var(--taille) * 1.125); height: var(--taille);
     margin: calc(var(--taille) * -.8115) 0 0 calc(var(--taille) * -.558);
@@ -302,9 +296,9 @@
   @keyframes sommeil { 0%, 100% { transform: rotate(-1.2deg); } 50% { transform: rotate(1.2deg); } }
   @keyframes respiration { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.01); } }
 
-  /* Boutons d'habitudes : petites pièces en pâte mate de 48 px, lumière en haut à gauche.
-     --pastel : teinte du disque ; --soutenu : la même, un peu plus soutenue, une fois validé ; --encre : icône, nom, série et pastille.
-     Non validé : en relief, dégradé presque invisible, fin biseau. Validé : franchement enfoncé, pastille cochée en haut à droite. */
+  /* Boutons d'habitudes : disques de 48 px posés sur le cadre de l'arche.
+     --pastel : teinte du disque ; --encre : icône.
+     Toujours à plat, dans sa teinte ; validé, il porte la pastille cochée. */
   .scene .tuile {
     position: absolute; left: 0; top: 0; width: 48px; height: 48px; margin: -24px 0 0 -24px;
     transform: translate(var(--x, 0), var(--y, 0));
@@ -313,44 +307,34 @@
     background: none; border: 0; padding: 0; display: block; color: var(--texte); touch-action: manipulation;
     -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
   }
-  .tuile[data-h="eau"] { --pastel: #c9dbe6; --soutenu: #b3cde0; --encre: #3f5a6e; }
-  .tuile[data-h="sport"] { --pastel: #ecccbc; --soutenu: #e5b9a3; --encre: #7a4128; }
-  .tuile[data-h="lecture"] { --pastel: #ebcdd4; --soutenu: #e2b8c3; --encre: #6e3a52; }
-  .tuile[data-h="meditation"] { --pastel: #d8d3e6; --soutenu: #c8c1dc; --encre: #574d78; }
-  .tuile:is([data-h="petitDej"], [data-h="dejeuner"], [data-h="diner"]) { --pastel: #ecdcb4; --soutenu: #e3cd98; --encre: #6b5320; }
-  .tuile[data-h="sommeil"] { --pastel: #d2d8ec; --soutenu: #bfc8e4; --encre: #444f7e; }
-  .tuile[data-h="menage"] { --pastel: #d3e0c8; --soutenu: #c1d4b3; --encre: #3d5a35; }
-  /* Disque mat : à peine plus clair en haut à gauche (7 % environ), anneau clair de 1 px à l'intérieur du bord,
-     liseré un peu plus foncé en bas à droite, ombre douce en bas à droite et légère lumière en haut à gauche. */
+  .tuile[data-h="eau"] { --pastel: #c9dbe6; --encre: #3f5a6e; }
+  .tuile[data-h="sport"] { --pastel: #ecccbc; --encre: #7a4128; }
+  .tuile[data-h="lecture"] { --pastel: #ebcdd4; --encre: #6e3a52; }
+  .tuile[data-h="meditation"] { --pastel: #d8d3e6; --encre: #574d78; }
+  .tuile:is([data-h="petitDej"], [data-h="dejeuner"], [data-h="diner"]) { --pastel: #ecdcb4; --encre: #6b5320; }
+  .tuile[data-h="sommeil"] { --pastel: #d2d8ec; --encre: #444f7e; }
+  .tuile[data-h="menage"] { --pastel: #e3d4c6; --encre: #6a4e3a; }   /* argile */
+  /* Disque plat dans la teinte pastel de l'habitude. */
   .icone-habitude {
     position: relative; width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; color: var(--encre);
-    background: linear-gradient(145deg, color-mix(in srgb, var(--pastel) 86%, #fff), color-mix(in srgb, var(--pastel) 95%, #5a3d28));
-    box-shadow: 3px 4px 9px var(--ombre-foncee), -3px -3px 8px var(--ombre-claire),
-                inset 0 0 0 1px rgba(255, 255, 255, .45), inset -1px -1.5px 0 rgba(95, 65, 42, .14);
-    transition: box-shadow .2s ease-out, background .2s ease-out;
+    background: var(--pastel);
   }
-  /* Icône Phosphor « regular », 22 px (46 % du disque), gravée par un seul liseré clair en bas à droite. */
-  .icone-habitude .icone { width: 22px; height: 22px; filter: drop-shadow(.8px .8px 0 rgba(255, 255, 255, .4)); }
+  /* Icône Phosphor « regular », 22 px (46 % du disque). */
+  .icone-habitude .icone { width: 22px; height: 22px; }
   .tuile:focus-visible { outline: none; }
   .tuile:focus-visible .icone-habitude { outline: 2px solid rgba(79, 122, 66, .5); outline-offset: 3px; }
-  /* Validé : franchement enfoncé, sans ombre extérieure ; ombre intérieure nette en haut à gauche, lumière douce
-     en bas à droite, disque plus sombre en haut à gauche. L'icône garde sa taille et sa couleur. */
-  .tuile.fait .icone-habitude {
-    background: linear-gradient(145deg, color-mix(in srgb, var(--soutenu) 92%, #5a3d28), color-mix(in srgb, var(--soutenu) 90%, #fff));
-    box-shadow: inset 4px 4px 8px rgba(110, 72, 40, .3), inset -2px -2px 5px rgba(255, 250, 240, .55);
-  }
+  /* Validation : 200 ms, très léger rebond (coupé si l'appareil demande moins de mouvement). */
+  .tuile.rebond .icone-habitude { animation: enfoncer .2s cubic-bezier(.3, 1.5, .5, 1); }
+  @keyframes enfoncer { 0% { transform: scale(1); } 55% { transform: scale(.95); } 100% { transform: scale(1); } }
   /* Pastille : 18 px, pleine dans la teinte foncée, coche crème, à cheval sur le bord en haut à droite,
-     détachée par un liseré couleur de page, toute petite ombre. Elle fait partie du bouton (même clic). */
+     détachée par un liseré couleur de page. Elle fait partie du bouton (même clic). */
   .tuile.fait .icone-habitude::after {
     content: ''; position: absolute; top: -2px; right: -2px; width: 18px; height: 18px; box-sizing: border-box; border-radius: 50%;
-    border: 1.5px solid var(--fond); box-shadow: 0 1px 2px rgba(80, 55, 30, .18);
+    border: 1.5px solid var(--fond); z-index: 1;
     background: var(--encre) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M2.2 5.3l1.9 1.9 3.8-4.2' fill='none' stroke='%23fffaf2' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 10px no-repeat;
   }
   .tuile.exclue { opacity: .5; }
-  .tuile.exclue .icone-habitude { background: none; box-shadow: none; outline: 1.5px dashed var(--ombre-foncee); outline-offset: -1.5px; }
-  /* Passage en creux : 200 ms, très léger rebond (coupé si l'appareil demande moins de mouvement). */
-  .tuile.rebond .icone-habitude { animation: enfoncer .2s cubic-bezier(.3, 1.5, .5, 1); }
-  @keyframes enfoncer { 0% { transform: scale(1); } 55% { transform: scale(.95); } 100% { transform: scale(1); } }
+  .tuile.exclue .icone-habitude { background: none; outline: 1.5px dashed var(--ombre-foncee); outline-offset: -1.5px; }
   /* Étincelles et confettis : partent du bouton touché vers le personnage, retirés après l'animation. */
   .etincelle {
     position: absolute; left: 50%; top: 24px; width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 50%;
@@ -364,52 +348,135 @@
   #defi { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 8px 10px; font-size: 13px; }
   #defi .icone { width: 18px; height: 18px; color: var(--accent); }
   .etapes-defi { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px; }
-  .etape-defi { width: 12px; height: 12px; border-radius: 50%; background: var(--fond); box-shadow: var(--relief-mini); }
+  .etape-defi { width: 12px; height: 12px; border-radius: 50%; background: var(--plat-fond); box-shadow: var(--filet); }
   .etapes-defi.serre { gap: 4px; }
-  .etapes-defi.serre .etape-defi { width: 7px; height: 7px; box-shadow: 1px 1px 3px var(--ombre-foncee), -1px -1px 3px var(--ombre-claire); }
+  .etapes-defi.serre .etape-defi { width: 7px; height: 7px; }
   .etape-defi.ok { background: var(--accent); box-shadow: none; }
-  .etape-defi.rate { background: var(--creux-fond); box-shadow: var(--creux-mini); }
+  .etape-defi.rate { background: var(--plat-filet); box-shadow: none; }
 
   .bouton {
-    background: var(--accent); color: #fff; border: 0; border-radius: 999px; padding: 11px 20px; font-weight: 700;
-    box-shadow: var(--relief-rond); transition: box-shadow .2s, transform .15s;
+    background: var(--accent); color: #fff; border: 0; border-radius: 10px; padding: 11px 20px; font-weight: 700;
+    transition: filter .15s, transform .15s;
   }
-  .bouton:active { box-shadow: inset 3px 3px 8px rgba(0, 0, 0, .28); transform: scale(.98); }
+  .bouton:active { filter: brightness(.92); transform: scale(.98); }
 
-  /* --- Tâches --- */
-  #compteur-taches { font-size: 12.5px; color: var(--texte-doux); margin: -8px 0 16px; }
-  #form-tache { display: flex; flex-wrap: wrap; gap: 12px; }
-  #form-tache .echeance { flex-basis: 100%; font-size: 13px; }
-  #nouvelle-tache { flex: 1; min-width: 0; background: var(--creux-fond); border: 0; box-shadow: var(--creux); border-radius: 999px; padding: 12px 18px; font-size: 16px; }
-  #nouvelle-tache:focus { outline: 2px solid rgba(79, 122, 66, .45); outline-offset: 2px; }
-  #liste-taches { list-style: none; margin: 18px 0 0; padding: 0; display: grid; gap: 12px; }
-  /* Une tâche : la ligne à cocher, puis ses deux actions (modifier, supprimer). */
-  #liste-taches li { display: flex; align-items: center; gap: 8px; }
-  .tache-cocher {
-    flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; text-align: left; background: var(--fond);
-    border: 0; border-radius: 16px; padding: 12px 16px; min-height: 50px; box-shadow: var(--relief-rond); transition: box-shadow .3s, background .3s;
+  /* --- Tâches : en tableau : Tâche, Statut, Priorité, Échéance, Description ---
+     Titres de colonnes en petit, puis un bloc clair bordé d'un filet où chaque tâche est une ligne séparée par un filet.
+     Les sous-tâches suivent leur tâche, décalées. Sur iPhone, chaque tâche tient sur deux lignes (nom et statut,
+     puis priorité, échéance et description). Toucher le nom ouvre la fenêtre ; toucher le statut le fait passer au suivant. */
+  #ecran-taches { gap: 12px; }
+  #ecran-taches { max-width: 960px; margin: 0 auto; }
+  #app:has(#ecran-taches:not([hidden])) { max-width: 960px; }   /* le tableau a besoin de plus de largeur que les autres écrans */
+  .bande-taches { justify-content: center; }
+  .bande-taches .bande-titre { text-align: center; }
+  .colonnes, .ligne-tache {
+    display: grid; align-items: center; column-gap: 14px;
+    grid-template-columns: minmax(0, 1.3fr) 96px 78px 72px minmax(0, 1.5fr);
+    grid-template-areas: "nom statut priorite date description";
   }
-  .tache-faite .tache-cocher { background: var(--creux-fond); box-shadow: var(--creux-mini); }
-  .tache-cocher .contenu { display: grid; gap: 3px; min-width: 0; }
-  .tache-cocher .texte { overflow-wrap: anywhere; }
-  .tache-cocher .date { font-size: 12px; color: var(--texte-doux); }
-  .tache-cocher .date.retard { color: #a4512c; font-weight: 600; }
+  .colonnes { padding: 0 16px 8px; font-size: 12.5px; color: var(--texte-doux); }
+  .colonnes span:nth-child(1) { grid-area: nom; } .colonnes span:nth-child(2) { grid-area: statut; }
+  .colonnes span:nth-child(3) { grid-area: priorite; } .colonnes span:nth-child(4) { grid-area: date; }
+  .colonnes span:nth-child(5) { grid-area: description; }
+  #liste-taches { list-style: none; margin: 0; padding: 0; border: 1px solid var(--plat-filet); border-radius: 12px; background: var(--plat-fond); overflow: hidden; }
+  #liste-taches > li + li { border-top: 1px solid var(--plat-filet-doux); }
+  .ligne-tache { min-height: 50px; padding: 6px 16px; }
+  .ligne-tache.sous { min-height: 42px; }
+  .sous .tache-ouvrir { padding-left: 18px; }   /* décalage dans la colonne, pour garder les colonnes alignées */
+  .tache-ouvrir {
+    grid-area: nom; min-width: 0; align-self: stretch; display: grid; gap: 1px; align-content: center; text-align: left;
+    border: 0; background: none; padding: 6px 0; color: var(--texte); position: relative;
+  }
+  .tache-ouvrir .texte { font-weight: 700; font-size: 14.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sous .tache-ouvrir .texte { font-weight: 400; font-size: 14px; }
+  .sous .tache-ouvrir::before { content: ''; position: absolute; left: 4px; top: calc(50% - 8px); width: 8px; height: 8px; border: solid var(--plat-filet); border-width: 0 0 1.5px 1.5px; border-bottom-left-radius: 3px; }
+  .tache-ouvrir .compte { font-size: 11.5px; color: var(--texte-doux); }
+  .ligne-tache .statut { grid-area: statut; }
+  .ligne-tache .priorite { grid-area: priorite; }
+  .ligne-tache .date { grid-area: date; font-size: 13.5px; color: var(--texte); }
+  .ligne-tache .date.retard { color: #a4512c; font-weight: 700; }
+  .ligne-tache .description { grid-area: description; min-width: 0; font-size: 13.5px; color: var(--texte-doux); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .taches-vide { padding: 18px 16px; color: var(--texte-doux); font-size: 14px; text-align: center; }
+  /* Statut : une étiquette plate teintée ; la toucher passe au statut suivant. */
+  .statut { justify-self: start; border: 0; border-radius: 5px; padding: 3px 7px; font-size: 13px; white-space: nowrap; background: #ece4db; color: #5f544b; }
+  .statut.en-cours { background: #ebe0f4; color: #6a4690; }
+  .statut.termine { background: #e6efcf; color: #4c6a26; }
+  /* Priorité : trois places, une étoile pleine par niveau, un point pour les autres. */
+  .priorite { display: flex; align-items: center; gap: 4px; }
+  .priorite .icone { width: 17px; height: 17px; fill: #f3c64f; stroke: #d39b2a; stroke-width: 1.2; }
+  .priorite .vide { width: 17px; display: grid; place-items: center; }
+  .priorite .vide::before { content: ''; width: 3.5px; height: 3.5px; border-radius: 50%; background: var(--texte-doux); opacity: .6; }
+  /* iPhone : la tâche sur deux lignes, sans titres de colonnes. */
+  @media (max-width: 699px) {
+    .colonnes { display: none; }
+    .ligne-tache {
+      grid-template-columns: auto auto minmax(0, 1fr) auto; row-gap: 2px; column-gap: 10px; padding: 8px 14px;
+      grid-template-areas: "nom nom nom statut" "priorite date description description";
+    }
+    .ligne-tache.sous { grid-template-areas: "nom nom nom statut"; }
+    .tache-ouvrir { padding: 2px 0; }
+    .ligne-tache .date, .ligne-tache .description { font-size: 12.5px; }
+    .priorite .icone, .priorite .vide { width: 14px; height: 14px; }
+  }
+  /* Boutons plats de la page : le + (disque vert), les petits boutons ronds de la fenêtre (filet fin). */
   .tache-action {
-    flex: none; width: 40px; height: 40px; border: 0; border-radius: 50%; display: grid; place-items: center;
-    background: var(--fond); box-shadow: var(--relief-mini); color: var(--texte-doux);
+    flex: none; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center;
+    border: 1px solid var(--plat-filet); background: var(--plat-fond); color: var(--texte-doux);
   }
+  .tache-action:active { background: var(--plat-filet-doux); }
   .tache-action .icone { width: 18px; height: 18px; }
-  .tache-action:active { box-shadow: var(--creux-mini); }
   /* Suppression en deux touches : la première demande confirmation. */
-  .tache-action.confirmer { width: auto; padding: 0 12px; border-radius: 20px; color: #fff; background: #a4512c; box-shadow: none; font-size: 13px; font-weight: 600; }
-  /* Modification sur place : texte, échéance, Enregistrer et Annuler. */
-  .tache-edition { flex: 1; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px; border-radius: 16px; box-shadow: var(--creux-mini); background: var(--creux-fond); }
-  .tache-edition .texte-edite { flex: 1 1 100%; min-width: 0; background: var(--fond); border: 0; border-radius: 12px; padding: 10px 12px; font-size: 16px; box-shadow: var(--creux-mini); }
-  .tache-edition .champ { flex: 1; font-size: 13px; }
-  .tache-edition .bouton { padding: 8px 14px; font-size: 14px; }
-  .rond { flex: none; width: 22px; height: 22px; border-radius: 50%; background: var(--creux-fond); box-shadow: var(--creux-mini); display: grid; place-items: center; font-size: 11px; color: #fff; }
-  .tache-faite .rond { background: var(--accent); box-shadow: none; }
-  .tache-faite .texte { text-decoration: line-through; color: var(--texte-doux); }
+  .tache-action.confirmer { width: auto; padding: 0 12px; border-radius: 20px; border-color: #a4512c; color: #fff; background: #a4512c; font-size: 12.5px; font-weight: 600; }
+  /* Bouton + : un simple plus couleur du texte, en haut à droite du tableau, sur la ligne des titres de colonnes
+     (posé par-dessus, pour ne pas décaler les colonnes ; sur iPhone, sans titres, il garde sa ligne). */
+  .entete-tableau { position: relative; min-height: 32px; margin-bottom: 6px; display: flex; align-items: center; }
+  .entete-tableau .colonnes { flex: 1; padding-bottom: 0; }
+  #ajouter-tache {
+    position: absolute; right: 4px; top: 50%; transform: translateY(-50%);
+    width: 20px; height: 20px; border: 0; padding: 0; display: grid; place-items: center;
+    background: none; color: var(--texte);
+  }
+  #ajouter-tache:active { opacity: .6; }
+  #ajouter-tache .icone { width: 18px; height: 18px; stroke-width: 1.8; }
+  #ajouter-tache::after { content: ''; position: absolute; inset: -12px; }   /* zone de toucher de 44 px */
+  /* Fenêtre de tâche, plate : fond clair, filet, ombre légère sous elle, placée haut pour rester visible au-dessus du clavier. */
+  #fenetre-tache {
+    width: min(460px, calc(100% - 32px)); max-width: none; margin: calc(env(safe-area-inset-top) + 10vh) auto auto; padding: 0;
+    border: 1px solid var(--plat-filet); border-radius: 16px; background: var(--plat-fond); color: var(--texte); box-shadow: 0 12px 32px rgba(61, 49, 41, .16);
+  }
+  #fenetre-tache[open] { animation: fenetre .2s cubic-bezier(.22, 1, .36, 1); }
+  #fenetre-tache::backdrop { background: rgba(61, 49, 41, .25); }
+  @keyframes fenetre { from { opacity: 0; transform: translateY(8px); } }
+  #form-tache { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; padding: 18px 18px 16px; }
+  #form-tache .titre-carte { margin: 0; font-size: 19px; }
+  #form-tache .intitule { font-size: 13px; color: var(--texte-doux); margin: 0 0 6px; }
+  /* Champs plats ; les deux textes grandissent avec leur contenu (ajusterTexte), jusqu'à 40 % de l'écran. */
+  #nouvelle-tache, #description-tache, #sous-taches-edition input, #echeance-tache {
+    background: #fff; border: 1px solid var(--plat-filet); border-radius: 10px; box-shadow: none; font-size: 16px;
+  }
+  #nouvelle-tache, #description-tache { display: block; width: 100%; padding: 11px 13px; line-height: 1.35; resize: none; overflow-y: auto; max-height: 40vh; overflow-wrap: anywhere; }
+  #nouvelle-tache { font-weight: 600; }
+  #nouvelle-tache:focus, #description-tache:focus, #sous-taches-edition input:focus, #echeance-tache:focus { border-color: var(--accent); outline: none; }
+  #echeance-tache { padding: 8px 10px; font-weight: 400; min-height: 40px; }
+  .ligne-reglages { display: flex; flex-wrap: wrap; gap: 14px 28px; align-items: start; }
+  /* Choix de la priorité : trois étoiles, toucher la n-ième donne la priorité n. */
+  #choix-priorite { display: flex; gap: 2px; }
+  #choix-priorite button { border: 0; background: none; padding: 4px; display: grid; place-items: center; }
+  #choix-priorite .icone { width: 26px; height: 26px; fill: none; stroke: #c9b7a4; stroke-width: 1.3; }
+  #choix-priorite button[aria-pressed="true"] .icone { fill: #f3c64f; stroke: #d39b2a; }
+  .sous-taches-fenetre { display: grid; gap: 8px; }
+  #sous-taches-edition { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  #sous-taches-edition li { display: flex; align-items: center; gap: 8px; }
+  #sous-taches-edition input { flex: 1; min-width: 0; padding: 8px 11px; }
+  #sous-taches-edition .tache-action { width: 32px; height: 32px; }
+  #sous-taches-edition .tache-action .icone { width: 14px; height: 14px; }
+  #ajouter-sous-tache { justify-self: start; display: inline-flex; align-items: center; gap: 6px; border: 0; background: none; padding: 4px 2px; color: var(--accent-texte); font-weight: 600; font-size: 14px; }
+  #ajouter-sous-tache .icone { width: 16px; height: 16px; }
+  .actions-fenetre { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 8px; margin-top: 2px; }
+  .actions-fenetre .bouton { padding: 10px 16px; font-size: 14px; }
+  #supprimer-tache { margin-right: auto; }
+  #fermer-tache { width: 36px; height: 36px; }
+  #fermer-tache .icone { width: 16px; height: 16px; }
 
   /* --- Divers --- */
   .pied { text-align: center; }
@@ -420,44 +487,60 @@
     background: var(--texte); color: #fff; border-radius: 999px; padding: 10px 18px; font-size: 14px; max-width: calc(100% - 32px); z-index: 20;
   }
   /* --- Correction d'un jour passé --- */
-  #bandeau-correction { border-radius: 20px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; box-shadow: var(--relief-rond); }
+  #bandeau-correction { border-radius: 12px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; background: var(--plat-fond); border: 1px solid var(--plat-filet); }
   #bandeau-correction .icone { color: var(--accent); }
   #bandeau-correction span { flex: 1; font-size: 14px; }
   #bandeau-correction .bouton { padding: 8px 14px; font-size: 14px; }
 
-  /* --- Navigation : en relief, icônes seules, le nom n'apparaît que pour l'onglet actif (en creux) --- */
-  /* Menu dépliant en haut à droite : un bouton « menu » ; ouvert, les quatre écrans se déploient dessous. */
-  #menu {
-    position: fixed; top: calc(12px + env(safe-area-inset-top)); right: calc(12px + env(safe-area-inset-right)); z-index: 10;
-    display: flex; flex-direction: column; align-items: center; gap: 10px;
+  /* --- Navigation : icônes seules (contour si inactif, pleine si actif, fondu de 200 ms), l'onglet actif sur une pastille
+     vert doux. Fond de la couleur de la page, en léger relief comme l'arche. Zones de toucher d'au moins 44 px.
+     Mobile : barre en bas. Ordinateur : bande courbe dans le coin en haut à gauche, au même endroit sur tous les
+     écrans (placerMenu). --- */
+  :root {
+    --barre: 58px;   /* hauteur de la barre du bas (mobile) */
+    --relief-menu: 0 4px 10px rgba(120, 90, 60, .18), 1px 2px 4px rgba(120, 90, 60, .1), -3px -3px 8px rgba(255, 255, 255, .8);
   }
-  #menu-bouton {
-    width: 50px; height: 50px; border: 0; border-radius: 50%; display: grid; place-items: center;
-    background: var(--fond); box-shadow: 4px 5px 10px var(--ombre-foncee), -4px -4px 9px var(--ombre-claire); color: var(--texte); transition: box-shadow .2s;
+  #navigation {
+    position: fixed; z-index: 10; display: flex; gap: 4px; padding: 6px;
+    background: var(--fond); border-radius: 28px; box-shadow: var(--relief-menu);
   }
-  #menu-bouton .ferme, #menu.ouvert #menu-bouton .ouvre { display: none; }
-  #menu.ouvert #menu-bouton .ferme { display: block; }
-  #menu.ouvert #menu-bouton { box-shadow: var(--creux-mini); background: var(--creux-fond); }
-  nav {
-    display: flex; flex-direction: column; gap: 4px; padding: 5px; border-radius: 26px;
-    background: var(--fond); box-shadow: var(--relief);
-    opacity: 0; visibility: hidden; transform: translateY(-10px) scale(.96); transform-origin: top center; pointer-events: none;
-    transition: opacity .2s ease, transform .2s ease, visibility .2s;
+  #navigation button {
+    flex: 1; min-width: 44px; min-height: 44px; border: 0; background: none; border-radius: 22px; padding: 0;
+    display: grid; place-items: center; color: var(--texte-doux); transition: background .2s ease;
   }
-  #menu.ouvert nav { opacity: 1; visibility: visible; transform: none; pointer-events: auto; }
-  nav button {
-    border: 0; background: none; border-radius: 20px; width: 46px; min-height: 46px; padding: 6px 0;
-    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
-    font-weight: 600; color: var(--texte-doux); transition: box-shadow .3s, background .3s;
+  .onglet-icone { position: relative; width: 24px; height: 24px; display: grid; place-items: center; }
+  .onglet-icone .icone { grid-area: 1 / 1; width: 22px; height: 22px; transition: opacity .2s ease; }
+  .onglet-icone .actif { opacity: 0; color: var(--accent); }
+  #navigation button[aria-current="page"] { background: var(--feuille-clair); }
+  #navigation button[aria-current="page"] .actif { opacity: 1; }
+  #navigation button[aria-current="page"] .inactif { opacity: 0; }
+  .courbe-menu { display: none; }
+  /* Mobile : barre fixe en bas, décollée des bords, au-dessus de la barre d'accueil de l'iPhone ;
+     le contenu garde de la place en dessous pour ne pas passer sous la barre. */
+  @media (max-width: 768px) {
+    #navigation {
+      left: calc(14px + env(safe-area-inset-left)); right: calc(14px + env(safe-area-inset-right));
+      bottom: calc(12px + env(safe-area-inset-bottom)); height: var(--barre);
+    }
+    body { padding-bottom: calc(var(--barre) + 28px + env(safe-area-inset-bottom)); }
   }
-  nav button[aria-current="page"] { background: var(--creux-fond); box-shadow: var(--creux-mini); color: var(--accent-texte); }
-  /* Sur iPhone, le contenu laisse la place du bouton menu : la bande à côté de lui, les autres écrans dessous. */
-  @media (max-width: 599px) {
-    .bande { margin-right: 62px; }
-    #ecran-historique, #ecran-taches, #ecran-reglages { padding-top: 62px; }
+  /* Ordinateur : sur tous les écrans, les icônes sont posées sur une bande courbe en haut à gauche (positions données par
+     placerMenu) ; sans script, un rail vertical au même endroit. Le contenu reste centré sur la page, avec la même marge
+     des deux côtés, assez large pour ne pas passer sous la courbe. */
+  @media (min-width: 769px) {
+    #navigation { left: 20px; top: 20px; flex-direction: column; width: 56px; padding: 6px; }
+    #navigation button { flex: none; height: 44px; }
+    body { padding-left: 210px; padding-right: 210px; }
+    #navigation.courbe { inset: 0; width: auto; padding: 0; background: none; box-shadow: none; border-radius: 0; pointer-events: none; display: block; }
+    #navigation.courbe .courbe-menu { display: block; position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+    #navigation.courbe .courbe-menu path {
+      fill: none; stroke: var(--fond); stroke-linecap: round; stroke-width: var(--epaisseur-menu, 56px);
+      filter: drop-shadow(0 4px 5px rgba(120, 90, 60, .18)) drop-shadow(-3px -3px 4px rgba(255, 255, 255, .8));
+    }
+    #navigation.courbe button { position: absolute; left: 0; top: 0; width: 44px; height: 44px; margin: -22px 0 0 -22px; pointer-events: auto; }
   }
 
-  /* --- Calendrier en pixels : une case par jour en léger relief, verte selon la journée ; vide = en creux --- */
+  /* --- Calendrier en pixels : une case plate par jour, verte selon la journée ; vide = aplat clair --- */
   :root { --n1: #cadbb5; --n2: #abc993; --n3: #8ab372; --n4: #6a9656; --n5: #4f7a42; }
   .cal-ligne { display: grid; grid-template-columns: 52px repeat(7, 1fr) 44px; gap: 7px; align-items: center; margin-bottom: 7px; }
   .cal-ligne.titres { font-size: 11px; color: var(--texte-doux); text-align: center; letter-spacing: .3px; margin-bottom: 9px; }
@@ -466,12 +549,11 @@
   .cal-score small { display: block; font-family: 'DM Sans', system-ui, sans-serif; font-size: 10px; color: var(--texte-doux); font-weight: 500; }
   .cal-case {
     aspect-ratio: 1; border-radius: 9px; border: 0; padding: 0; position: relative;
-    background: var(--creux-fond); box-shadow: var(--creux-mini); transition: transform .15s;
+    background: var(--plat-filet-doux); transition: transform .15s;
   }
   .cal-case:active { transform: scale(.94); }
-  .cal-case.vide { background: transparent; box-shadow: none; }
-  .cal-case.exclue { background: transparent; box-shadow: none; outline: 1.5px dashed var(--ombre-foncee); outline-offset: -2px; }
-  .cal-case.n1, .cal-case.n2, .cal-case.n3, .cal-case.n4, .cal-case.n5 { box-shadow: var(--relief-mini); }
+  .cal-case.vide { background: transparent; }
+  .cal-case.exclue { background: transparent; outline: 1.5px dashed var(--ombre-foncee); outline-offset: -2px; }
   .cal-case.aujourdhui::after {
     content: ''; position: absolute; bottom: -6px; left: 50%; width: 4px; height: 4px; border-radius: 50%;
     background: var(--accent); transform: translateX(-50%);
@@ -481,47 +563,47 @@
   .legende .cal-case { width: 14px; display: inline-block; border-radius: 5px; }
   .legende .astuce { margin-left: auto; }
 
-  /* --- Évolution des scores : barres vertes dans des rainures en creux --- */
+  /* --- Évolution des scores : barres vertes sur un aplat clair --- */
   #graphique { display: flex; align-items: flex-end; gap: 12px; overflow-x: auto; padding: 4px 2px 2px; }
   .barre { flex: 0 0 40px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 6px; font-size: 11px; color: var(--texte-doux); white-space: nowrap; }
   .barre b { font-family: var(--titres); font-variation-settings: 'SOFT' 100; color: var(--texte); font-size: 15px; font-weight: 600; }
-  .barre .rainure { width: 22px; height: 130px; border-radius: 999px; background: var(--creux-fond); box-shadow: var(--creux-mini); display: flex; align-items: flex-end; overflow: hidden; }
-  .barre .plein { width: 100%; border-radius: 999px; background: linear-gradient(180deg, var(--n3), var(--accent)); min-height: 6px; }
+  .barre .rainure { width: 22px; height: 130px; border-radius: 6px; background: var(--plat-filet-doux); display: flex; align-items: flex-end; overflow: hidden; }
+  .barre .plein { width: 100%; border-radius: 6px; background: var(--accent); min-height: 6px; }
   .vide-texte { color: var(--texte-doux); font-size: 14px; }
 
-  /* --- Réglages : mêmes reliefs ; un choix actif passe en creux --- */
+  /* --- Réglages : plats ; un choix actif prend un aplat teinté --- */
   .note { font-size: 12.5px; color: var(--texte-doux); margin: 14px 0 0; line-height: 1.5; }
-  .segment { display: flex; background: var(--creux-fond); box-shadow: var(--creux-mini); border-radius: 999px; padding: 5px; gap: 4px; margin-bottom: 14px; }
-  .segment button { flex: 1; border: 0; background: none; border-radius: 999px; padding: 8px 6px; font-weight: 600; color: var(--texte-doux); min-height: 40px; transition: box-shadow .3s, background .3s; }
-  .segment button[aria-pressed="true"] { background: var(--fond); color: var(--texte); box-shadow: var(--relief-mini); }
+  .segment { display: flex; background: var(--plat-filet-doux); border-radius: 10px; padding: 4px; gap: 4px; margin-bottom: 14px; }
+  .segment button { flex: 1; border: 0; background: none; border-radius: 7px; padding: 8px 6px; font-weight: 600; color: var(--texte-doux); min-height: 40px; transition: background .3s; }
+  .segment button[aria-pressed="true"] { background: var(--plat-fond); color: var(--texte); box-shadow: var(--filet); }
   .champ { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--texte-doux); }
   .champ input, .poids input {
-    background: var(--creux-fond); border: 0; box-shadow: var(--creux-mini); border-radius: 14px; padding: 6px 10px; font-weight: 600; min-height: 42px;
+    background: #fff; border: 1px solid var(--plat-filet); border-radius: 10px; padding: 6px 10px; font-weight: 600; min-height: 42px;
   }
   .puces { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
   .puce {
-    display: inline-flex; align-items: center; gap: 6px; border: 0; background: var(--fond); box-shadow: var(--relief-mini);
-    border-radius: 999px; padding: 7px 13px; font-size: 13.5px; min-height: 40px; transition: box-shadow .3s, background .3s;
+    display: inline-flex; align-items: center; gap: 6px; border: 0; background: var(--plat-fond); box-shadow: var(--filet);
+    border-radius: 999px; padding: 7px 13px; font-size: 13.5px; min-height: 40px; transition: background .3s;
   }
   .puce .icone { width: 17px; height: 17px; }
-  /* Exclusion active : en creux, texte terracotta ; choix du défi : en creux, texte vert. */
-  .puce[aria-pressed="true"] { background: var(--creux-fond); box-shadow: var(--creux-mini); color: #843b1f; font-weight: 600; }
-  .puce.choisie[aria-pressed="true"] { color: var(--accent-texte); }
+  /* Exclusion active : aplat terracotta clair ; choix du défi : aplat vert clair. */
+  .puce[aria-pressed="true"] { background: #f4dfd5; box-shadow: none; color: #843b1f; font-weight: 600; }
+  .puce.choisie[aria-pressed="true"] { background: var(--feuille-clair); color: var(--accent-texte); }
   .puce:disabled { opacity: .55; }
   .compteur { display: flex; align-items: center; gap: 14px; margin: 8px 0 14px; }
-  .compteur button { width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--fond); box-shadow: var(--relief-rond); font-size: 22px; font-weight: 600; }
-  .compteur button:active { box-shadow: var(--creux-mini); }
+  .compteur button { width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--plat-fond); box-shadow: var(--filet); font-size: 22px; font-weight: 600; }
+  .compteur button:active { background: var(--plat-filet-doux); }
   .compteur b { font-family: var(--titres); font-variation-settings: 'SOFT' 100; font-size: 28px; font-weight: 600; min-width: 24px; text-align: center; }
   .defi-actif .titre-defi { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 16px; }
   .defi-actif .icone { width: 20px; height: 20px; color: var(--accent); }
-  .bouton.secondaire { background: var(--fond); color: var(--texte); box-shadow: var(--relief-rond); border: 0; }
-  .bouton.secondaire:active { box-shadow: var(--creux-mini); }
+  .bouton.secondaire { background: var(--plat-fond); color: var(--texte); box-shadow: var(--filet); border: 0; }
+  .bouton.secondaire:active { background: var(--plat-filet-doux); }
   .poids { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
   .poids label { display: grid; gap: 6px; font-size: 12.5px; color: var(--texte-doux); }
   .poids input { width: 100%; text-align: center; font-size: 17px; }
   #reglage-compte { font-size: 14px; color: var(--texte-doux); margin: 0 0 6px; }
   .liste-defis { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; font-size: 14px; }
-  .liste-defis li { display: flex; align-items: center; gap: 10px; background: var(--fond); border-radius: 16px; padding: 12px 14px; box-shadow: var(--relief-mini); }
+  .liste-defis li { display: flex; align-items: center; gap: 10px; background: var(--plat-fond); border-radius: 12px; padding: 12px 14px; box-shadow: var(--filet); }
   .liste-defis .icone { width: 18px; height: 18px; color: var(--accent); }
 
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
@@ -544,11 +626,18 @@
   <symbol id="i-diner" viewBox="0 0 256 256"><g fill="currentColor" stroke="none"><path d="M224,112H32a8,8,0,0,0-8,8,104.35,104.35,0,0,0,56,92.28V216a16,16,0,0,0,16,16h64a16,16,0,0,0,16-16v-3.72A104.35,104.35,0,0,0,232,120,8,8,0,0,0,224,112Zm-59.34,88a8,8,0,0,0-4.66,7.27V216H96v-8.71A8,8,0,0,0,91.34,200a88.29,88.29,0,0,1-51-72H215.63A88.29,88.29,0,0,1,164.66,200ZM81.77,55c5.35-6.66,6.67-11.16,6.12-13.14-.42-1.49-2.41-2.26-2.43-2.26A8,8,0,0,1,88,24a8.11,8.11,0,0,1,2.38.36c1,.31,9.91,3.33,12.79,12.76,2.46,8.07-.55,17.45-8.94,27.89-5.35,6.66-6.67,11.16-6.12,13.14.42,1.49,2.37,2.24,2.39,2.25A8,8,0,0,1,88,96a8.11,8.11,0,0,1-2.38-.36c-1-.31-9.91-3.33-12.79-12.76C70.37,74.81,73.38,65.43,81.77,55Zm40,0c5.35-6.66,6.67-11.16,6.12-13.14-.42-1.49-2.41-2.26-2.43-2.26A8,8,0,0,1,128,24a8.11,8.11,0,0,1,2.38.36c1,.31,9.91,3.33,12.79,12.76,2.46,8.07-.55,17.45-8.94,27.89-5.35,6.66-6.67,11.16-6.12,13.14.42,1.49,2.37,2.24,2.39,2.25A8,8,0,0,1,128,96a8.11,8.11,0,0,1-2.38-.36c-1-.31-9.91-3.33-12.79-12.76C110.37,74.81,113.38,65.43,121.77,55Zm40,0c5.35-6.66,6.67-11.16,6.12-13.14-.42-1.49-2.41-2.26-2.43-2.26A8,8,0,0,1,168,24a8.11,8.11,0,0,1,2.38.36c1,.31,9.91,3.33,12.79,12.76,2.46,8.07-.55,17.45-8.94,27.89-5.35,6.66-6.67,11.16-6.12,13.14.42,1.49,2.37,2.24,2.39,2.25A8,8,0,0,1,168,96a8.11,8.11,0,0,1-2.38-.36c-1-.31-9.91-3.33-12.79-12.76C150.37,74.81,153.38,65.43,161.77,55Z"/></g></symbol>
   <symbol id="i-menage" viewBox="0 0 256 256"><g fill="currentColor" stroke="none"><path d="M235.5,216.81c-22.56-11-35.5-34.58-35.5-64.8V134.73a15.94,15.94,0,0,0-10.09-14.87L165,110a8,8,0,0,1-4.48-10.34l21.32-53a28,28,0,0,0-16.1-37,28.14,28.14,0,0,0-35.82,16,.61.61,0,0,0,0,.12L108.9,79a8,8,0,0,1-10.37,4.49L73.11,73.14A15.89,15.89,0,0,0,55.74,76.8C34.68,98.45,24,123.75,24,152a111.45,111.45,0,0,0,31.18,77.53A8,8,0,0,0,61,232H232a8,8,0,0,0,3.5-15.19ZM67.14,88l25.41,10.3a24,24,0,0,0,31.23-13.45l21-53c2.56-6.11,9.47-9.27,15.43-7a12,12,0,0,1,6.88,15.92L145.69,93.76a24,24,0,0,0,13.43,31.14L184,134.73V152c0,.33,0,.66,0,1L55.77,101.71A108.84,108.84,0,0,1,67.14,88Zm48,128a87.53,87.53,0,0,1-24.34-42,8,8,0,0,0-15.49,4,105.16,105.16,0,0,0,18.36,38H64.44A95.54,95.54,0,0,1,40,152a85.9,85.9,0,0,1,7.73-36.29l137.8,55.12c3,18,10.56,33.48,21.89,45.16Z"/></g></symbol>
   <symbol id="i-sommeil" viewBox="0 0 256 256"><g fill="currentColor" stroke="none"><path d="M240,96a8,8,0,0,1-8,8H216v16a8,8,0,0,1-16,0V104H184a8,8,0,0,1,0-16h16V72a8,8,0,0,1,16,0V88h16A8,8,0,0,1,240,96ZM144,56h8v8a8,8,0,0,0,16,0V56h8a8,8,0,0,0,0-16h-8V32a8,8,0,0,0-16,0v8h-8a8,8,0,0,0,0,16Zm72.77,97a8,8,0,0,1,1.43,8A96,96,0,1,1,95.07,37.8a8,8,0,0,1,10.6,9.06A88.07,88.07,0,0,0,209.14,150.33,8,8,0,0,1,216.77,153Zm-19.39,14.88c-1.79.09-3.59.14-5.38.14A104.11,104.11,0,0,1,88,64c0-1.79,0-3.59.14-5.38A80,80,0,1,0,197.38,167.86Z"/></g></symbol>
-  <symbol id="i-jour" viewBox="0 0 24 24"><path d="M5 19C5 10.5 10.5 5 19 5c0 8.5-5.5 14-14 14z"/><path d="M5 19l8.5-8.5"/></symbol>
-  <symbol id="i-historique" viewBox="0 0 24 24"><rect x="4" y="5.5" width="16" height="14.5" rx="3.5"/><path d="M4 10h16M8.5 3.5v3.5M15.5 3.5v3.5"/><path d="M8 13.5h.01M12 13.5h.01M16 13.5h.01M8 16.8h.01M12 16.8h.01"/></symbol>
-  <symbol id="i-reglages" viewBox="0 0 24 24"><path d="M18.70 10.33 L21.31 10.69 L21.31 13.31 L18.70 13.67 L17.91 15.55 L19.51 17.66 L17.66 19.51 L15.55 17.91 L13.67 18.70 L13.31 21.31 L10.69 21.31 L10.33 18.70 L8.45 17.91 L6.34 19.51 L4.49 17.66 L6.09 15.55 L5.30 13.67 L2.69 13.31 L2.69 10.69 L5.30 10.33 L6.09 8.45 L4.49 6.34 L6.34 4.49 L8.45 6.09 L10.33 5.30 L10.69 2.69 L13.31 2.69 L13.67 5.30 L15.55 6.09 L17.66 4.49 L19.51 6.34 L17.91 8.45Z"/><circle cx="12" cy="12" r="3"/></symbol>
-  <symbol id="i-taches" viewBox="0 0 24 24"><path d="M4.5 6.5l1.6 1.6 2.9-3M4.5 12.5l1.6 1.6 2.9-3M4.5 18.5l1.6 1.6 2.9-3M12 7h7.5M12 13h7.5M12 19h7.5"/></symbol>
-  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M5 7.5h14M5 12h14M5 16.5h14"/></symbol>
+  <symbol id="i-etoile" viewBox="0 0 24 24"><path d="M12 3.6l2.5 5.2 5.7.8-4.1 4 1 5.6L12 16.5l-5.1 2.7 1-5.6-4.1-4 5.7-.8z"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <!-- Navigation : Aujourd'hui (la tête du personnage, d'après images/logo.png), Tâches (cercle coché), Calendrier, Réglages
+       (Phosphor « regular » pour l'onglet inactif, « fill » pour l'actif). Même trait (16/256), angles arrondis. -->
+  <symbol id="n-jour" viewBox="0 0 256 256"><g fill="none" stroke="currentColor" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"><path d="M128,50C188,50,222,78,222,134C222,190,186,214,128,214C70,214,34,190,34,134C34,78,68,50,128,50Z"/><path d="M128,58V130Q128,139,120,142V206" stroke-width="12"/><path d="M112,170Q122,177,132,170" stroke-width="12"/></g><g fill="currentColor" stroke="none"><circle cx="90" cy="140" r="11"/><circle cx="164" cy="140" r="11"/></g></symbol>
+  <symbol id="n-jour-actif" viewBox="0 0 256 256"><g stroke="none"><path d="M128,50C188,50,222,78,222,134C222,190,186,214,128,214C70,214,34,190,34,134C34,78,68,50,128,50Z" fill="currentColor" opacity=".42"/><path d="M128,50C68,50,34,78,34,134C34,190,70,214,120,214V142Q128,139,128,130Z" fill="currentColor"/><g fill="#2f3a2c"><circle cx="90" cy="140" r="11"/><circle cx="164" cy="140" r="11"/></g></g><path d="M112,170Q122,177,132,170" fill="none" stroke="#2f3a2c" stroke-width="10" stroke-linecap="round"/></symbol>
+  <symbol id="n-taches" viewBox="0 0 256 256"><g fill="currentColor" stroke="none"><path d="M173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34ZM232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"/></g></symbol>
+  <symbol id="n-taches-actif" viewBox="0 0 256 256"><g fill="currentColor" stroke="none"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm45.66,85.66-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35a8,8,0,0,1,11.32,11.32Z"/></g></symbol>
+  <symbol id="n-historique" viewBox="0 0 256 256"><g fill="currentColor" stroke="none"><path d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM72,48v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V80H48V48ZM208,208H48V96H208V208Z"/></g></symbol>
+  <symbol id="n-historique-actif" viewBox="0 0 256 256"><g fill="currentColor" stroke="none"><path d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32Zm0,48H48V48H72v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24Z"/></g></symbol>
+  <symbol id="n-reglages" viewBox="0 0 256 256"><g fill="currentColor" stroke="none"><path d="M128,80a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160Zm109.94-52.79a8,8,0,0,0-3.89-5.4l-29.83-17-.12-33.62a8,8,0,0,0-2.83-6.08,111.91,111.91,0,0,0-36.72-20.67,8,8,0,0,0-6.46.59L128,41.85,97.88,25a8,8,0,0,0-6.47-.6A112.1,112.1,0,0,0,54.73,45.15a8,8,0,0,0-2.83,6.07l-.15,33.65-29.83,17a8,8,0,0,0-3.89,5.4,106.47,106.47,0,0,0,0,41.56,8,8,0,0,0,3.89,5.4l29.83,17,.12,33.62a8,8,0,0,0,2.83,6.08,111.91,111.91,0,0,0,36.72,20.67,8,8,0,0,0,6.46-.59L128,214.15,158.12,231a7.91,7.91,0,0,0,3.9,1,8.09,8.09,0,0,0,2.57-.42,112.1,112.1,0,0,0,36.68-20.73,8,8,0,0,0,2.83-6.07l.15-33.65,29.83-17a8,8,0,0,0,3.89-5.4A106.47,106.47,0,0,0,237.94,107.21Zm-15,34.91-28.57,16.25a8,8,0,0,0-3,3c-.58,1-1.19,2.06-1.81,3.06a7.94,7.94,0,0,0-1.22,4.21l-.15,32.25a95.89,95.89,0,0,1-25.37,14.3L134,199.13a8,8,0,0,0-3.91-1h-.19c-1.21,0-2.43,0-3.64,0a8.08,8.08,0,0,0-4.1,1l-28.84,16.1A96,96,0,0,1,67.88,201l-.11-32.2a8,8,0,0,0-1.22-4.22c-.62-1-1.23-2-1.8-3.06a8.09,8.09,0,0,0-3-3.06l-28.6-16.29a90.49,90.49,0,0,1,0-28.26L61.67,97.63a8,8,0,0,0,3-3c.58-1,1.19-2.06,1.81-3.06a7.94,7.94,0,0,0,1.22-4.21l.15-32.25a95.89,95.89,0,0,1,25.37-14.3L122,56.87a8,8,0,0,0,4.1,1c1.21,0,2.43,0,3.64,0a8.08,8.08,0,0,0,4.1-1l28.84-16.1A96,96,0,0,1,188.12,55l.11,32.2a8,8,0,0,0,1.22,4.22c.62,1,1.23,2,1.8,3.06a8.09,8.09,0,0,0,3,3.06l28.6,16.29A90.49,90.49,0,0,1,222.9,142.12Z"/></g></symbol>
+  <symbol id="n-reglages-actif" viewBox="0 0 256 256"><g fill="currentColor" stroke="none"><path d="M237.94,107.21a8,8,0,0,0-3.89-5.4l-29.83-17-.12-33.62a8,8,0,0,0-2.83-6.08,111.91,111.91,0,0,0-36.72-20.67,8,8,0,0,0-6.46.59L128,41.85,97.88,25a8,8,0,0,0-6.47-.6A111.92,111.92,0,0,0,54.73,45.15a8,8,0,0,0-2.83,6.07l-.15,33.65-29.83,17a8,8,0,0,0-3.89,5.4,106.47,106.47,0,0,0,0,41.56,8,8,0,0,0,3.89,5.4l29.83,17,.12,33.63a8,8,0,0,0,2.83,6.08,111.91,111.91,0,0,0,36.72,20.67,8,8,0,0,0,6.46-.59L128,214.15,158.12,231a7.91,7.91,0,0,0,3.9,1,8.09,8.09,0,0,0,2.57-.42,112.1,112.1,0,0,0,36.68-20.73,8,8,0,0,0,2.83-6.07l.15-33.65,29.83-17a8,8,0,0,0,3.89-5.4A106.47,106.47,0,0,0,237.94,107.21ZM128,168a40,40,0,1,1,40-40A40,40,0,0,1,128,168Z"/></g></symbol>
   <symbol id="i-fermer" viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></symbol>
   <symbol id="i-defi" viewBox="0 0 24 24"><path d="M6 20.5V4"/><path d="M6 5c3.3-1.6 6.3 1.6 11 0v7.4c-4.7 1.6-7.7-1.6-11 0"/></symbol>
   <symbol id="i-crayon" viewBox="0 0 24 24"><path d="M4.5 19.5l1-4L15.8 5.2a2.1 2.1 0 0 1 3 3L8.5 18.5z"/><path d="M13.8 7.2l3 3"/></symbol>
@@ -626,14 +715,17 @@
  </div>
 
  <div id="ecran-taches" hidden>
-    <section class="carte" id="carte-taches">
-      <h2 class="titre-carte">Tâches</h2>
-      <div id="compteur-taches"></div>
-      <form id="form-tache" autocomplete="off">
-        <input id="nouvelle-tache" placeholder="Nouvelle tâche…" enterkeyhint="done" maxlength="200">
-        <button class="bouton" aria-label="Ajouter">+</button>
-        <label class="champ echeance">Échéance <input type="date" id="echeance-tache"></label>
-      </form>
+    <header class="bande bande-taches">
+      <div class="bande-titre">
+        <h1 id="titre-taches">Tâches</h1>
+        <p class="bande-infos" id="compteur-taches"></p>
+      </div>
+    </header>
+    <section class="tableau-taches">
+      <div class="entete-tableau">
+        <div class="colonnes" aria-hidden="true"><span>Tâche</span><span>Statut</span><span>Priorité</span><span>Échéance</span><span>Description</span></div>
+        <button id="ajouter-tache" aria-label="Nouvelle tâche"><svg class="icone" aria-hidden="true"><use href="#i-plus"/></svg></button>
+      </div>
       <ul id="liste-taches"></ul>
     </section>
  </div>
@@ -671,17 +763,40 @@
  </div>
 </main>
 
-<div id="menu" hidden>
-  <button id="menu-bouton" aria-label="Menu" aria-expanded="false" aria-controls="navigation">
-    <svg class="icone ouvre" aria-hidden="true"><use href="#i-menu"/></svg><svg class="icone ferme" aria-hidden="true"><use href="#i-fermer"/></svg>
-  </button>
-  <nav id="navigation">
-    <button data-ecran="jour" aria-label="Jour"><svg class="icone" aria-hidden="true"><use href="#i-jour"/></svg></button>
-    <button data-ecran="taches" aria-label="Tâches"><svg class="icone" aria-hidden="true"><use href="#i-taches"/></svg></button>
-    <button data-ecran="historique" aria-label="Historique"><svg class="icone" aria-hidden="true"><use href="#i-historique"/></svg></button>
-    <button data-ecran="reglages" aria-label="Réglages"><svg class="icone" aria-hidden="true"><use href="#i-reglages"/></svg></button>
-  </nav>
-</div>
+<nav id="navigation" aria-label="Écrans" hidden>
+    <svg class="courbe-menu" aria-hidden="true"><path/></svg>
+    <button data-ecran="jour" aria-label="Aujourd’hui"><span class="onglet-icone"><svg class="icone inactif" aria-hidden="true"><use href="#n-jour"/></svg><svg class="icone actif" aria-hidden="true"><use href="#n-jour-actif"/></svg></span></button>
+    <button data-ecran="taches" aria-label="Tâches"><span class="onglet-icone"><svg class="icone inactif" aria-hidden="true"><use href="#n-taches"/></svg><svg class="icone actif" aria-hidden="true"><use href="#n-taches-actif"/></svg></span></button>
+    <button data-ecran="historique" aria-label="Calendrier"><span class="onglet-icone"><svg class="icone inactif" aria-hidden="true"><use href="#n-historique"/></svg><svg class="icone actif" aria-hidden="true"><use href="#n-historique-actif"/></svg></span></button>
+    <button data-ecran="reglages" aria-label="Réglages"><span class="onglet-icone"><svg class="icone inactif" aria-hidden="true"><use href="#n-reglages"/></svg><svg class="icone actif" aria-hidden="true"><use href="#n-reglages-actif"/></svg></span></button>
+</nav>
+
+<dialog id="fenetre-tache" aria-labelledby="titre-fenetre-tache">
+  <form id="form-tache" autocomplete="off">
+    <h2 class="titre-carte" id="titre-fenetre-tache">Nouvelle tâche</h2>
+    <textarea id="nouvelle-tache" rows="1" placeholder="Que faut-il faire ?" aria-label="Texte de la tâche" enterkeyhint="done" maxlength="200"></textarea>
+    <textarea id="description-tache" rows="2" placeholder="Description (facultative)" aria-label="Description" maxlength="1000"></textarea>
+    <div class="ligne-reglages">
+      <div><p class="intitule" id="titre-priorite">Priorité</p>
+        <div id="choix-priorite" role="group" aria-labelledby="titre-priorite">
+          <button type="button" data-p="1" aria-label="Priorité 1"><svg class="icone" aria-hidden="true"><use href="#i-etoile"/></svg></button>
+          <button type="button" data-p="2" aria-label="Priorité 2"><svg class="icone" aria-hidden="true"><use href="#i-etoile"/></svg></button>
+          <button type="button" data-p="3" aria-label="Priorité 3"><svg class="icone" aria-hidden="true"><use href="#i-etoile"/></svg></button>
+        </div></div>
+      <label><p class="intitule">Échéance</p><input type="date" id="echeance-tache"></label>
+    </div>
+    <div class="sous-taches-fenetre">
+      <p class="intitule" style="margin: 0">Sous-tâches</p>
+      <ul id="sous-taches-edition"></ul>
+      <button type="button" id="ajouter-sous-tache"><svg class="icone" aria-hidden="true"><use href="#i-plus"/></svg>Ajouter une sous-tâche</button>
+    </div>
+    <div class="actions-fenetre">
+      <button type="button" class="tache-action" id="supprimer-tache" aria-label="Supprimer la tâche" hidden><svg class="icone" aria-hidden="true"><use href="#i-poubelle"/></svg></button>
+      <button class="bouton" id="valider-tache">Ajouter</button>
+      <button type="button" class="tache-action" id="fermer-tache" aria-label="Fermer"><svg class="icone" aria-hidden="true"><use href="#i-fermer"/></svg></button>
+    </div>
+  </form>
+</dialog>
 
 <div id="toast" hidden></div>
 
@@ -937,7 +1052,7 @@ const GOOGLE_CLIENT_ID = '565047413369-2bi3f5bqfsao5hgdg271gv7g2prdhqrc.apps.goo
 
 // État en mémoire, alimenté en temps réel par Firestore (synchronise iPhone et ordinateur).
 const etat = { uid: null, aujourdhui: cleDuJour(new Date()), ecran: 'jour', jourAffiche: null,
-  ui: { exclMode: 'semaine', exclDate: null, defiType: 'sport-semaine', defiCible: 4, defiHabitude: 'meditation', abandon: false, tacheEditee: null, brouillon: null, suppression: null }, reglages: null, jours: {}, semaines: {}, taches: [], charge: new Set() };
+  ui: { exclMode: 'semaine', exclDate: null, defiType: 'sport-semaine', defiCible: 4, defiHabitude: 'meditation', abandon: false }, reglages: null, jours: {}, semaines: {}, taches: [], charge: new Set() };
 let desabonnements = [];
 
 const ref = (...chemin) => doc(db, 'users', etat.uid, ...chemin);
@@ -1066,22 +1181,26 @@ const VERSION_MONDE = 2;
 // L'ordre de la liste est l'ordre d'empilement : pour qu'il passe derrière un élément de décor (un arbre),
 // ajoute un plan pour cet élément après le sien.
 const MONDE = [
-  { plan: 'fond', image: 'images/monde/fond.jpg', provisoire: 'images/jardin.jpg', balance: 6, glisse: 6, entree: 1.03, flou: 1.75 },
+  { plan: 'fond', image: 'images/monde/fond.jpg', provisoire: 'images/jardin.jpg', flou: 1.2 },   // immobile : ni balancement, ni parallaxe, ni travelling
   { plan: 'personnage', balance: 11, glisse: 14 },
 ];
-// Place du personnage dans l'arche : ses pieds (x, y, en fraction du monde) et la hauteur du cadre de ses images
-// (il en occupe 69 %), au plus 150 % de la largeur de l'arche (sa silhouette est bien plus étroite que le cadre) et 65 % de sa hauteur.
-const PLACE_PERSONNAGE = { x: .5, y: .82, taille: 'min(150cqw, 65cqh)' };
+// Place du personnage dans l'arche : tout près, coupé par le bas du jardin juste au-dessus du nombril (on ne voit plus
+// ses pieds). Ses pieds (x, y, en fraction du monde) sont donc sous le bas du monde, de sousPieds × taille : l'écart
+// entre ses pieds (81,15 % du cadre) et le haut de son nombril (61,5 %). taille : hauteur du cadre de ses images,
+// 136 % de la hauteur de l'arche (le buste en occupe alors environ 67 %), au plus 204 % de sa largeur (la tête
+// tient dans l'arche étroite de l'iPhone).
+const PLACE_PERSONNAGE = { x: .5, y: 1, sousPieds: .1965, taille: 'min(204cqw, 136cqh)' };
 function construireMonde() {
   const monde = $('monde'), lumiere = document.querySelector('.lumiere');
   monde.style.setProperty('--pieds-x', PLACE_PERSONNAGE.x);
   monde.style.setProperty('--pieds-y', PLACE_PERSONNAGE.y);
+  monde.style.setProperty('--sous-pieds', PLACE_PERSONNAGE.sousPieds);
   monde.style.setProperty('--taille', PLACE_PERSONNAGE.taille);
   for (const p of MONDE) {
     const plan = el('div', 'plan');
     plan.dataset.plan = p.plan;
-    plan.style.setProperty('--glisse', p.glisse);
-    plan.style.setProperty('--balance', p.balance);
+    plan.style.setProperty('--glisse', p.glisse ?? 0);   // 0 : plan immobile
+    plan.style.setProperty('--balance', p.balance ?? 0);
     if (p.entree) plan.style.setProperty('--entree', p.entree);
     if (p.flou) plan.style.setProperty('--flou', p.flou);
     const filtres = [p.flou && `blur(${p.flou}px)`, p.sombre && `brightness(${p.sombre})`].filter(Boolean);
@@ -1138,30 +1257,39 @@ function icone(nom) {
   return svg;
 }
 // Scène calée sur l'écran : l'arche du jardin au centre, de sous la date jusqu'à MARGE_BAS du bas de l'écran (barre
-// d'accueil de l'iPhone en plus), ARCHE_MAX de large au plus. Son cadre est assez épais pour porter les boutons :
+// d'accueil de l'iPhone en plus ; sur iPhone, raccourcie à HAUTEUR_ARCHE_MOBILE), ARCHE_MAX de large au plus. Son cadre est assez épais pour porter les boutons :
 // ils sont posés sur sa ligne médiane, à intervalles égaux sur tout le tour (arrondi du haut, côtés et bas),
 // dans l'ordre de TOUR, en partant du sommet et dans le sens des aiguilles d'une montre.
-const TOUR = ['eau', 'sport', 'lecture', 'meditation', 'diner', 'dejeuner', 'petitDej', 'sommeil', 'menage'];   // repas côte à côte, en bas
+const TOUR = ['eau', 'petitDej', 'dejeuner', 'diner', 'sport', 'menage', 'sommeil', 'meditation', 'lecture'];   // les trois repas ensemble, à droite, dans l'ordre de la journée
 const RAYON_BOUTON = 24;            // boutons ronds de 48 px
 const ARCHE_MAX = 640;
-const MARGE = 8;                    // entre l'arche et le bord de l'écran
+const MARGE = 18;                   // entre l’arche et le bord de l’écran (sur iPhone, où l’arche prend toute la largeur)
 const MARGE_BAS = 24;               // sous l'arche
+const HAUTEUR_ARCHE_MOBILE = 1;     // sur iPhone, part de la hauteur disponible (au-dessus de la barre de navigation) prise par l'arche
+const ESPACE_BARRE = 12;            // sur mobile, entre le bas de l'arche et la barre de navigation
 function caleCadran() {
   const scene = $('scene');
   if (!scene || $('ecran-jour').hidden) return;
   const r = RAYON_BOUTON;
   const largeur = scene.getBoundingClientRect().width;
-  const hauteur = Math.max(320, innerHeight - (scene.getBoundingClientRect().top + scrollY));
+  // L'écran du jour est figé : la scène prend la hauteur restante, moins le défi en cours s'il est affiché dessous.
+  const defi = $('carte-defi');
+  const sousScene = defi.hidden ? 0 : defi.offsetHeight + 12;
+  // Sur mobile, la barre de navigation du bas fait office de bas d'écran (elle est déjà au-dessus de la barre d'accueil).
+  const barre = $('navigation');
+  const barreEnBas = matchMedia('(max-width: 768px)').matches && !barre.hidden;
+  const bas = barreEnBas ? barre.getBoundingClientRect().top - ESPACE_BARRE : innerHeight;
+  const hauteur = Math.max(320, bas - (scene.getBoundingClientRect().top + scrollY) - sousScene);
   const sonde = el('div');   // hauteur de la barre d'accueil de l'iPhone (0 ailleurs)
   sonde.style.cssText = 'position: fixed; visibility: hidden; height: env(safe-area-inset-bottom)';
   document.body.append(sonde);
-  const accueil = sonde.offsetHeight;
+  const accueil = barreEnBas ? 0 : sonde.offsetHeight;
   sonde.remove();
   const cadre = 2 * r + (largeur < 600 ? 12 : 20);                 // le bouton et un peu d'air de chaque côté
   const arche = Math.round(Math.min(ARCHE_MAX, largeur - 2 * MARGE, hauteur * .85));
   const gauche = (largeur - arche) / 2, haut = 6;
   scene.style.height = `${hauteur}px`;
-  const hauteurArche = hauteur - haut - MARGE_BAS - accueil;
+  const hauteurArche = (hauteur - haut - (barreEnBas ? 0 : MARGE_BAS) - accueil) * (largeur < 600 ? HAUTEUR_ARCHE_MOBILE : 1);
   for (const [nom, v] of [['--ax', gauche], ['--ay', haut], ['--hublot', arche], ['--ah', hauteurArche], ['--cadre-arche', cadre]]) scene.style.setProperty(nom, `${v}px`);
   // Ligne médiane du cadre, parcourue depuis le sommet : quart de cercle droit, côté droit, bas, côté gauche, quart gauche.
   const R = arche / 2, rho = R - cadre / 2, cx = gauche + R, cyArc = haut + R, yBas = haut + hauteurArche - cadre / 2;
@@ -1182,6 +1310,28 @@ function caleCadran() {
   });
 }
 addEventListener('resize', caleCadran);
+// Menu sur ordinateur, sur tous les écrans au même endroit : les icônes suivent une bande courbe calée dans le coin en
+// haut à gauche de la fenêtre. Sa courbe est celle du haut de l'arche, côté gauche, agrandie de ECART_MENU et de la
+// demi-épaisseur de la bande ; elle va de DEBUT_MENU degrés du sommet vers le bas, une icône tous les PAS_MENU px.
+// Sur mobile, le menu reste une barre en bas.
+const ECART_MENU = 16, EPAISSEUR_MENU = 56, DEBUT_MENU = 30, PAS_MENU = 54, COIN_MENU = 20;   // px, px, degrés, px, px
+function placerMenu() {
+  const nav = $('navigation'), boutons = [...nav.querySelectorAll('button')];
+  const courbe = matchMedia('(min-width: 769px)').matches && !nav.hidden;
+  nav.classList.toggle('courbe', courbe);
+  if (!courbe) { for (const b of boutons) b.style.removeProperty('transform'); return; }
+  const rho = ARCHE_MAX / 2 + ECART_MENU + EPAISSEUR_MENU / 2, pas = PAS_MENU / rho, debut = DEBUT_MENU * Math.PI / 180;
+  // côté gauche, du haut vers le bas (angle compté depuis le sommet, vers la gauche), puis calé dans le coin
+  let points = boutons.map((_, i) => [-rho * Math.sin(debut + i * pas), -rho * Math.cos(debut + i * pas)]);
+  const dx = COIN_MENU + EPAISSEUR_MENU / 2 - Math.min(...points.map(p => p[0]));
+  const dy = COIN_MENU + EPAISSEUR_MENU / 2 - Math.min(...points.map(p => p[1]));
+  points = points.map(([x, y]) => [x + dx, y + dy]);
+  boutons.forEach((b, i) => { b.style.transform = `translate(${points[i][0].toFixed(1)}px, ${points[i][1].toFixed(1)}px)`; });
+  const [[x1, y1], [x2, y2]] = [points[0], points[points.length - 1]];
+  nav.style.setProperty('--epaisseur-menu', `${EPAISSEUR_MENU}px`);
+  nav.querySelector('.courbe-menu path').setAttribute('d', `M${x1.toFixed(1)},${y1.toFixed(1)} A${rho.toFixed(1)},${rho.toFixed(1)} 0 0 0 ${x2.toFixed(1)},${y2.toFixed(1)}`);
+}
+addEventListener('resize', placerMenu);
 // Parallaxe : l'inclinaison du téléphone déplace le regard (la souris, elle, ne fait rien bouger) ; chaque plan du monde glisse
 // en sens inverse de son nombre de px (MONDE). Mouvement lissé image par image ;
 // coupé si l'appareil demande moins de mouvement.
@@ -1394,14 +1544,15 @@ function rendre() {
   $('ecran-connexion').hidden = true;
   $('chargement').hidden = true;
   $('app').hidden = false;
-  $('menu').hidden = false;
+  $('navigation').hidden = false;
   for (const nom of ['jour', 'historique', 'taches', 'reglages']) $(`ecran-${nom}`).hidden = etat.ecran !== nom;
-  for (const b of $('navigation').children) {
+  for (const b of $('navigation').querySelectorAll('button')) {
     if (b.dataset.ecran === etat.ecran) b.setAttribute('aria-current', 'page');
     else b.removeAttribute('aria-current');
   }
   rendreJour();
   caleCadran();
+  placerMenu();
   if (etat.ecran === 'jour' && ecranAffiche !== 'jour') { montrerBulle(); travelling(); }
   ecranAffiche = etat.ecran;
   rendreHistorique();
@@ -1504,84 +1655,69 @@ function rendreJour() {
   };
 }
 
-// Tâches (écran dédié, hors score) : les tâches cochées restent barrées jusqu'à la fin de leur semaine.
-// Chacune peut être modifiée (texte et échéance) et supprimée (deux touches). Les tâches à faire sont triées par
-// échéance (la plus proche d'abord, sans échéance ensuite), puis par date de création.
+// Tâches (écran dédié, hors score), en tableau : nom, statut, priorité (1 à 3 étoiles), échéance, description. Trois statuts : à faire, en cours, terminé
+// (terminé = champ fait, comme avant ; en cours = champ enCours). Les tâches terminées restent visibles jusqu'à la fin
+// de leur semaine. Chaque tâche peut avoir des sous-tâches (champ sousTaches : [{ id, texte, statut }]), affichées sous elle.
+// Toucher un nom ouvre la fenêtre de la tâche (texte, échéance, sous-tâches, suppression en deux touches) ;
+// toucher un statut le fait passer au suivant. Les tâches non terminées sont triées par échéance
+// (la plus proche d'abord, sans échéance ensuite), puis par date de création.
 const echeanceEnTexte = (cle, aujourdhui) => cle === aujourdhui ? 'aujourd’hui' : cle === ajouterJours(aujourdhui, 1) ? 'demain'
   : cle === ajouterJours(aujourdhui, -1) ? 'hier' : formatDate(cle, { weekday: 'short', day: 'numeric', month: 'short' });
-let minuteurSuppression = 0;
+const STATUTS = { 'a-faire': 'À faire', 'en-cours': 'En cours', termine: 'Terminé' };
+const STATUT_SUIVANT = { 'a-faire': 'en-cours', 'en-cours': 'termine', termine: 'a-faire' };
+const statutDe = t => t.fait ? 'termine' : t.enCours ? 'en-cours' : 'a-faire';
+const PRIORITE_DEFAUT = 2;   // tâches créées avant la priorité, et nouvelles tâches
+function etoiles(n) {
+  const p = el('span', 'priorite');
+  p.setAttribute('role', 'img');
+  p.setAttribute('aria-label', `Priorité ${n} sur 3`);
+  for (let i = 1; i <= 3; i++) p.append(i <= n ? icone('etoile') : el('span', 'vide'));
+  return p;
+}
+function boutonStatut(statut, nom, changer) {
+  const b = el('button', `statut ${statut}`, STATUTS[statut]);
+  b.setAttribute('aria-label', `${nom} : ${STATUTS[statut]}. Passer à « ${STATUTS[STATUT_SUIVANT[statut]]} »`);
+  b.onclick = changer;
+  return b;
+}
 function rendreTaches() {
-  const { aujourdhui, ui } = etat;
+  const { aujourdhui } = etat;
   const dansLaSemaine = t => t.fait && t.faitLe && lundiDe(t.faitLe) === lundiDe(aujourdhui);
   const cree = t => t.creeLe?.toMillis?.() ?? 0;
   const visibles = etat.taches.filter(t => !t.fait || dansLaSemaine(t))
     .sort((x, y) => (x.fait - y.fait) || (!x.fait && ((x.echeance ? 0 : 1) - (y.echeance ? 0 : 1) || (x.echeance ?? '').localeCompare(y.echeance ?? ''))) || cree(x) - cree(y));
   const faites = etat.taches.filter(dansLaSemaine).length;
   $('compteur-taches').textContent = `${faites} tâche${faites > 1 ? 's' : ''} faite${faites > 1 ? 's' : ''} cette semaine`;
-  $('liste-taches').replaceChildren(...visibles.map(t => {
-    const li = el('li', t.fait ? 'tache-faite' : '');
-    if (ui.tacheEditee === t.id) {
-      // Modification sur place ; le brouillon survit aux mises à jour venues de Firestore.
-      const form = el('form', 'tache-edition');
-      const texte = el('input', 'texte-edite');
-      Object.assign(texte, { value: ui.brouillon?.texte ?? t.texte, maxLength: 200, enterKeyHint: 'done' });
-      texte.setAttribute('aria-label', 'Texte de la tâche');
-      const date = el('input');
-      Object.assign(date, { type: 'date', value: ui.brouillon?.echeance ?? t.echeance ?? '' });
-      const champ = el('label', 'champ', 'Échéance ');
-      champ.append(date);
-      const garder = () => { ui.brouillon = { texte: texte.value, echeance: date.value }; };
-      texte.oninput = garder; date.oninput = garder;
-      const enregistrer = el('button', 'bouton', 'Enregistrer');
-      const annuler = el('button', 'bouton secondaire', 'Annuler');
-      annuler.type = 'button';
-      const fermer = () => { ui.tacheEditee = null; ui.brouillon = null; rendre(); };
-      annuler.onclick = fermer;
-      form.onsubmit = e => {
-        e.preventDefault();
-        const nouveau = texte.value.trim();
-        if (!nouveau) return texte.focus();
-        updateDoc(ref('tasks', t.id), { texte: nouveau, echeance: date.value || null }).catch(erreur);
-        fermer();
-      };
-      form.append(texte, champ, enregistrer, annuler);
-      li.append(form);
-      if (ui.focusEdition) { ui.focusEdition = false; requestAnimationFrame(() => texte.focus()); }
-      return li;
+  const lignes = [];
+  for (const t of visibles) {
+    const statut = statutDe(t);
+    const sous = t.sousTaches ?? [];
+    const li = el('li', `ligne-tache tache-${statut}`);
+    const ouvrir = el('button', 'tache-ouvrir');
+    ouvrir.append(el('span', 'texte', t.texte));
+    if (sous.length) ouvrir.append(el('span', 'compte', `${sous.filter(x => x.statut === 'termine').length}/${sous.length} sous-tâche${sous.length > 1 ? 's' : ''}`));
+    ouvrir.setAttribute('aria-label', `Ouvrir « ${t.texte} »`);
+    ouvrir.onclick = () => ouvrirTache(t);
+    const retard = statut !== 'termine' && t.echeance && t.echeance < aujourdhui;
+    const date = el('span', `date${retard ? ' retard' : ''}`, t.echeance ? formatDate(t.echeance, { day: '2-digit', month: '2-digit' }) : '');
+    if (t.echeance) date.title = `${retard ? 'En retard · ' : 'Échéance : '}${echeanceEnTexte(t.echeance, aujourdhui)}`;
+    const suivant = STATUT_SUIVANT[statut];
+    li.append(ouvrir, etoiles(t.priorite ?? PRIORITE_DEFAUT), date, el('span', 'description', t.description ?? ''), boutonStatut(statut, t.texte, () => setDoc(ref('tasks', t.id),
+      { fait: suivant === 'termine', faitLe: suivant === 'termine' ? aujourdhui : null, enCours: suivant === 'en-cours' }, { merge: true }).catch(erreur)));
+    lignes.push(li);
+    for (const st of sous) {
+      const ls = el('li', `ligne-tache sous tache-${st.statut}`);
+      const o = el('button', 'tache-ouvrir');
+      o.append(el('span', 'texte', st.texte));
+      o.setAttribute('aria-label', `Ouvrir « ${t.texte} » (sous-tâche « ${st.texte} »)`);
+      o.onclick = () => ouvrirTache(t);
+      ls.append(o, boutonStatut(st.statut, st.texte, () => updateDoc(ref('tasks', t.id),
+        { sousTaches: sous.map(x => x.id === st.id ? { ...x, statut: STATUT_SUIVANT[x.statut] } : x) }).catch(erreur)));
+      lignes.push(ls);
     }
-    const b = el('button', 'tache-cocher');
-    b.setAttribute('aria-pressed', !!t.fait);
-    const contenu = el('span', 'contenu');
-    contenu.append(el('span', 'texte', t.texte));
-    if (t.echeance) {
-      const retard = !t.fait && t.echeance < aujourdhui;
-      contenu.append(el('span', `date${retard ? ' retard' : ''}`, `${retard ? 'En retard · ' : 'Échéance : '}${echeanceEnTexte(t.echeance, aujourdhui)}`));
-    }
-    b.append(el('span', 'rond', t.fait ? '✓' : ''), contenu);
-    b.onclick = () => setDoc(ref('tasks', t.id), { fait: !t.fait, faitLe: t.fait ? null : aujourdhui }, { merge: true }).catch(erreur);
-    const modifier = el('button', 'tache-action');
-    modifier.append(icone('crayon'));
-    modifier.setAttribute('aria-label', `Modifier « ${t.texte} »`);
-    modifier.onclick = () => { ui.tacheEditee = t.id; ui.brouillon = null; ui.focusEdition = true; ui.suppression = null; rendre(); };
-    const supprimer = el('button', 'tache-action');
-    if (ui.suppression === t.id) {
-      supprimer.classList.add('confirmer');
-      supprimer.textContent = 'Supprimer ?';
-      supprimer.setAttribute('aria-label', `Confirmer la suppression de « ${t.texte} »`);
-      supprimer.onclick = () => { clearTimeout(minuteurSuppression); ui.suppression = null; deleteDoc(ref('tasks', t.id)).catch(erreur); rendre(); };
-    } else {
-      supprimer.append(icone('poubelle'));
-      supprimer.setAttribute('aria-label', `Supprimer « ${t.texte} »`);
-      supprimer.onclick = () => {
-        ui.suppression = t.id;
-        clearTimeout(minuteurSuppression);
-        minuteurSuppression = setTimeout(() => { ui.suppression = null; rendre(); }, 3000);
-        rendre();
-      };
-    }
-    li.append(b, modifier, supprimer);
-    return li;
-  }));
+  }
+  if (!lignes.length) lignes.push(el('li', 'taches-vide', 'Aucune tâche pour l’instant.'));
+  $('liste-taches').replaceChildren(...lignes);
 }
 
 // Calendrier en pixels : une ligne par semaine (la plus récente en haut), une case par jour.
@@ -1763,35 +1899,121 @@ for (const b of $('excl-mode').children) b.onclick = () => { etat.ui.exclMode = 
 $('excl-date').onchange = () => { if ($('excl-date').value) { etat.ui.exclDate = $('excl-date').value; rendre(); } };
 $('poids-defaut').onclick = () => ecrireReglages({ poids: POIDS_DEFAUT });
 
-// Navigation : menu dépliant, refermé après le choix d'un écran, en touchant ailleurs ou avec Échap.
-function fermerMenu() {
-  $('menu').classList.remove('ouvert');
-  $('menu-bouton').setAttribute('aria-expanded', 'false');
-}
-$('menu-bouton').onclick = () => {
-  const ouvert = $('menu').classList.toggle('ouvert');
-  $('menu-bouton').setAttribute('aria-expanded', String(ouvert));
-};
-document.addEventListener('pointerdown', e => { if (!$('menu').contains(e.target)) fermerMenu(); });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') fermerMenu(); });
-for (const b of $('navigation').children) b.onclick = () => {
+// Navigation : barre du bas (mobile) ou rail de gauche (ordinateur), toujours visible.
+for (const b of $('navigation').querySelectorAll('button')) b.onclick = () => {
   etat.ecran = b.dataset.ecran;
   if (etat.ecran === 'jour') etat.jourAffiche = null;
-  fermerMenu();
+  b.blur();
   rendre();
   scrollTo(0, 0);
 };
+// Au clavier : flèche du bas pour l'écran suivant (Aujourd'hui → Tâches → Calendrier → Réglages), flèche du haut
+// pour le précédent ; sans effet pendant une saisie ou quand la fenêtre de tâche est ouverte.
+document.addEventListener('keydown', e => {
+  if (!['ArrowDown', 'ArrowUp'].includes(e.key) || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+  if ($('navigation').hidden || $('fenetre-tache').open || e.target.closest?.('input, textarea, select, [contenteditable]')) return;
+  const onglets = [...$('navigation').querySelectorAll('button')];
+  const i = onglets.findIndex(b => b.dataset.ecran === etat.ecran) + (e.key === 'ArrowDown' ? 1 : -1);
+  if (i < 0 || i >= onglets.length) return;
+  e.preventDefault();
+  onglets[i].click();
+});
 $('retour-aujourdhui').onclick = () => { etat.jourAffiche = null; rendre(); scrollTo(0, 0); };
 
-// Saisie des tâches
+// Fenêtre de tâche : le bouton + l'ouvre vide (création), toucher une tâche l'ouvre remplie (modification, sous-tâches, suppression).
+// L'échéance proposée pour une nouvelle tâche est aujourd'hui (on peut l'effacer).
+// La fenêtre se ferme par la croix, Échap ou en touchant à côté ; elle repart vide.
+const fenetreTache = $('fenetre-tache');
+let tacheOuverte = null, minuteurSuppression = 0, sousBrouillon = [];
+// Sous-tâches en cours de saisie dans la fenêtre ; enregistrées avec la tâche (les vides sont ignorées).
+// Entrée dans une sous-tâche en ajoute une nouvelle juste en dessous.
+const nouvelId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+function rendreSousTaches(focus) {
+  $('sous-taches-edition').replaceChildren(...sousBrouillon.map((st, i) => {
+    const li = el('li');
+    const champ = el('input');
+    Object.assign(champ, { value: st.texte, maxLength: 200, placeholder: 'Sous-tâche', enterKeyHint: 'next' });
+    champ.setAttribute('aria-label', `Sous-tâche ${i + 1}`);
+    champ.oninput = () => { st.texte = champ.value; };
+    champ.onkeydown = e => {
+      if (e.key !== 'Enter' || e.isComposing) return;
+      e.preventDefault();
+      sousBrouillon.splice(i + 1, 0, { id: nouvelId(), texte: '', statut: 'a-faire' });
+      rendreSousTaches(i + 1);
+    };
+    const retirer = el('button', 'tache-action');
+    retirer.type = 'button';
+    retirer.append(icone('fermer'));
+    retirer.setAttribute('aria-label', `Retirer la sous-tâche ${i + 1}`);
+    retirer.onclick = () => { sousBrouillon.splice(i, 1); rendreSousTaches(); };
+    li.append(champ, retirer);
+    if (i === focus) requestAnimationFrame(() => champ.focus());
+    return li;
+  }));
+}
+$('ajouter-sous-tache').onclick = () => {
+  sousBrouillon.push({ id: nouvelId(), texte: '', statut: 'a-faire' });
+  rendreSousTaches(sousBrouillon.length - 1);
+};
+function ouvrirTache(t = null) {
+  tacheOuverte = t?.id ?? null;
+  $('titre-fenetre-tache').textContent = t ? 'Modifier la tâche' : 'Nouvelle tâche';
+  $('valider-tache').textContent = t ? 'Enregistrer' : 'Ajouter';
+  $('supprimer-tache').hidden = !t;
+  $('nouvelle-tache').value = t?.texte ?? '';
+  $('echeance-tache').value = t ? t.echeance ?? '' : etat.aujourdhui;
+  $('description-tache').value = t?.description ?? '';
+  choisirPriorite(t?.priorite ?? PRIORITE_DEFAUT);
+  sousBrouillon = (t?.sousTaches ?? []).map(x => ({ ...x }));
+  rendreSousTaches();
+  fenetreTache.showModal();
+  ajusterTexte($('nouvelle-tache'));
+  ajusterTexte($('description-tache'));
+  $('nouvelle-tache').focus();
+}
+// Le champ prend la hauteur de son texte ; Entrée enregistre (pas de retour à la ligne, comme avant).
+function ajusterTexte(champ) {
+  champ.style.height = 'auto';
+  champ.style.height = `${champ.scrollHeight + 2}px`;   // + les filets du haut et du bas
+}
+$('nouvelle-tache').oninput = e => ajusterTexte(e.target);
+$('description-tache').oninput = e => ajusterTexte(e.target);
+let prioriteChoisie = PRIORITE_DEFAUT;
+function choisirPriorite(n) {
+  prioriteChoisie = n;
+  for (const b of $('choix-priorite').children) b.setAttribute('aria-pressed', +b.dataset.p <= n);
+}
+for (const b of $('choix-priorite').children) b.onclick = () => choisirPriorite(+b.dataset.p);
+$('nouvelle-tache').onkeydown = e => { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); $('form-tache').requestSubmit(); } };
+function armerSuppression(armee) {
+  clearTimeout(minuteurSuppression);
+  const b = $('supprimer-tache');
+  b.classList.toggle('confirmer', armee);
+  b.replaceChildren(armee ? 'Supprimer ?' : icone('poubelle'));
+  b.setAttribute('aria-label', armee ? 'Confirmer la suppression' : 'Supprimer la tâche');
+  if (armee) minuteurSuppression = setTimeout(() => armerSuppression(false), 3000);
+}
+$('echeance-tache').value = etat.aujourdhui;
+$('ajouter-tache').onclick = () => ouvrirTache();
+$('fermer-tache').onclick = () => fenetreTache.close();
+fenetreTache.onclick = e => { if (e.target === fenetreTache) fenetreTache.close(); };
+fenetreTache.onclose = () => { tacheOuverte = null; sousBrouillon = []; rendreSousTaches(); armerSuppression(false); $('nouvelle-tache').value = ''; $('description-tache').value = ''; $('echeance-tache').value = etat.aujourdhui; };
+// Suppression en deux touches : la première demande confirmation (3 s).
+$('supprimer-tache').onclick = () => {
+  if (!$('supprimer-tache').classList.contains('confirmer')) return armerSuppression(true);
+  deleteDoc(ref('tasks', tacheOuverte)).catch(erreur);
+  fenetreTache.close();
+};
 $('form-tache').onsubmit = e => {
   e.preventDefault();
-  const texte = $('nouvelle-tache').value.trim();
-  if (!texte) return;
+  const texte = $('nouvelle-tache').value.replace(/\s*\n\s*/g, ' ').trim();   // un retour à la ligne collé devient une espace
+  if (!texte) return $('nouvelle-tache').focus();
   const echeance = $('echeance-tache').value || null;
-  $('nouvelle-tache').value = '';
-  $('echeance-tache').value = '';
-  addDoc(col('tasks'), { texte, echeance, fait: false, faitLe: null, creeLe: serverTimestamp() }).catch(erreur);
+  const sousTaches = sousBrouillon.map(x => ({ ...x, texte: x.texte.trim() })).filter(x => x.texte);
+  const description = $('description-tache').value.trim(), priorite = prioriteChoisie;
+  if (tacheOuverte) updateDoc(ref('tasks', tacheOuverte), { texte, description, priorite, echeance, sousTaches }).catch(erreur);
+  else addDoc(col('tasks'), { texte, description, priorite, echeance, fait: false, faitLe: null, enCours: false, sousTaches, creeLe: serverTimestamp() }).catch(erreur);
+  fenetreTache.close();
 };
 
 let minuteurToast;
@@ -1808,6 +2030,7 @@ function erreur(e) {
 function verifierJour() {
   const cle = cleDuJour(new Date());
   if (cle === etat.aujourdhui) return;
+  if (!$('fenetre-tache').open && $('echeance-tache').value === etat.aujourdhui) $('echeance-tache').value = cle;
   etat.aujourdhui = cle;
   if (etat.charge.size === 4) { figerSemainesPassees(); archiverDefi(); rendre(); }
 }
@@ -1840,7 +2063,7 @@ attendreGoogle().then(() => {
 onAuthStateChanged(auth, u => {
   arreterEcoute();
   if (u) { $('chargement').hidden = false; ecouter(u.uid); }
-  else { $('app').hidden = true; $('menu').hidden = true; fermerMenu(); $('chargement').hidden = true; $('ecran-connexion').hidden = false; }
+  else { $('app').hidden = true; $('navigation').hidden = true; $('chargement').hidden = true; $('ecran-connexion').hidden = false; }
 });
 $('deconnexion').onclick = () => signOut(auth);
 </script>
