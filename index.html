@@ -397,6 +397,17 @@
   .ligne-tache .date { grid-area: date; font-size: 13.5px; color: var(--texte); }
   .ligne-tache .date.retard { color: #a4512c; font-weight: 700; }
   .ligne-tache .description { grid-area: description; min-width: 0; font-size: 13.5px; color: var(--texte-doux); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  /* Historique : les tâches terminées les semaines précédentes, repliées sous le tableau, groupées par semaine. */
+  #voir-historique-taches {
+    justify-self: center; display: inline-flex; align-items: center; gap: 6px; border: 0; background: none;
+    padding: 10px 8px; color: var(--accent-texte); font-weight: 600; font-size: 14px;
+  }
+  #voir-historique-taches .fleche { display: inline-block; transition: transform .2s; }
+  #voir-historique-taches[aria-expanded="true"] .fleche { transform: rotate(180deg); }
+  #historique-taches { list-style: none; margin: 0; padding: 0; border: 1px solid var(--plat-filet); border-radius: 12px; background: var(--plat-fond); overflow: hidden; }
+  #historique-taches > li + li { border-top: 1px solid var(--plat-filet-doux); }
+  #historique-taches .semaine-faite { padding: 8px 16px 6px; font-size: 12.5px; font-weight: 600; color: var(--texte-doux); background: var(--plat-filet-doux); }
+  #historique-taches .tache-ouvrir .texte { color: var(--texte-doux); }
   .taches-vide { padding: 18px 16px; color: var(--texte-doux); font-size: 14px; text-align: center; }
   /* Statut : une étiquette plate teintée ; la toucher passe au statut suivant. */
   .statut { justify-self: start; border: 0; border-radius: 5px; padding: 3px 7px; font-size: 13px; white-space: nowrap; background: #ece4db; color: #5f544b; }
@@ -807,6 +818,8 @@
       </div>
       <ul id="liste-taches"></ul>
     </section>
+    <button id="voir-historique-taches" aria-expanded="false" aria-controls="historique-taches" hidden></button>
+    <ul id="historique-taches" hidden></ul>
  </div>
 
  <div id="ecran-reglages" hidden>
@@ -1786,6 +1799,43 @@ function boutonStatut(statut, nom, changer) {
   b.onclick = changer;
   return b;
 }
+// Une ligne du tableau (et celles de ses sous-tâches). Dans l'historique, la colonne date montre le jour où elle a été faite.
+function lignesTache(t, aujourdhui, historique = false) {
+  const statut = statutDe(t);
+  const sous = t.sousTaches ?? [];
+  const li = el('li', `ligne-tache tache-${statut}`);
+  const ouvrir = el('button', 'tache-ouvrir');
+  ouvrir.append(el('span', 'texte', t.texte));
+  if (sous.length) ouvrir.append(el('span', 'compte', `${sous.filter(x => x.statut === 'termine').length}/${sous.length} sous-tâche${sous.length > 1 ? 's' : ''}`));
+  ouvrir.setAttribute('aria-label', `Ouvrir « ${t.texte} »`);
+  ouvrir.onclick = () => ouvrirTache(t);
+  let date;
+  if (historique) {
+    date = el('span', 'date', t.faitLe ? formatDate(t.faitLe, { day: '2-digit', month: '2-digit' }) : '');
+    if (t.faitLe) date.title = `Faite le ${formatDate(t.faitLe, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}`;
+  } else {
+    const retard = statut !== 'termine' && t.echeance && t.echeance < aujourdhui;
+    date = el('span', `date${retard ? ' retard' : ''}`, t.echeance ? formatDate(t.echeance, { day: '2-digit', month: '2-digit' }) : '');
+    if (t.echeance) date.title = `${retard ? 'En retard · ' : 'Échéance : '}${echeanceEnTexte(t.echeance, aujourdhui)}`;
+  }
+  const suivant = STATUT_SUIVANT[statut];
+  li.append(ouvrir, etoiles(t.priorite ?? PRIORITE_DEFAUT), date, el('span', 'description', t.description ?? ''), boutonStatut(statut, t.texte, () => setDoc(ref('tasks', t.id),
+    { fait: suivant === 'termine', faitLe: suivant === 'termine' ? aujourdhui : null, enCours: suivant === 'en-cours' }, { merge: true }).catch(erreur)));
+  const lignes = [li];
+  for (const st of sous) {
+    const ls = el('li', `ligne-tache sous tache-${st.statut}`);
+    const o = el('button', 'tache-ouvrir');
+    o.append(el('span', 'texte', st.texte));
+    o.setAttribute('aria-label', `Ouvrir « ${t.texte} » (sous-tâche « ${st.texte} »)`);
+    o.onclick = () => ouvrirTache(t);
+    ls.append(o, boutonStatut(st.statut, st.texte, () => updateDoc(ref('tasks', t.id),
+      { sousTaches: sous.map(x => x.id === st.id ? { ...x, statut: STATUT_SUIVANT[x.statut] } : x) }).catch(erreur)));
+    lignes.push(ls);
+  }
+  return lignes;
+}
+let historiqueTachesOuvert = false;
+$('voir-historique-taches').onclick = () => { historiqueTachesOuvert = !historiqueTachesOuvert; rendreTaches(); };
 function rendreTaches() {
   const { aujourdhui } = etat;
   const dansLaSemaine = t => t.fait && t.faitLe && lundiDe(t.faitLe) === lundiDe(aujourdhui);
@@ -1794,36 +1844,31 @@ function rendreTaches() {
     .sort((x, y) => (x.fait - y.fait) || (!x.fait && ((x.echeance ? 0 : 1) - (y.echeance ? 0 : 1) || (x.echeance ?? '').localeCompare(y.echeance ?? ''))) || cree(x) - cree(y));
   const faites = etat.taches.filter(dansLaSemaine).length;
   $('compteur-taches').textContent = `${faites} tâche${faites > 1 ? 's' : ''} faite${faites > 1 ? 's' : ''} cette semaine`;
-  const lignes = [];
-  for (const t of visibles) {
-    const statut = statutDe(t);
-    const sous = t.sousTaches ?? [];
-    const li = el('li', `ligne-tache tache-${statut}`);
-    const ouvrir = el('button', 'tache-ouvrir');
-    ouvrir.append(el('span', 'texte', t.texte));
-    if (sous.length) ouvrir.append(el('span', 'compte', `${sous.filter(x => x.statut === 'termine').length}/${sous.length} sous-tâche${sous.length > 1 ? 's' : ''}`));
-    ouvrir.setAttribute('aria-label', `Ouvrir « ${t.texte} »`);
-    ouvrir.onclick = () => ouvrirTache(t);
-    const retard = statut !== 'termine' && t.echeance && t.echeance < aujourdhui;
-    const date = el('span', `date${retard ? ' retard' : ''}`, t.echeance ? formatDate(t.echeance, { day: '2-digit', month: '2-digit' }) : '');
-    if (t.echeance) date.title = `${retard ? 'En retard · ' : 'Échéance : '}${echeanceEnTexte(t.echeance, aujourdhui)}`;
-    const suivant = STATUT_SUIVANT[statut];
-    li.append(ouvrir, etoiles(t.priorite ?? PRIORITE_DEFAUT), date, el('span', 'description', t.description ?? ''), boutonStatut(statut, t.texte, () => setDoc(ref('tasks', t.id),
-      { fait: suivant === 'termine', faitLe: suivant === 'termine' ? aujourdhui : null, enCours: suivant === 'en-cours' }, { merge: true }).catch(erreur)));
-    lignes.push(li);
-    for (const st of sous) {
-      const ls = el('li', `ligne-tache sous tache-${st.statut}`);
-      const o = el('button', 'tache-ouvrir');
-      o.append(el('span', 'texte', st.texte));
-      o.setAttribute('aria-label', `Ouvrir « ${t.texte} » (sous-tâche « ${st.texte} »)`);
-      o.onclick = () => ouvrirTache(t);
-      ls.append(o, boutonStatut(st.statut, st.texte, () => updateDoc(ref('tasks', t.id),
-        { sousTaches: sous.map(x => x.id === st.id ? { ...x, statut: STATUT_SUIVANT[x.statut] } : x) }).catch(erreur)));
-      lignes.push(ls);
-    }
-  }
+  const lignes = visibles.flatMap(t => lignesTache(t, aujourdhui));
   if (!lignes.length) lignes.push(el('li', 'taches-vide', 'Aucune tâche pour l’instant.'));
   $('liste-taches').replaceChildren(...lignes);
+
+  // Historique : tâches terminées avant cette semaine, la plus récente d'abord, sous un titre par semaine.
+  const anciennes = etat.taches.filter(t => t.fait && !dansLaSemaine(t))
+    .sort((x, y) => (y.faitLe ?? '').localeCompare(x.faitLe ?? '') || cree(y) - cree(x));
+  const bouton = $('voir-historique-taches');
+  bouton.hidden = !anciennes.length;
+  if (!anciennes.length) historiqueTachesOuvert = false;
+  bouton.setAttribute('aria-expanded', historiqueTachesOuvert);
+  bouton.replaceChildren(`${historiqueTachesOuvert ? 'Masquer' : 'Voir'} l’historique (${anciennes.length} tâche${anciennes.length > 1 ? 's' : ''} terminée${anciennes.length > 1 ? 's' : ''})`, el('span', 'fleche', '▾'));
+  $('historique-taches').hidden = !historiqueTachesOuvert;
+  if (!historiqueTachesOuvert) return $('historique-taches').replaceChildren();
+  const histo = [];
+  let semaine;
+  for (const t of anciennes) {
+    const s = t.faitLe ? lundiDe(t.faitLe) : null;
+    if (!histo.length || s !== semaine) {
+      semaine = s;
+      histo.push(el('li', 'semaine-faite', s ? `Semaine du ${formatDate(s, { day: 'numeric', month: 'long', ...(s.slice(0, 4) !== aujourdhui.slice(0, 4) && { year: 'numeric' }) })}` : 'Date inconnue'));
+    }
+    histo.push(...lignesTache(t, aujourdhui, true));
+  }
+  $('historique-taches').replaceChildren(...histo);
 }
 
 // Calendrier en pixels : une ligne par semaine (la plus récente en haut), une case par jour.
